@@ -1,2 +1,0 @@
-serviceClass: ee.ut.client.GreetingService
-path: 9FC3B8EED34D684B506D5E38F6807364.gwt.rpc

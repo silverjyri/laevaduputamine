@@ -1,3 +1,0 @@
-# Module laevadepommitamine
-# RPC service class, partial path of RPC policy file
-ee.ut.client.GreetingService, 9FC3B8EED34D684B506D5E38F6807364.gwt.rpc
