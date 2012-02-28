@@ -63,7 +63,7 @@ public class Laevadepommitamine implements EntryPoint {
 				field.add(row);
 			}
 		}
-		
+
 		// Add the nameField and sendButton to the RootPanel
 		// Use RootPanel.get() to get the entire body element
 		RootPanel.get("nameFieldContainer").add(nameField);

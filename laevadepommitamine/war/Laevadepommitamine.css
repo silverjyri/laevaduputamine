@@ -36,7 +36,15 @@ h1 {
   margin: 15px 6px 6px;
 }
 
+#game {
+	margin-left: auto;
+	margin-right: auto;
+	width: 650px;
+}
+
 .field {
+	margin-left: 20px;
+	margin-right: 20px;
 	background-color:  #99CCFF;
 	border: 1px solid black;
 	padding: 10px;
