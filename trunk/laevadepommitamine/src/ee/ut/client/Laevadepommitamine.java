@@ -47,6 +47,23 @@ public class Laevadepommitamine implements EntryPoint {
 		// We can add style names to widgets
 		sendButton.addStyleName("sendButton");
 
+		int f = 1;
+		for (f = 1; f<=2; f++) {
+			RootPanel field = RootPanel.get("field" + f);
+			int i;
+			for (i=0; i<10; i++) {
+				int j;
+				HTML row = new HTML();
+				for (j=0; j<10; j++) {
+					HTML box = new HTML();
+					box.setStyleName("box");
+					box.getElement().setId("p" + f + "b" + i + j);
+					row.getElement().appendChild(box.getElement());
+				}
+				field.add(row);
+			}
+		}
+		
 		// Add the nameField and sendButton to the RootPanel
 		// Use RootPanel.get() to get the entire body element
 		RootPanel.get("nameFieldContainer").add(nameField);
