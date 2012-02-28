@@ -79,8 +79,10 @@ public class Laevadepommitamine implements EntryPoint {
 	
 	public void onModuleLoad() {
 		final Button newButton = new Button("Alusta m&auml;ngu");
+		newButton.setStylePrimaryName("button");
 		final Button loginButton = new Button("Logi sisse");
-
+		loginButton.setStylePrimaryName("button");
+		
 		RootPanel menu = RootPanel.get("menu");
 		menu.add(newButton);
 		menu.add(loginButton);
