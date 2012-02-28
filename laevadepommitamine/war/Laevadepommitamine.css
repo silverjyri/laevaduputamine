@@ -70,3 +70,8 @@ h1 {
 .box:hover {
 	background-color: #88BBEE;
 }
+
+.ship_single {
+	background-image: url('img/vertic4.png');
+	background-size: cover;
+}
