@@ -3,18 +3,15 @@ package ee.ut.client;
 import java.util.Arrays;
 import java.util.List;
 
-import com.gargoylesoftware.htmlunit.javascript.host.Document;
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
-import com.google.gwt.event.dom.client.MouseMoveEvent;
-import com.google.gwt.event.dom.client.MouseMoveHandler;
 import com.google.gwt.user.cellview.client.CellList;
 import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy.KeyboardSelectionPolicy;
-import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HTML;
@@ -42,10 +39,18 @@ public class Laevadepommitamine implements EntryPoint {
 			field.addDomHandler(new MouseDownHandler() {
 				@Override
 				public void onMouseDown(MouseDownEvent event) {
+					if (event.getNativeButton() != com.google.gwt.dom.client.NativeEvent.BUTTON_LEFT) {
+						return;
+					}
+					
 					RootPanel field = (RootPanel) event.getSource();
+					char p = field.getElement().getId().charAt(5);
 					int x = (event.getX() - 6) / 33;
 					int y = (event.getY() - 6) / 33;
-					Window.alert("" + x + " " + y);
+					RootPanel target = RootPanel.get("p" + p + "b" + y + x);
+					if (target != null) {
+						target.addStyleName("ship_single");
+					}
 				}
 			}, MouseDownEvent.getType());
 			
