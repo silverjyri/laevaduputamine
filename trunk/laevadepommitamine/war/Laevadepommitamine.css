@@ -75,3 +75,29 @@ h1 {
 	background-image: url('img/vertic4.png');
 	background-size: cover;
 }
+
+.ship_horizontal_1 {
+	background-image: url('img/vertic1.png');
+	background-size: cover;
+}
+.ship_horizontal_2 {
+	background-image: url('img/vertic2.png');
+	background-size: cover;
+}
+.ship_horizontal_3 {
+	background-image: url('img/vertic3.png');
+	background-size: cover;
+}
+
+.ship_vertical_1 {
+	background-image: url('img/horis3.png');
+	background-size: cover;
+}
+.ship_vertical_2 {
+	background-image: url('img/horis2.png');
+	background-size: cover;
+}
+.ship_vertical_3 {
+	background-image: url('img/horis1.png');
+	background-size: cover;
+}

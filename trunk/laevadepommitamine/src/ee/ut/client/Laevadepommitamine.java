@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
@@ -24,6 +23,53 @@ import com.google.gwt.view.client.SingleSelectionModel;
  */
 public class Laevadepommitamine implements EntryPoint {
 
+	private String getFieldId(int player, int row, int column) {
+		return "p" + player + "b" + row + column;
+	}
+
+	private RootPanel getField(int player, int row, int column) {
+		return RootPanel.get(getFieldId(player, row, column));
+	}
+	
+	private void placeShip(int player, int row, int column, int length, boolean vertical) {
+		if (length == 1) {
+			RootPanel field = getField(player, row, column);
+			field.addStyleName("ship_single");
+			return;
+		}
+
+		int i;
+		for (i=0; i<length; i++)
+		{
+			RootPanel field;
+			if (vertical) {
+				field = getField(player, row + i, column);
+				if (field == null) {
+					return;
+				}
+				if (i == 0) {
+					field.addStyleName("ship_vertical_1");
+				} else if (i == length - 1) {
+					field.addStyleName("ship_vertical_3");
+				} else {
+					field.addStyleName("ship_vertical_2");
+				}
+			} else {
+				field = getField(player, row, column + i);
+				if (field == null) {
+					return;
+				}
+				if (i == 0) {
+					field.addStyleName("ship_horizontal_1");
+				} else if (i == length - 1) {
+					field.addStyleName("ship_horizontal_3");
+				} else {
+					field.addStyleName("ship_horizontal_2");
+				}
+			}
+		}
+	}
+	
 	public void onModuleLoad() {
 		final Button newButton = new Button("Alusta m&auml;ngu");
 		final Button loginButton = new Button("Logi sisse");
@@ -44,13 +90,10 @@ public class Laevadepommitamine implements EntryPoint {
 					}
 					
 					RootPanel field = (RootPanel) event.getSource();
-					char p = field.getElement().getId().charAt(5);
-					int x = (event.getX() - 6) / 33;
-					int y = (event.getY() - 6) / 33;
-					RootPanel target = RootPanel.get("p" + p + "b" + y + x);
-					if (target != null) {
-						target.addStyleName("ship_single");
-					}
+					int p = Integer.parseInt(field.getElement().getId().substring(5, 6));
+					int col = (event.getX() - 6) / 33;
+					int row = (event.getY() - 6) / 33;
+					placeShip(p, row, col, 1, false);
 				}
 			}, MouseDownEvent.getType());
 			
@@ -61,13 +104,19 @@ public class Laevadepommitamine implements EntryPoint {
 				for (j=0; j<10; j++) {
 					HTML box = new HTML();
 					box.setStyleName("box");
-					box.getElement().setId("p" + f + "b" + i + j);
+					box.getElement().setId(getFieldId(f, i, j));
 					row.getElement().appendChild(box.getElement());
 				}
 				field.add(row);
 			}
 		}
 
+		placeShip(1, 0, 0, 1, false);
+		placeShip(1, 2, 4, 2, true);
+		placeShip(1, 5, 3, 3, false);
+		placeShip(1, 3, 8, 4, true);
+		placeShip(1, 8, 2, 5, false);
+		
 		newButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
 
