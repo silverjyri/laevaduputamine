@@ -70,6 +70,13 @@ public class Laevadepommitamine implements EntryPoint {
 		}
 	}
 	
+	private void placeHit(int player, int row, int column) {
+		RootPanel field = getField(player, row, column);
+		if (field != null) {
+			field.addStyleName("bomb");
+		}
+	}
+	
 	public void onModuleLoad() {
 		final Button newButton = new Button("Alusta m&auml;ngu");
 		final Button loginButton = new Button("Logi sisse");
@@ -93,7 +100,11 @@ public class Laevadepommitamine implements EntryPoint {
 					int p = Integer.parseInt(field.getElement().getId().substring(5, 6));
 					int col = (event.getX() - 6) / 33;
 					int row = (event.getY() - 6) / 33;
-					placeShip(p, row, col, 1, false);
+					if (p == 1) {
+						placeShip(p, row, col, 1, false);
+					} else {
+						placeHit(p, row, col);
+					}
 				}
 			}, MouseDownEvent.getType());
 			
@@ -116,6 +127,9 @@ public class Laevadepommitamine implements EntryPoint {
 		placeShip(1, 5, 3, 3, false);
 		placeShip(1, 3, 8, 4, true);
 		placeShip(1, 8, 2, 5, false);
+		placeHit(1, 4, 8);
+		placeHit(2, 1, 6);
+		placeHit(2, 6, 7);
 		
 		newButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
