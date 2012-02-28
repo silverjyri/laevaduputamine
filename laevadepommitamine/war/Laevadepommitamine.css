@@ -21,6 +21,15 @@ h1 {
   margin: 0px;
   text-align: center;
 }
+.button {
+	border-color:#99CCFF;
+	border-width: medium;
+	font-size: 12pt;
+	font-family: monospace;
+	font-weight:bold;
+	text-align: center;	
+	color:green;
+}
 
 #menu {
 	margin: 10px;
@@ -32,6 +41,7 @@ h1 {
 
 .list {
 	background-color: white;
+	color:green;
 	margin: 10px;
 	float: left;
 	width: 200px;
