@@ -32,3 +32,16 @@ h1 {
 #closeButton {
   margin: 15px 6px 6px;
 }
+
+.field {
+	border: 1px solid black;
+	padding: 10px;
+	float: left;
+}
+
+.box {
+	border: 1px solid grey;
+	width: 24px;
+	height: 24px;
+	float: left;
+}
