@@ -64,6 +64,8 @@ h1 {
 	width: 32px;
 	height: 32px;
 	float: left;
+	margin-right: -1px;
+	margin-bottom: -1px;
 }
 .box:hover {
 	background-color: #88BBEE;
