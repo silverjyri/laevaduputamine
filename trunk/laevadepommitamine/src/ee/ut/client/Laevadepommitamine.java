@@ -96,7 +96,7 @@ public class Laevadepommitamine implements EntryPoint {
 	    // Add a selection model to handle user selection.
 	    final SingleSelectionModel<String> selectionModel2 = new SingleSelectionModel<String>();
 	    cellList.setSelectionModel(selectionModel2);
-	    selectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
+	    selectionModel2.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
 	      public void onSelectionChange(SelectionChangeEvent event) {
 	        String selected = selectionModel2.getSelectedObject();
 	        if (selected != null) {
