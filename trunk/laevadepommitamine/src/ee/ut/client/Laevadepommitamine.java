@@ -3,12 +3,18 @@ package ee.ut.client;
 import java.util.Arrays;
 import java.util.List;
 
+import com.gargoylesoftware.htmlunit.javascript.host.Document;
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.MouseDownEvent;
+import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.event.dom.client.MouseMoveEvent;
+import com.google.gwt.event.dom.client.MouseMoveHandler;
 import com.google.gwt.user.cellview.client.CellList;
 import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy.KeyboardSelectionPolicy;
+import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HTML;
@@ -32,6 +38,17 @@ public class Laevadepommitamine implements EntryPoint {
 		int f = 1;
 		for (f = 1; f<=2; f++) {
 			RootPanel field = RootPanel.get("field" + f);
+		
+			field.addDomHandler(new MouseDownHandler() {
+				@Override
+				public void onMouseDown(MouseDownEvent event) {
+					RootPanel field = (RootPanel) event.getSource();
+					int x = (event.getX() - 6) / 33;
+					int y = (event.getY() - 6) / 33;
+					Window.alert("" + x + " " + y);
+				}
+			}, MouseDownEvent.getType());
+			
 			int i;
 			for (i=0; i<10; i++) {
 				int j;
@@ -51,8 +68,8 @@ public class Laevadepommitamine implements EntryPoint {
 
 			}
 		});
-		
-		
+
+
 		final List<String> games = Arrays.asList("Game 1", "Game 2",
 			      "Game 3", "Game 4");
 		
