@@ -9,6 +9,10 @@ html {
 	-o-background-size: cover;
 	background-size: cover;;
 }
+body {
+	background: none !important;
+}
+
 h1 {
   font-family:monospace;
   font-size:4em;
@@ -34,6 +38,29 @@ h1 {
 /** Set ids using widget.getElement().setId("idOfElement") */
 #closeButton {
   margin: 15px 6px 6px;
+}
+
+#menu {
+	margin: 10px;
+}
+
+#lists {
+	float: left;
+}
+
+.list {
+	background-color: white;
+	margin: 10px;
+	float: left;
+	width: 200px;
+	overflow-y: auto;
+	height: 50px;
+}
+
+#gamelist {
+}
+
+#playerlist {
 }
 
 #game {
