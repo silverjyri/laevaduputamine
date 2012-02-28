@@ -101,3 +101,8 @@ h1 {
 	background-image: url('img/horis1.png');
 	background-size: cover;
 }
+
+.bomb {
+	background-image: url('img/bomb.png');
+	background-size: cover;
+}
