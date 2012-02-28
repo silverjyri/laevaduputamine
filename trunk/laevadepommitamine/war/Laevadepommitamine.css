@@ -2,6 +2,13 @@
 
 
 /** Example rules used by the template application (remove for your app) */
+html {
+   background: url(img/Radar.png) no-repeat center center fixed;
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	-o-background-size: cover;
+	background-size: cover;;
+}
 h1 {
   font-size: 2em;
   font-weight: bold;
