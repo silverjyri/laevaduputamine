@@ -82,10 +82,16 @@ public class Laevadepommitamine implements EntryPoint {
 		newButton.setStylePrimaryName("button");
 		final Button loginButton = new Button("Logi sisse");
 		loginButton.setStylePrimaryName("button");
+		final Button scoreButton = new Button("Edetabel");
+		scoreButton.setStylePrimaryName("button");
+		final Button historyButton = new Button("Ajalugu");
+		historyButton.setStylePrimaryName("button");
 		
 		RootPanel menu = RootPanel.get("menu");
 		menu.add(newButton);
 		menu.add(loginButton);
+		menu.add(scoreButton);
+		menu.add(historyButton);
 		
 		int f = 1;
 		for (f = 1; f<=2; f++) {
