@@ -5,12 +5,14 @@ import java.util.List;
 
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.user.cellview.client.CellList;
 import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy.KeyboardSelectionPolicy;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HTML;
@@ -27,32 +29,33 @@ public class Laevadepommitamine implements EntryPoint {
 		return "p" + player + "b" + row + column;
 	}
 
-	private RootPanel getField(int player, int row, int column) {
-		return RootPanel.get(getFieldId(player, row, column));
+	private com.google.gwt.dom.client.Element getField(int player, int row, int column) {
+		return Document.get().getElementById(getFieldId(player, row, column));
+		//return RootPanel.get(getFieldId(player, row, column));
 	}
 	
 	private void placeShip(int player, int row, int column, int length, boolean vertical) {
 		if (length == 1) {
-			RootPanel field = getField(player, row, column);
-			field.addStyleName("ship_single");
+			com.google.gwt.dom.client.Element field = getField(player, row, column);
+			field.addClassName("ship_single");
 			return;
 		}
 
 		int i;
 		for (i=0; i<length; i++)
 		{
-			RootPanel field;
+			com.google.gwt.dom.client.Element field;
 			if (vertical) {
 				field = getField(player, row + i, column);
 				if (field == null) {
 					return;
 				}
 				if (i == 0) {
-					field.addStyleName("ship_vertical_1");
+					field.addClassName("ship_vertical_1");
 				} else if (i == length - 1) {
-					field.addStyleName("ship_vertical_3");
+					field.addClassName("ship_vertical_3");
 				} else {
-					field.addStyleName("ship_vertical_2");
+					field.addClassName("ship_vertical_2");
 				}
 			} else {
 				field = getField(player, row, column + i);
@@ -60,20 +63,20 @@ public class Laevadepommitamine implements EntryPoint {
 					return;
 				}
 				if (i == 0) {
-					field.addStyleName("ship_horizontal_1");
+					field.addClassName("ship_horizontal_1");
 				} else if (i == length - 1) {
-					field.addStyleName("ship_horizontal_3");
+					field.addClassName("ship_horizontal_3");
 				} else {
-					field.addStyleName("ship_horizontal_2");
+					field.addClassName("ship_horizontal_2");
 				}
 			}
 		}
 	}
 	
 	private void placeHit(int player, int row, int column) {
-		RootPanel field = getField(player, row, column);
+		com.google.gwt.dom.client.Element field = getField(player, row, column);
 		if (field != null) {
-			field.addStyleName("bomb");
+			field.addClassName("bomb");
 		}
 	}
 	
