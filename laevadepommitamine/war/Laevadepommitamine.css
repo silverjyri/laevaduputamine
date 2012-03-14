@@ -149,3 +149,8 @@ h1 {
 	background-image: url('img/bomb.png');
 	background-size: cover;
 }
+.sunk {
+	background-image: url('img/sunk.png');
+	background-size: cover;
+}
+
