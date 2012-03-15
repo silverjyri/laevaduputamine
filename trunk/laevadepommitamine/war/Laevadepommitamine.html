@@ -10,12 +10,16 @@
     <link type="text/css" rel="stylesheet" href="Laevadepommitamine.css">
     <title>Laevade pommitamine</title>
     
-    <!--                                           -->
-    <!-- This script loads your compiled module.   -->
-    <!-- If you add any GWT meta tags, they must   -->
-    <!-- be added before this line.                -->
-    <!--                                           -->
-    <script type="text/javascript" language="javascript" src="laevadepommitamine/laevadepommitamine.nocache.js"></script>
+    <!-- LAB.js loads scripts that depend on each other -->
+    <script type="text/javascript" src="lib/LAB.js"></script>
+	<script>
+	  $LAB
+	    .script("lib/jquery-1.7.1.js")
+	    .wait()
+	    .script("Client.js")
+	    .wait()
+	    .script("laevadepommitamine/laevadepommitamine.nocache.js");
+	</script>
   </head>
 
   <body>
@@ -31,15 +35,16 @@
       </div>
     </noscript>
 
+	<h1>Laevade pommitamine</h1>
+
+	<!-- Siia sisse pannakse erinevad ekraanid (lobby, asetus, game) -->
+	<div id="screen-container">
+	</div>
+<!--
 	<div id="game">
-    	<h1>Laevade pommitamine</h1>
-		<div id="menu"></div>
-		<div id="lists">
-			<div id="gamelist" class="list"></div>
-			<div id="playerlist" class="list"></div>
-		</div>
 		<div id="field1" class="field"></div>
 		<div id="field2" class="field"></div>
 	</div>
+-->
   </body>
 </html>
