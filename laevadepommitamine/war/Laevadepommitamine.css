@@ -51,7 +51,7 @@ h1 {
 	margin: 10px;
 }
 
-#lists {
+#lobby {
 	float: left;
 }
 
@@ -82,7 +82,7 @@ h1 {
 	
 }
 
-#game {
+#screen-container {
 	margin-left: auto;
 	margin-right: auto;
 	width: 800px;

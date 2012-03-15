@@ -81,21 +81,7 @@ public class Laevadepommitamine implements EntryPoint {
 	}
 	
 	public void onModuleLoad() {
-		final Button newButton = new Button("Alusta m&auml;ngu");
-		newButton.setStylePrimaryName("button");
-		final Button loginButton = new Button("Logi sisse");
-		loginButton.setStylePrimaryName("button");
-		final Button scoreButton = new Button("Edetabel");
-		scoreButton.setStylePrimaryName("button");
-		final Button historyButton = new Button("Ajalugu");
-		historyButton.setStylePrimaryName("button");
-		
-		RootPanel menu = RootPanel.get("menu");
-		menu.add(newButton);
-		menu.add(loginButton);
-		menu.add(scoreButton);
-		menu.add(historyButton);
-		
+		return;/*
 		int f = 1;
 		for (f = 1; f<=2; f++) {
 			RootPanel field = RootPanel.get("field" + f);
@@ -209,6 +195,6 @@ public class Laevadepommitamine implements EntryPoint {
 	    cellList.setRowData(0, players);
 
 	    // Add it to the root panel.
-	    RootPanel.get("playerlist").add(cellList);
+	    RootPanel.get("playerlist").add(cellList);*/
 	}
 }
