@@ -6,13 +6,13 @@ import java.util.List;
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.user.cellview.client.CellList;
 import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy.KeyboardSelectionPolicy;
-import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HTML;
@@ -29,14 +29,14 @@ public class Laevadepommitamine implements EntryPoint {
 		return "p" + player + "b" + row + column;
 	}
 
-	private com.google.gwt.dom.client.Element getField(int player, int row, int column) {
+	private Element getField(int player, int row, int column) {
 		return Document.get().getElementById(getFieldId(player, row, column));
 		//return RootPanel.get(getFieldId(player, row, column));
 	}
 	
 	private void placeShip(int player, int row, int column, int length, boolean vertical) {
 		if (length == 1) {
-			com.google.gwt.dom.client.Element field = getField(player, row, column);
+			Element field = getField(player, row, column);
 			field.addClassName("ship_single");
 			return;
 		}
@@ -44,7 +44,7 @@ public class Laevadepommitamine implements EntryPoint {
 		int i;
 		for (i=0; i<length; i++)
 		{
-			com.google.gwt.dom.client.Element field;
+			Element field;
 			if (vertical) {
 				field = getField(player, row + i, column);
 				if (field == null) {
@@ -74,7 +74,7 @@ public class Laevadepommitamine implements EntryPoint {
 	}
 	
 	private void placeHit(int player, int row, int column) {
-		com.google.gwt.dom.client.Element field = getField(player, row, column);
+		Element field = getField(player, row, column);
 		if (field != null) {
 			field.addClassName("bomb");
 		}
