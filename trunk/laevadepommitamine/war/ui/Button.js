@@ -8,13 +8,17 @@ function Button(text, options) {
 }
 
 Button.prototype = {
+onRender: function() {
+	if (this.scope) {
+		this.el.click($.proxy(this.fn, this.scope));
+	} else {
+		this.el.click(this.fn);
+	}
+},
 render: function() {
 	var el = $('<button type="button" class="button">' + this.text + '</button>');
-	if (this.scope) {
-		el.click($.proxy(this.fn, this.scope));
-	} else {
-		el.click(this.fn);
-	}
+	this.el = el;
+	this.onRender();
 	return el;
 }
 };

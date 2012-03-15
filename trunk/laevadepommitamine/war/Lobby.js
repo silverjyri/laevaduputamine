@@ -5,22 +5,30 @@ Lobby.prototype = new Screen();
 Lobby.constructor = Lobby;
 
 Lobby.prototype.render = function() {
+	if (this.el) {
+		this.startBtn.onRender();
+		this.loginBtn.onRender();
+		this.chartBtn.onRender();
+		this.historyBtn.onRender();
+		return this.el;
+	}
+	
 	var el = $('<div id="lobby" class="screen">' +
 		'<div id="menu"></div>' +
 		'<div id="lists"></div>' +
 	'</div>');
 	
 	var menu = el.children("#menu");
-	var startBtn = new Button("Alusta m&auml;ngu", {scope: this, fn: function() {
-		this.gamesList.remove("Game 5");
+	this.startBtn = new Button("Alusta m&auml;ngu", {scope: this, fn: function() {
+		Client.startPlacement();
 	}});
-	var loginBtn = new Button("Logi sisse");
-	var chartBtn = new Button("Edetabel");
-	var historyBtn = new Button("Ajalugu");
-	menu.append(startBtn.render());
-	menu.append(loginBtn.render());
-	menu.append(chartBtn.render());
-	menu.append(historyBtn.render());
+	this.loginBtn = new Button("Logi sisse");
+	this.chartBtn = new Button("Edetabel");
+	this.historyBtn = new Button("Ajalugu");
+	menu.append(this.startBtn.render());
+	menu.append(this.loginBtn.render());
+	menu.append(this.chartBtn.render());
+	menu.append(this.historyBtn.render());
 
 	var lists = el.children("#lists");
 	var gamesList = new ListBox({id: "gameslist"});
