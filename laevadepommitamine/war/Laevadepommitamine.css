@@ -74,6 +74,10 @@ h1 {
 	height: 60px;
 }
 
+.listitem {
+	cursor: pointer;
+}
+
 #gamelist {
 	
 }
@@ -82,7 +86,7 @@ h1 {
 	
 }
 
-#screen-container {
+#screen_container {
 	margin-left: auto;
 	margin-right: auto;
 	width: 800px;
