@@ -7,9 +7,17 @@ $LAB
 .wait()
 .script("ui/ListBox.js")
 .script("Lobby.js")
-.wait();
-
-$(document).ready(function() {
-	this.lobby = new Lobby();
-	$("#screen_container").append(this.lobby.render());
+.script("Placement.js")
+.wait(function() {
+	Client.startLobby();
 });
+
+Client.startLobby = function() {
+	this.lobby = this.lobby || new Lobby();
+	$("#screen_container").html(this.lobby.render());
+};
+
+Client.startPlacement = function() {
+	this.placement = this.placement || new Placement();
+	$("#screen_container").html(this.placement.render());
+};
