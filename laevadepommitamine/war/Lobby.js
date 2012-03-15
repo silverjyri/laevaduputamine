@@ -11,7 +11,9 @@ Lobby.prototype.render = function() {
 	'</div>');
 	
 	var menu = el.children("#menu");
-	var startBtn = new Button("Alusta m&auml;ngu");
+	var startBtn = new Button("Alusta m&auml;ngu", {scope: this, fn: function() {
+		this.gamesList.remove("Game 5");
+	}});
 	var loginBtn = new Button("Logi sisse");
 	var chartBtn = new Button("Edetabel");
 	var historyBtn = new Button("Ajalugu");
@@ -28,6 +30,7 @@ Lobby.prototype.render = function() {
 	gamesList.add("Game 5");
 	gamesList.add("Game 6");
 	gamesList.add("Game 7");
+	this.gamesList = gamesList;
 	var playersList = new ListBox({id: "playerslist"});
 	menu.append(gamesList.render());
 	menu.append(playersList.render());
