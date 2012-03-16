@@ -24,11 +24,13 @@ onMouseDown: function(e) {
 		$(document).mouseup(this, $.proxy(this.onMouseUp, this));
 	}
 },
+
 onRender: function() {
 	if (this.onDrag) {
 		this.el.mousedown(this, $.proxy(this.onMouseDown, this));
 	}
 },
+
 render: function() {
 	if (this.el) {
 		return this.el;
@@ -84,13 +86,22 @@ render: function() {
 	this.onRender();
 	return el;
 },
+
 clone: function() {
 	return new ShipFloating(this.length, this.vertical, {left: this.left, top: this.top});
 },
+
 dragTo: function(x, y) {
 	this.el.css({left:x, top:y});
 },
 dragBy: function(x, y) {
 	this.dragTo(x+this.left, y+this.top);
+},
+
+position: function() {
+	if(this.el) {
+		return {left: this.el.css('left'), top: this.el.css('top')};
+	}
+	return {left: this.left, top: this.top};
 }
 };

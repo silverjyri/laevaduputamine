@@ -176,3 +176,10 @@ h1 {
 	color: white;
 	position: absolute;
 }
+
+.ship_preview_valid {
+	background-color: green;
+}
+.ship_preview_invalid {
+	background-color: red;
+}
