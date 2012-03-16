@@ -53,31 +53,30 @@ render: function() {
 	if (this.length == 1) {
 		el.append('<div class="box_floating ship_single"><div>');
 	} else {
+		var i;
 		if (this.vertical) {
-			var i;
 			for (i = 0; i < this.length; i++) {
-				var ship = $('<div class="box_floating" style="clear:left;"><div>');
+				var box = $('<div class="box_floating" style="clear:left;"><div>');
 				if (i == 0) {
-					ship.addClass("ship_vertical_1");
+					box.addClass("ship_vertical_1");
 				} else if (i == this.length - 1) {
-					ship.addClass("ship_vertical_3");
+					box.addClass("ship_vertical_3");
 				} else {
-					ship.addClass("ship_vertical_2");
+					box.addClass("ship_vertical_2");
 				}
-				el.append(ship);
+				el.append(box);
 			}
 		} else {
-			var i;
 			for (i = 0; i < this.length; i++) {
-				var ship = $('<div class="box_floating"><div>');
+				var box = $('<div class="box_floating"><div>');
 				if (i == 0) {
-					ship.addClass("ship_horizontal_1");
+					box.addClass("ship_horizontal_1");
 				} else if (i == this.length - 1) {
-					ship.addClass("ship_horizontal_3");
+					box.addClass("ship_horizontal_3");
 				} else {
-					ship.addClass("ship_horizontal_2");
+					box.addClass("ship_horizontal_2");
 				}
-				el.append(ship);
+				el.append(box);
 			}
 		}
 	}

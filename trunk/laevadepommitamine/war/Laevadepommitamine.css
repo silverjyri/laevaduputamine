@@ -178,8 +178,8 @@ h1 {
 }
 
 .ship_preview_valid {
-	background-color: green;
+	background-color: #88FFC0;
 }
 .ship_preview_invalid {
-	background-color: red;
+	background-color: #C880A0;
 }

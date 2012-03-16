@@ -33,6 +33,15 @@ render: function() {
 },
 
 verifyShipLocation: function(x, y, length, vertical) {
+	if (vertical) {
+		if (y + length > 10) {
+			return false;
+		}
+	} else {
+		if (x + length > 10) {
+			return false;
+		}
+	}
 	return true;
 },
 
@@ -66,7 +75,44 @@ clearShipPreview: function() {
 	}
 },
 
-addShip: function(ship) {
+addShip: function(x, y, length, vertical) {
+	if (!this.verifyShipLocation(x, y, length, vertical)) {
+		return false;
+	}
+	var ship = {x:y, y:y, length:length, vertical:vertical};
+	this.ships[this.ships.length] = ship;
+
+	if (length == 1) {
+		var box = $('#'+this.getBoxId(x, y));
+		box.addClass('ship_single');
+		return true;
+	}
 	
+	var i;
+	if (vertical) {
+		for (i = 0; i < length; i++) {
+			var box = $('#'+this.getBoxId(x, y + i));
+			if (i == 0) {
+				box.addClass("ship_vertical_1");
+			} else if (i == length - 1) {
+				box.addClass("ship_vertical_3");
+			} else {
+				box.addClass("ship_vertical_2");
+			}
+		}
+	} else {
+		for (i = 0; i < length; i++) {
+			var box = $('#'+this.getBoxId(x + i, y));
+			if (i == 0) {
+				box.addClass("ship_horizontal_1");
+			} else if (i == length - 1) {
+				box.addClass("ship_horizontal_3");
+			} else {
+				box.addClass("ship_horizontal_2");
+			}
+		}
+	}
+	
+	return true;
 }
 };
