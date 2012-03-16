@@ -33,21 +33,26 @@ render: function() {
 },
 
 verifyShipLocation: function(x, y, length, vertical) {
-	if (vertical) {
-		if (y + length > 10) {
-			return false;
-		}
-	} else {
-		if (x + length > 10) {
-			return false;
+	if ((vertical ? y : x) + length > 10) {
+		return false;
+	}
+
+	var valid = true;
+	var ships = this.ships;
+	for (i in ships) {
+		var ship = ships[i];
+		var sx = ship.x;
+		var sy = ship.y;
+		var w = vertical ? 1 : length;
+		var h = vertical ? length : 1;
+		var sw = ship.vertical ? 1 : ship.length;
+		var sh = ship.vertical ? ship.length : 1;
+		if ((x + w >= sx) && (x <= sx + sw) && (y + h >= sy) && (y <= sy +sh)) {
+			valid = false;
 		}
 	}
 	
-	$.each(this.ships, function(index, value) {
-
-	});
-	
-	return true;
+	return valid;
 },
 
 showShipPreview: function(x, y, length, vertical) {
@@ -84,7 +89,7 @@ addShip: function(x, y, length, vertical) {
 	if (!this.verifyShipLocation(x, y, length, vertical)) {
 		return false;
 	}
-	var ship = {x:y, y:y, length:length, vertical:vertical};
+	var ship = {x:x, y:y, length:length, vertical:vertical};
 	this.ships[this.ships.length] = ship;
 
 	if (length == 1) {
