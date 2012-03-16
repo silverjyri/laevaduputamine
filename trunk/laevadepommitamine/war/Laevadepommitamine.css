@@ -51,10 +51,6 @@ h1 {
 	margin: 10px;
 }
 
-#lobby {
-	float: left;
-}
-
 .list {
 	border-top: 1px solid #96d1f8;
 	background: #1eba48;
@@ -76,14 +72,6 @@ h1 {
 
 .listitem {
 	cursor: pointer;
-}
-
-#gamelist {
-	
-}
-
-#playerlist {
-	
 }
 
 #screen_container {
@@ -158,3 +146,21 @@ h1 {
 	background-size: cover;
 }
 
+.ship_container {
+	background-color: #99CCFF;
+	width: 200px;
+	height: 200px;
+	float: left;
+	position: relative;
+}
+
+.ship_floating {
+	position: absolute;
+}
+
+.box_floating {
+	border: none;
+	width: 32px;
+	height: 32px;
+	float: left;
+}

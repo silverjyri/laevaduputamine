@@ -6,11 +6,16 @@ $LAB
 .script("Screen.js")
 .wait()
 .script("ui/ListBox.js")
+.wait()
 .script("Lobby.js")
+.wait(function() {
+	//Client.startLobby();
+})
+.script("ShipFloating.js")
 .script("Placement.js")
 .script("Field.js")
 .wait(function() {
-	Client.startLobby();
+	Client.startPlacement();
 });
 
 Client.startLobby = function() {
