@@ -29,6 +29,9 @@ Placement.prototype.render = function() {
 	menu.append(this.chartBtn.render());
 	menu.append(this.historyBtn.render());
 
+	this.p1 = new Field("1");
+	el.append(this.p1.render());
+	
 	this.el = el;
 	return el;
 };

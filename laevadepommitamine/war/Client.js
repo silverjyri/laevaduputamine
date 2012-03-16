@@ -8,6 +8,7 @@ $LAB
 .script("ui/ListBox.js")
 .script("Lobby.js")
 .script("Placement.js")
+.script("Field.js")
 .wait(function() {
 	Client.startLobby();
 });
