@@ -18,9 +18,9 @@ onMouseUp: function(e) {
 	$(document).off('mouseup', this.onMouseUp);
 },
 onMouseDown: function(e) {
-	$.proxy(this.onDrag, this.scope)(e, e.data);
+	var canDrag = $.proxy(this.onDrag, this.scope)(e, e.data);
 
-	if (this.onDrop) {
+	if (canDrag && this.onDrop) {
 		$(document).mouseup(this, $.proxy(this.onMouseUp, this));
 	}
 },
