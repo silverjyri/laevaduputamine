@@ -15,7 +15,7 @@ function ShipFloating(length, vertical, options) {
 ShipFloating.prototype = {
 onMouseUp: function(e) {
 	$.proxy(this.onDrop, this.scope)(e, e.data);
-	$(document).off('mouseup');
+	$(document).off('mouseup', this.onMouseUp);
 },
 onMouseDown: function(e) {
 	$.proxy(this.onDrag, this.scope)(e, e.data);
@@ -41,8 +41,12 @@ render: function() {
 	if (this.top) {
 		el.css('top', this.top);
 	}
-	el.css('width', this.length * 32);
-	el.css('height', this.top * 32);
+	
+	if (this.vertical) {
+		el.css({width: 32, height: this.length * 32});
+	} else {
+		el.css({width: this.length * 32, height: 32});
+	}
 	
 	if (this.length == 1) {
 		el.append('<div class="box_floating ship_single"><div>');
@@ -83,7 +87,10 @@ render: function() {
 clone: function() {
 	return new ShipFloating(this.length, this.vertical, {left: this.left, top: this.top});
 },
+dragTo: function(x, y) {
+	this.el.css({left:x, top:y});
+},
 dragBy: function(x, y) {
-	this.el.css({left:(x + this.left), top:(y + this.top)});
+	this.dragTo(x+this.left, y+this.top);
 }
 };
