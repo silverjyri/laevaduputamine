@@ -4,6 +4,19 @@ function Placement() {
 Placement.prototype = new Screen();
 Placement.constructor = Placement;
 
+Placement.prototype.getEventShipCoords = function(e, fieldRect) {
+	if (e.pageX >= fieldRect.left &&
+		e.pageY >= fieldRect.top &&
+		e.pageX <= fieldRect.right &&
+		e.pageY <= fieldRect.bottom) {
+		// Snap to grid
+		var x = parseInt((e.pageX - fieldRect.left) / 33);
+		var y = parseInt((e.pageY - fieldRect.top) / 33);
+		return {x:x, y:y};
+	}
+	return null;
+};
+
 Placement.prototype.render = function() {
 	if (this.el) {
 		this.endBtn.onRender();
@@ -34,21 +47,17 @@ Placement.prototype.render = function() {
 	menu.append(this.historyBtn.render());
 	
 	var onDragMove = function(e) {
-		var data = e.data;
-		var field = data.field;
+		var data = this.dragData;
+		var fieldRect = data.fieldRect;
 		var clone = data.clone;
-		if (e.pageX >= field.left &&
-			e.pageY >= field.top &&
-			e.pageX <= field.right &&
-			e.pageY <= field.bottom) {
-			// Snap to grid
-			var x = parseInt((e.pageX - field.left) / 33);
-			var y = parseInt((e.pageY - field.top) / 33);
-			var pos = $('#ship_container').position();
-			var newPos = {left: field.left - pos.left + x * 33, top: field.top - pos.top + y * 33};
+		var coords = this.getEventShipCoords(e, fieldRect);
+		if (coords) {
+			var pos = this.shipContainer.position();
+			var newPos = {left: fieldRect.left - pos.left + coords.x * 33,
+				top: fieldRect.top - pos.top + coords.y * 33};
 			var oldPos = clone.position();
-			if (newPos.left != oldPos.left || newPos.top != oldPos.top) {
-				this.field.showShipPreview(x, y, clone.length, clone.vertical);
+			if (newPos.left != parseInt(oldPos.left) || newPos.top != parseInt(oldPos.top)) {
+				this.field.showShipPreview(coords.x, coords.y, clone.length, clone.vertical);
 				clone.dragTo(newPos.left, newPos.top);
 			}
 		} else {
@@ -60,45 +69,59 @@ Placement.prototype.render = function() {
 	var onDrag = function(e, ship) {
 		e.preventDefault();
 		var clone = ship.clone();
-		this.clone = clone;
 		var field = $('.field');
 		var pl = parseInt(field.css('padding-left')) + 1;
 		var pt = parseInt(field.css('padding-top')) + 1;
 		var pos = field.offset();
-		var field = {left: pos.left + pl, top: pos.top + pt,
+		var fieldRect = {left: pos.left + pl, top: pos.top + pt,
 			right: pos.left + field.width(), bottom: pos.top + field.height()};
-		var data = {clone: clone, x: e.pageX, y: e.pageY, field: field};
+		this.dragData = {clone: clone, x: e.pageX, y: e.pageY, fieldRect: fieldRect};
 		this.shipContainer.append(clone.render());
 		this.onDragMoveProxy = $.proxy(onDragMove, this);
-		$(document).mousemove(data, this.onDragMoveProxy);
+		$(document).mousemove(this.dragData, this.onDragMoveProxy);
 	};
 	
 	var onDrop = function(e, ship) {
 		e.preventDefault();
 		$(document).off('mousemove', this.onDragMoveProxy);
+		
+		var data = this.dragData;
+		var clone = data.clone;
+		var coords = this.getEventShipCoords(e, data.fieldRect);
+		if (coords) {
+			var added = this.field.addShip(coords.x, coords.y, clone.length, clone.vertical);
+			if (added) {
+				var count = this.shipCounts[clone.length].html();
+				this.shipCounts[clone.length].html(count-1);
+			} else {
+				//TODO: animate the ship to its original location				
+			}
+		}
+		
 		this.field.clearShipPreview();
-		this.clone.el.remove();
-		delete this.clone;
+		clone.el.remove();
 		delete this.onDragMoveProxy;
+		delete this.dragData;
 	};
 	
 	this.ships = {};
 	var s = 10;
-	this.ships['4h'] = new ShipFloating(4, false, {left: 3*s, onDrag: onDrag, onDrop: onDrop, scope: this});
-	this.ships['3h'] = new ShipFloating(3, false, {left: 2*s, top: 32+s, onDrag: onDrag, onDrop: onDrop, scope: this});
-	this.ships['2h'] = new ShipFloating(2, false, {left: s, top: 64+2*s, onDrag: onDrag, onDrop: onDrop, scope: this});
-	this.ships['1h'] = new ShipFloating(1, false, {top: 96+3*s, onDrag: onDrag, onDrop: onDrop, scope: this});
+	var events = {onDrag: onDrag, onDrop: onDrop, scope: this};
+	this.ships['4h'] = new ShipFloating(4, false, $.extend({left: 3*s}, events));
+	this.ships['3h'] = new ShipFloating(3, false, $.extend({left: 2*s, top: 32+s}, events));
+	this.ships['2h'] = new ShipFloating(2, false, $.extend({left: s, top: 64+2*s}, events));
+	this.ships['1h'] = new ShipFloating(1, false, $.extend({top: 96+3*s}, events));
 	
-	this.ships['4v'] = new ShipFloating(4, true, {top: 32, left: 128+3*s, onDrag: onDrag, onDrop: onDrop, scope: this});
-	this.ships['3v'] = new ShipFloating(3, true, {top: 64+s, left: 96+2*s, onDrag: onDrag, onDrop: onDrop, scope: this});
-	this.ships['2v'] = new ShipFloating(2, true, {top: 96+2*s, left: 64+s, onDrag: onDrag, onDrop: onDrop, scope: this});
-	this.ships['1v'] = new ShipFloating(1, true, {top: 128+3*s, left: 32, onDrag: onDrag, onDrop: onDrop, scope: this});
+	this.ships['4v'] = new ShipFloating(4, true, $.extend({left: 128+3*s, top: 32}, events));
+	this.ships['3v'] = new ShipFloating(3, true, $.extend({left: 96+2*s, top: 64+s}, events));
+	this.ships['2v'] = new ShipFloating(2, true, $.extend({left: 64+s, top: 96+2*s}, events));
+	this.ships['1v'] = new ShipFloating(1, true, $.extend({left: 32, top: 128+3*s}, events));
 
 	this.shipCounts = {};
-	this.shipCounts[1] = $('<div class="ship_count" style="left:' + (128+3*s) + 'px;">1</div>');
-	this.shipCounts[2] = $('<div class="ship_count" style="left:' + (96+2*s) + 'px; top:' + (32+s) + 'px;">2</div>');
-	this.shipCounts[3] = $('<div class="ship_count" style="left:' + (64+s) + 'px; top:' + (64+2*s) + 'px;">3</div>');
-	this.shipCounts[4] = $('<div class="ship_count" style="left:32px; top:' + (96+3*s) + 'px;">4</div>');
+	this.shipCounts[4] = $('<div class="ship_count" style="left:' + (128+3*s) + 'px;">1</div>');
+	this.shipCounts[3] = $('<div class="ship_count" style="left:' + (96+2*s) + 'px; top:' + (32+s) + 'px;">2</div>');
+	this.shipCounts[2] = $('<div class="ship_count" style="left:' + (64+s) + 'px; top:' + (64+2*s) + 'px;">3</div>');
+	this.shipCounts[1] = $('<div class="ship_count" style="left:32px; top:' + (96+3*s) + 'px;">4</div>');
 
 	var shipContainer = el.children('#ship_container');
 	this.shipContainer = shipContainer;
