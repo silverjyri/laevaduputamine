@@ -10,6 +10,9 @@ Placement.prototype.render = function() {
 		this.loginBtn.onRender();
 		this.chartBtn.onRender();
 		this.historyBtn.onRender();
+		$.each(this.ships, function(index, value) {
+			value.onRender();
+		});
 		return this.el;
 	}
 	
@@ -33,6 +36,7 @@ Placement.prototype.render = function() {
 	var onDragMove = function(e) {
 		var data = e.data;
 		var field = data.field;
+		var clone = data.clone;
 		if (e.pageX >= field.left &&
 			e.pageY >= field.top &&
 			e.pageX <= field.right &&
@@ -41,9 +45,15 @@ Placement.prototype.render = function() {
 			var x = parseInt((e.pageX - field.left) / 33);
 			var y = parseInt((e.pageY - field.top) / 33);
 			var pos = $('#ship_container').position();
-			data.clone.dragTo(field.left - pos.left + x * 33, field.top - pos.top + y * 33);
+			var newPos = {left: field.left - pos.left + x * 33, top: field.top - pos.top + y * 33};
+			var oldPos = clone.position();
+			if (newPos.left != oldPos.left || newPos.top != oldPos.top) {
+				this.field.showShipPreview(x, y, clone.length, clone.vertical);
+				clone.dragTo(newPos.left, newPos.top);
+			}
 		} else {
-			data.clone.dragBy(e.pageX - data.x, e.pageY - data.y);
+			this.field.clearShipPreview();
+			clone.dragBy(e.pageX - data.x, e.pageY - data.y);
 		}
 	};
 	
@@ -57,17 +67,19 @@ Placement.prototype.render = function() {
 		var pos = field.offset();
 		var field = {left: pos.left + pl, top: pos.top + pt,
 			right: pos.left + field.width(), bottom: pos.top + field.height()};
-		console.log(field);
 		var data = {clone: clone, x: e.pageX, y: e.pageY, field: field};
 		this.shipContainer.append(clone.render());
-		$(document).mousemove(data, onDragMove);
+		this.onDragMoveProxy = $.proxy(onDragMove, this);
+		$(document).mousemove(data, this.onDragMoveProxy);
 	};
 	
 	var onDrop = function(e, ship) {
 		e.preventDefault();
-		$(document).off('mousemove', onDragMove);
+		$(document).off('mousemove', this.onDragMoveProxy);
+		this.field.clearShipPreview();
 		this.clone.el.remove();
 		delete this.clone;
+		delete this.onDragMoveProxy;
 	};
 	
 	this.ships = {};
@@ -88,7 +100,7 @@ Placement.prototype.render = function() {
 	this.shipCounts[3] = $('<div class="ship_count" style="left:' + (64+s) + 'px; top:' + (64+2*s) + 'px;">3</div>');
 	this.shipCounts[4] = $('<div class="ship_count" style="left:32px; top:' + (96+3*s) + 'px;">4</div>');
 
-	var shipContainer = el.children("#ship_container");
+	var shipContainer = el.children('#ship_container');
 	this.shipContainer = shipContainer;
 	$.each(this.ships, function(index, value) {
 		shipContainer.append(value.render());
@@ -98,8 +110,8 @@ Placement.prototype.render = function() {
 	});
 	el.append(shipContainer);
 
-	this.p1 = new Field("1");
-	el.append(this.p1.render());
+	this.field = new Field('1');
+	el.append(this.field.render());
 	
 	this.el = el;
 	return el;
