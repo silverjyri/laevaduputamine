@@ -42,6 +42,11 @@ verifyShipLocation: function(x, y, length, vertical) {
 			return false;
 		}
 	}
+	
+	$.each(this.ships, function(index, value) {
+
+	});
+	
 	return true;
 },
 

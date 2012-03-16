@@ -68,6 +68,10 @@ Placement.prototype.render = function() {
 	
 	var onDrag = function(e, ship) {
 		e.preventDefault();
+		if (this.shipCounts[ship.length].html() == 0) {
+			return false;
+		}
+		
 		var clone = ship.clone();
 		var field = $('.field');
 		var pl = parseInt(field.css('padding-left')) + 1;
@@ -79,6 +83,8 @@ Placement.prototype.render = function() {
 		this.shipContainer.append(clone.render());
 		this.onDragMoveProxy = $.proxy(onDragMove, this);
 		$(document).mousemove(this.dragData, this.onDragMoveProxy);
+
+		return true;
 	};
 	
 	var onDrop = function(e, ship) {
@@ -92,7 +98,12 @@ Placement.prototype.render = function() {
 			var added = this.field.addShip(coords.x, coords.y, clone.length, clone.vertical);
 			if (added) {
 				var count = this.shipCounts[clone.length].html();
-				this.shipCounts[clone.length].html(count-1);
+				count--;
+				this.shipCounts[clone.length].html(count);
+				if (count == 0) {
+					this.ships['' + clone.length + 'h'].el.css('opacity', 0.2);
+					this.ships['' + clone.length + 'v'].el.css('opacity', 0.2);
+				}
 			} else {
 				//TODO: animate the ship to its original location				
 			}
