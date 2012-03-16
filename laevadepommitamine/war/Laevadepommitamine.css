@@ -146,10 +146,10 @@ h1 {
 	background-size: cover;
 }
 
-.ship_container {
+#ship_container {
 	background-color: #99CCFF;
-	width: 200px;
-	height: 200px;
+	width: 190px;
+	height: 190px;
 	float: left;
 	position: relative;
 }
@@ -163,4 +163,16 @@ h1 {
 	width: 32px;
 	height: 32px;
 	float: left;
+}
+
+.ship_count {
+	background-image: url('img/count.png');
+	text-indent: 10px;
+	width: 32px;
+	height: 27px;
+	padding-top: 5px;
+	font-size: 20px;
+	font-weight: bold;
+	color: white;
+	position: absolute;
 }
