@@ -34,45 +34,6 @@ public class Laevadepommitamine implements EntryPoint {
 		//return RootPanel.get(getFieldId(player, row, column));
 	}
 	
-	private void placeShip(int player, int row, int column, int length, boolean vertical) {
-		if (length == 1) {
-			Element field = getField(player, row, column);
-			field.addClassName("ship_single");
-			return;
-		}
-
-		int i;
-		for (i=0; i<length; i++)
-		{
-			Element field;
-			if (vertical) {
-				field = getField(player, row + i, column);
-				if (field == null) {
-					return;
-				}
-				if (i == 0) {
-					field.addClassName("ship_vertical_1");
-				} else if (i == length - 1) {
-					field.addClassName("ship_vertical_3");
-				} else {
-					field.addClassName("ship_vertical_2");
-				}
-			} else {
-				field = getField(player, row, column + i);
-				if (field == null) {
-					return;
-				}
-				if (i == 0) {
-					field.addClassName("ship_horizontal_1");
-				} else if (i == length - 1) {
-					field.addClassName("ship_horizontal_3");
-				} else {
-					field.addClassName("ship_horizontal_2");
-				}
-			}
-		}
-	}
-	
 	private void placeHit(int player, int row, int column) {
 		Element field = getField(player, row, column);
 		if (field != null) {
