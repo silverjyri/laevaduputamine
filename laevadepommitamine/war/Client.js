@@ -15,6 +15,8 @@ $LAB
 .script("ShipFloating.js")
 .script("Placement.js")
 .script("Field.js")
+.script("controller/Player.js")
+.script("controller/AI.js")
 .wait(function() {
 	Client.startPlacement();
 })
