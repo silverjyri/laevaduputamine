@@ -4,6 +4,7 @@ function Button(text, options) {
 	if (options) {
 		this.fn = options.fn;
 		this.scope = options.scope;
+		this.image = options.image;
 	}
 }
 
@@ -16,7 +17,12 @@ onRender: function() {
 	}
 },
 render: function() {
-	var el = $('<button type="button" class="button">' + this.text + '</button>');
+	if (this.image) {
+		var el = $('<img class="button_img" src="' + this.image + '" alt="' + this.text + '" />');
+	} else {
+		var el = $('<button type="button" class="button">' + this.text + '</button>');
+	}
+
 	this.el = el;
 	this.onRender();
 	return el;

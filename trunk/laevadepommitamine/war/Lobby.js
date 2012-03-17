@@ -4,34 +4,30 @@ function Lobby() {
 Lobby.prototype = new Screen();
 Lobby.constructor = Lobby;
 
+Lobby.prototype.onRender = function() {
+	this.menu.onRender();
+},
+
 Lobby.prototype.render = function() {
 	if (this.el) {
-		this.startBtn.onRender();
-		this.loginBtn.onRender();
-		this.chartBtn.onRender();
-		this.historyBtn.onRender();
 		return this.el;
 	}
 	
-	var el = $('<div id="lobby" class="screen">' +
-		'<div id="menu"></div>' +
-		'<div id="lists"></div>' +
-	'</div>');
-	
-	var menu = el.children("#menu");
-	this.startBtn = new Button("Alusta m&auml;ngu", {scope: this, fn: function() {
-		Client.startPlacement();
-	}});
-	this.loginBtn = new Button("Logi sisse");
-	this.chartBtn = new Button("Edetabel");
-	this.historyBtn = new Button("Ajalugu");
-	menu.append(this.startBtn.render());
-	menu.append(this.loginBtn.render());
-	menu.append(this.chartBtn.render());
-	menu.append(this.historyBtn.render());
+	var el = $('<div id="lobby" class="screen"></div>');
 
-	var lists = el.children("#lists");
-	var gamesList = new ListBox({id: "gameslist"});
+	this.menu = new Menu([
+  	    new Button("Esileht", {image: 'img/home.png'}),
+  	    new Button("Alusta m&auml;ngu", {scope: this, fn: function() {
+  	    	Client.startPlacement();
+  	    }}),
+  	    new Button("Logi sisse"),
+  	    new Button("Edetabel"),
+  	    new Button("Ajalugu")
+  	]);
+  	el.append(this.menu.render());
+
+	var lists = $('<div id="lists"></div>');
+	var gamesList = new ListBox();
 	gamesList.add("Game 1");
 	gamesList.add("Game 2");
 	gamesList.add("Game 4");
@@ -39,9 +35,10 @@ Lobby.prototype.render = function() {
 	gamesList.add("Game 6");
 	gamesList.add("Game 7");
 	this.gamesList = gamesList;
-	var playersList = new ListBox({id: "playerslist"});
-	menu.append(gamesList.render());
-	menu.append(playersList.render());
+	var playersList = new ListBox();
+	lists.append(gamesList.render());
+	lists.append(playersList.render());
+	el.append(lists);
 
 	this.el = el;
 	return el;

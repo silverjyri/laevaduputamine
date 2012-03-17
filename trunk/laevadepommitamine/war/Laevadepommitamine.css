@@ -31,20 +31,27 @@ h1 {
 	background: -ms-linear-gradient(top, #000000, #1eba48);
 	background: -o-linear-gradient(top, #000000, #1eba48);
 	padding: 6px 12px;
-	-webkit-border-radius: 33px;
-	-moz-border-radius: 33px;
-	border-radius: 33px;
+	-webkit-border-radius: 36px;
+	-moz-border-radius: 36px;
+	border-radius: 36px;
 	-webkit-box-shadow: rgba(0, 0, 0, 1) 0 1px 0;
 	-moz-box-shadow: rgba(0, 0, 0, 1) 0 1px 0;
 	box-shadow: rgba(0, 0, 0, 1) 0 1px 0;
 	text-shadow: rgba(0, 0, 0, .4) 0 1px 0;
 	color: #ffffff;
-	font-size: 18px;
+	font-size: 16px;
 	font-family: Georgia, Serif;
 	text-decoration: none;
 	vertical-align: middle;
 	margin-left: 20px;
 	margin-right: 20px;
+	cursor: pointer;
+}
+
+.button_img {
+	float: left;
+	cursor: pointer;
+	padding-top: 2px;
 }
 
 #menu {
@@ -84,7 +91,6 @@ h1 {
 	margin-left: 20px;
 	margin-right: 20px;
 	background-color: #99CCFF;
-	border: 1px solid black;
 	padding: 5px;
 	float: left;
 }

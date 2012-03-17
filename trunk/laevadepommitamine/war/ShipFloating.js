@@ -82,7 +82,6 @@ render: function() {
 	}
 	
 	this.el = el;
-	this.onRender();
 	return el;
 },
 
