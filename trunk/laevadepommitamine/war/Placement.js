@@ -14,6 +14,7 @@ Placement.prototype.onRender = function() {
 },
 
 Placement.prototype.revertDrag = function() {
+	//TODO: animate the ship to its original location
 	var data = this.dragData;
 	var clone = data.clone;
 	if (data.existing) {
@@ -43,9 +44,6 @@ Placement.prototype.render = function() {
 	    	delete Client.placement;
 	    	Client.startLobby();
 	    }}),
-	    new Button("Logi sisse"),
-	    new Button("Edetabel"),
-	    new Button("Ajalugu")
 	]);
 	el.append(this.menu.render());
 
@@ -106,7 +104,6 @@ Placement.prototype.render = function() {
 				}
 			} else {
 				this.revertDrag();
-				//TODO: animate the ship to its original location				
 			}
 		} else {
 			this.revertDrag();
@@ -172,7 +169,7 @@ Placement.prototype.render = function() {
 		}
 	}
 	
-	this.field = new Field('0', {onMouseDown: onExistingDrag, scope: this});
+	this.field = new Field({onMouseDown: onExistingDrag, scope: this});
 	el.append(this.field.render());
 	
 	this.el = el;

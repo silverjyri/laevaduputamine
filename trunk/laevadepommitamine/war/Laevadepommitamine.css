@@ -189,3 +189,13 @@ h1 {
 .ship_preview_invalid {
 	background-color: #C880A0;
 }
+
+.name {
+	float: left;
+	color: gray;
+}
+
+.status_text{
+	float: right;
+	color: red;
+}

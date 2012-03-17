@@ -26,8 +26,6 @@ Game.prototype.render = function() {
 	    	delete Client.placement;
 	    	Client.startLobby();
 	    }}),
-	    new Button("Edetabel"),
-	    new Button("Ajalugu")
 	]);
 	el.append(this.menu.render());
 
@@ -39,8 +37,8 @@ Game.prototype.render = function() {
 		}
 	}
 	
-	this.field1 = new Field('1', {ships: this.ships, onMouseDown: onMouseDown, scope: this});
-	this.field2 = new Field('2', {onMouseDown: onMouseDown, scope: this});
+	this.field1 = new Field({id: '1', onMouseDown: onMouseDown, scope: this, ships: this.ships});
+	this.field2 = new Field({id: '2', onMouseDown: onMouseDown, scope: this});
 	el.append(this.field1.render());
 	el.append(this.field2.render());
 
