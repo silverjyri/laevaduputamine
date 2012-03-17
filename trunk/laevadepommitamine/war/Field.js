@@ -3,7 +3,7 @@ function Field(id, options) {
 	this.bombs = {};
 	this.ships = {};
 	if (options) {
-		this.onDrag = options.onDrag;
+		this.onMouseDown = options.onMouseDown;
 		this.onDrop = options.onDrop;
 		this.scope = options.scope;
 		this.startShips = options.ships;
@@ -51,27 +51,10 @@ getShipAtCoords: function(coords) {
 	}
 },
 
-onMouseUp: function(e) {
-	$.proxy(this.onDrop, this.scope)(e, e.data);
-	$(document).off('mouseup', this.onMouseUp);
-},
-onMouseDown: function(e) {
-	e.preventDefault();
-	var coords = this.getEventCoords(e);
-	var ship = this.getShipAtCoords(coords);
-	
-	if (ship && this.onDrag) {
-		this.dragData = {x: e.pageX, y: e.pageY, ship: ship};
-		$.proxy(this.onDrag, this.scope)(e, this.dragData);
-	
-		if (this.onDrop) {
-			$(document).mouseup(this, $.proxy(this.onMouseUp, this));
-		}
-	}
-},
-
 onRender: function() {
-	this.el.mousedown($.proxy(this.onMouseDown, this));
+	if (this.onMouseDown) {
+		this.el.mousedown(this, $.proxy(this.onMouseDown, this.scope || this));
+	}
 
 	var ships = this.startShips;
 	if (ships) {
@@ -210,7 +193,9 @@ renderShip: function(ship) {
 	}
 },
 
-removeShip: function(x, y) {
+removeShip: function(coords) {
+	var x = coords.x;
+	var y = coords.y;
 	var ship = this.ships['' + x + y];
 	var length = ship.length;
 
@@ -246,5 +231,16 @@ removeShip: function(x, y) {
 			}
 		}
 	}
+},
+
+addBomb: function(coords) {
+	var bomb = {x: coords.x, y: coords.y};
+	this.bombs['' + coords.x + coords.y] = bomb;
+	this.renderBomb(bomb);
+},
+
+renderBomb: function(bomb) {
+	var box = $('#'+this.getBoxId(bomb.x, bomb.y));
+	box.addClass('bomb');
 }
 };
