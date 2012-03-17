@@ -4,28 +4,20 @@ function Placement() {
 Placement.prototype = new Screen();
 Placement.constructor = Placement;
 
-Placement.prototype.getEventShipCoords = function(e, fieldRect) {
-	if (e.pageX >= fieldRect.left &&
-		e.pageY >= fieldRect.top &&
-		e.pageX <= fieldRect.right &&
-		e.pageY <= fieldRect.bottom) {
-		// Snap to grid
-		var x = parseInt((e.pageX - fieldRect.left) / 33);
-		var y = parseInt((e.pageY - fieldRect.top) / 33);
-		return {x:x, y:y};
-	}
-	return null;
-};
+Placement.prototype.onRender = function() {
+	this.endBtn.onRender();
+	this.loginBtn.onRender();
+	this.chartBtn.onRender();
+	this.historyBtn.onRender();
+	$.each(this.ships, function(index, value) {
+		value.onRender();
+	});
+	this.field.onRender();
+},
 
 Placement.prototype.render = function() {
 	if (this.el) {
-		this.endBtn.onRender();
-		this.loginBtn.onRender();
-		this.chartBtn.onRender();
-		this.historyBtn.onRender();
-		$.each(this.ships, function(index, value) {
-			value.onRender();
-		});
+		this.onRender();
 		return this.el;
 	}
 	
@@ -48,20 +40,21 @@ Placement.prototype.render = function() {
 	
 	var onDragMove = function(e) {
 		var data = this.dragData;
-		var fieldRect = data.fieldRect;
 		var clone = data.clone;
-		var coords = this.getEventShipCoords(e, fieldRect);
+		var field = this.field;
+		var coords = field.getEventCoords(e);
 		if (coords) {
-			var pos = this.shipContainer.position();
-			var newPos = {left: fieldRect.left - pos.left + coords.x * 33,
-				top: fieldRect.top - pos.top + coords.y * 33};
+			var contPos = this.shipContainer.offset();
+			var fieldPos = field.offset();
+			var newPos = {left: fieldPos.left - contPos.left + coords.x * 33,
+				top: fieldPos.top - contPos.top + coords.y * 33};
 			var oldPos = clone.position();
 			if (newPos.left != parseInt(oldPos.left) || newPos.top != parseInt(oldPos.top)) {
-				this.field.showShipPreview(coords.x, coords.y, clone.length, clone.vertical);
+				field.showShipPreview(coords.x, coords.y, clone.length, clone.vertical);
 				clone.dragTo(newPos.left, newPos.top);
 			}
 		} else {
-			this.field.clearShipPreview();
+			field.clearShipPreview();
 			clone.dragBy(e.pageX - data.x, e.pageY - data.y);
 		}
 	};
@@ -73,13 +66,7 @@ Placement.prototype.render = function() {
 		}
 		
 		var clone = ship.clone();
-		var field = $('.field');
-		var pl = parseInt(field.css('padding-left')) + 1;
-		var pt = parseInt(field.css('padding-top')) + 1;
-		var pos = field.offset();
-		var fieldRect = {left: pos.left + pl, top: pos.top + pt,
-			right: pos.left + field.width(), bottom: pos.top + field.height()};
-		this.dragData = {clone: clone, x: e.pageX, y: e.pageY, fieldRect: fieldRect};
+		this.dragData = {clone: clone, x: e.pageX, y: e.pageY};
 		this.shipContainer.append(clone.render());
 		this.onDragMoveProxy = $.proxy(onDragMove, this);
 		$(document).mousemove(this.dragData, this.onDragMoveProxy);
@@ -93,7 +80,7 @@ Placement.prototype.render = function() {
 		
 		var data = this.dragData;
 		var clone = data.clone;
-		var coords = this.getEventShipCoords(e, data.fieldRect);
+		var coords = this.field.getEventCoords(e);
 		if (coords) {
 			var added = this.field.addShip(coords.x, coords.y, clone.length, clone.vertical);
 			if (added) {
@@ -144,7 +131,12 @@ Placement.prototype.render = function() {
 	});
 	el.append(shipContainer);
 
-	this.field = new Field('1');
+	var onExistingDrag = function(e, data) {
+		e.preventDefault();
+		// TODO: drag existing ship
+	}
+	
+	this.field = new Field('1', {onDrag: onExistingDrag, scope: this});
 	el.append(this.field.render());
 	
 	this.el = el;

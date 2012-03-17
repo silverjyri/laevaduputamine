@@ -1,14 +1,59 @@
 function Field(id, options) {
 	this.id = id;
-	this.ships = [];
+	this.ships = {};
+	this.bombs = {};
+	if (options) {
+		this.onDrag = options.onDrag;
+		this.onDrop = options.onDrop;
+		this.scope = options.scope;
+	}
 }
 
 Field.prototype = {
 getBoxId: function(x, y) {
 	return 'p' + this.id + 'b' + x + y;
 },
-		
+
+getEventCoords: function(e) {
+	var el = this.el;
+	var pos = el.offset();
+	var pl = parseInt(el.css('padding-left')) + 1;
+	var pt = parseInt(el.css('padding-top')) + 1;
+	var fieldRect = {left: pos.left + pl, top: pos.top + pt,
+		right: pos.left + el.width(), bottom: pos.top + el.height()};
+	
+	if (e.pageX >= fieldRect.left &&
+		e.pageY >= fieldRect.top &&
+		e.pageX <= fieldRect.right &&
+		e.pageY <= fieldRect.bottom) {
+		// Snap to grid
+		return {x: parseInt((e.pageX - fieldRect.left) / 33),
+				y: parseInt((e.pageY - fieldRect.top) / 33)};
+	}
+	return null;
+},
+
+onMouseUp: function(e) {
+	$.proxy(this.onDrop, this.scope)(e, e.data);
+	$(document).off('mouseup', this.onMouseUp);
+},
+onMouseDown: function(e) {
+	var coords = this.getEventCoords(e);
+	var ship = this.ships['' + coords.x + coords.y];
+	
+	if (ship && this.onDrag) {
+		var clone = new ShipFloating(ship.length, ship.vertical);
+		this.dragData = {clone: clone, x: e.pageX, y: e.pageY};
+		$.proxy(this.onDrag, this.scope)(e, this.dragData);
+	
+		if (this.onDrop) {
+			$(document).mouseup(this, $.proxy(this.onMouseUp, this));
+		}
+	}
+},
+
 onRender: function() {
+	this.el.mousedown($.proxy(this.onMouseDown, this));
 },
 
 render: function() {
@@ -32,6 +77,15 @@ render: function() {
 	return el;
 },
 
+
+offset: function() {
+	var el = this.el;
+	var offs = el.offset();
+	var pl = parseInt(el.css('padding-left')) + 1;
+	var pt = parseInt(el.css('padding-top')) + 1;
+	return {left: offs.left + pl, top: offs.top + pt}
+},
+
 verifyShipLocation: function(x, y, length, vertical) {
 	if ((vertical ? y : x) + length > 10) {
 		return false;
@@ -47,7 +101,8 @@ verifyShipLocation: function(x, y, length, vertical) {
 		var h = vertical ? length : 1;
 		var sw = ship.vertical ? 1 : ship.length;
 		var sh = ship.vertical ? ship.length : 1;
-		if ((x + w >= sx) && (x <= sx + sw) && (y + h >= sy) && (y <= sy +sh)) {
+		if ((x + w >= sx) && (x <= sx + sw) &&
+			(y + h >= sy) && (y <= sy + sh)) {
 			valid = false;
 		}
 	}
@@ -90,7 +145,7 @@ addShip: function(x, y, length, vertical) {
 		return false;
 	}
 	var ship = {x:x, y:y, length:length, vertical:vertical};
-	this.ships[this.ships.length] = ship;
+	this.ships['' + x + y] = ship;
 
 	if (length == 1) {
 		var box = $('#'+this.getBoxId(x, y));
