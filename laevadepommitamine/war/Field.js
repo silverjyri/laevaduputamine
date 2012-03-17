@@ -33,6 +33,19 @@ getEventCoords: function(e) {
 	return null;
 },
 
+getShipAtCoords: function(coords) {
+	var ships = this.ships;
+	for (i in ships) {
+		var ship = ships[i];
+		var sw = ship.vertical ? 1 : ship.length;
+		var sh = ship.vertical ? ship.length : 1;
+		if ((coords.x >= ship.x) && (coords.x < ship.x + sw) &&
+			(coords.y >= ship.y) && (coords.y < ship.y + sh)) {
+			return ship;
+		}
+	}
+},
+
 onMouseUp: function(e) {
 	$.proxy(this.onDrop, this.scope)(e, e.data);
 	$(document).off('mouseup', this.onMouseUp);
@@ -40,7 +53,7 @@ onMouseUp: function(e) {
 onMouseDown: function(e) {
 	e.preventDefault();
 	var coords = this.getEventCoords(e);
-	var ship = this.ships['' + coords.x + coords.y];
+	var ship = this.getShipAtCoords(coords);
 	
 	if (ship && this.onDrag) {
 		this.dragData = {x: e.pageX, y: e.pageY, ship: ship};
