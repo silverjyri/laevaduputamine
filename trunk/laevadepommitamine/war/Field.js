@@ -80,11 +80,12 @@ render: function() {
 		el.attr("id", this.id);
 	}
 
-	if (this.id !== '0') {
-		el.append('<div class="name">M&auml;ngija: blabla' + this.id + '</div>');
+	if (this.id) {
 		if (this.id === '1') {
+			el.append('<div class="name">M&auml;ngija: ' + Client.game.player1.name + '</div>');
 			el.append('<div class="status_text">Sinu kord!</div>');
 		} else {
+			el.append('<div class="name">M&auml;ngija: ' + Client.game.player2.name + '</div>');
 			//el.append('<div class="status_text">Ootan vastase k&auml;iku...</div>');
 		}
 	}
@@ -242,14 +243,17 @@ removeShip: function(coords) {
 	}
 },
 
-addBomb: function(coords) {
-	var bomb = {x: coords.x, y: coords.y};
-	this.bombs['' + coords.x + coords.y] = bomb;
+addBomb: function(bomb) {
+	this.bombs['' + bomb.x + bomb.y] = bomb;
 	this.renderBomb(bomb);
 },
 
 renderBomb: function(bomb) {
 	var box = $('#'+this.getBoxId(bomb.x, bomb.y));
-	box.addClass('bomb');
+	if (bomb.hit) {
+		box.addClass('bomb');
+	} else {
+		box.addClass('empty');
+	}
 }
 };

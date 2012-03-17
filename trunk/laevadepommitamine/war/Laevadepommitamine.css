@@ -151,6 +151,10 @@ h1 {
 	background-image: url('img/sunk.png');
 	background-size: cover;
 }
+.empty {
+	background-image: url('img/empty.png');
+	background-size: cover;
+}
 
 #ship_container {
 	background-color: #99CCFF;
