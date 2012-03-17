@@ -84,12 +84,14 @@ Placement.prototype.render = function() {
 		if (coords) {
 			var added = this.field.addShip(coords.x, coords.y, clone.length, clone.vertical);
 			if (added) {
-				var count = this.shipCounts[clone.length].html();
-				count--;
-				this.shipCounts[clone.length].html(count);
-				if (count == 0) {
-					this.ships['' + clone.length + 'h'].el.css('opacity', 0.2);
-					this.ships['' + clone.length + 'v'].el.css('opacity', 0.2);
+				if (!data.existing) {
+					var count = this.shipCounts[clone.length].html();
+					count--;
+					this.shipCounts[clone.length].html(count);
+					if (count == 0) {
+						this.ships['' + clone.length + 'h'].el.css('opacity', 0.2);
+						this.ships['' + clone.length + 'v'].el.css('opacity', 0.2);
+					}
 				}
 			} else {
 				//TODO: animate the ship to its original location				
@@ -132,11 +134,22 @@ Placement.prototype.render = function() {
 	el.append(shipContainer);
 
 	var onExistingDrag = function(e, data) {
-		e.preventDefault();
-		// TODO: drag existing ship
+		var ship = data.ship;
+		var contPos = this.shipContainer.offset();
+		var clone = new ShipFloating(ship.length, ship.vertical, {left: e.pageX - contPos.left, top: e.pageY - contPos.top});
+		this.field.removeShip(ship.x, ship.y);
+		this.dragData = {clone: clone, x: e.pageX, y: e.pageY, existing: true};
+		this.shipContainer.append(clone.render());
+		this.onDragMoveProxy = $.proxy(onDragMove, this);
+		$(document).mousemove(this.dragData, this.onDragMoveProxy);
 	}
 	
-	this.field = new Field('1', {onDrag: onExistingDrag, scope: this});
+	var onExistingDrop = function(e, data) {
+		e.preventDefault();
+		alert("drop");
+	}
+	
+	this.field = new Field('1', {onDrag: onExistingDrag, onDrop: onDrop, scope: this});
 	el.append(this.field.render());
 	
 	this.el = el;

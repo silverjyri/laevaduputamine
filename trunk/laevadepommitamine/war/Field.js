@@ -38,12 +38,12 @@ onMouseUp: function(e) {
 	$(document).off('mouseup', this.onMouseUp);
 },
 onMouseDown: function(e) {
+	e.preventDefault();
 	var coords = this.getEventCoords(e);
 	var ship = this.ships['' + coords.x + coords.y];
 	
 	if (ship && this.onDrag) {
-		var clone = new ShipFloating(ship.length, ship.vertical);
-		this.dragData = {clone: clone, x: e.pageX, y: e.pageY};
+		this.dragData = {x: e.pageX, y: e.pageY, ship: ship};
 		$.proxy(this.onDrag, this.scope)(e, this.dragData);
 	
 		if (this.onDrop) {
@@ -179,5 +179,43 @@ addShip: function(x, y, length, vertical) {
 	}
 	
 	return true;
+},
+
+removeShip: function(x, y) {
+	var ship = this.ships['' + x + y];
+	var length = ship.length;
+
+	delete this.ships['' + x + y];
+	
+	if (length == 1) {
+		var box = $('#'+this.getBoxId(x, y));
+		box.removeClass('ship_single');
+		return true;
+	}
+	
+	var i;
+	if (ship.vertical) {
+		for (i = 0; i < length; i++) {
+			var box = $('#'+this.getBoxId(x, y + i));
+			if (i == 0) {
+				box.removeClass("ship_vertical_1");
+			} else if (i == length - 1) {
+				box.removeClass("ship_vertical_3");
+			} else {
+				box.removeClass("ship_vertical_2");
+			}
+		}
+	} else {
+		for (i = 0; i < length; i++) {
+			var box = $('#'+this.getBoxId(x + i, y));
+			if (i == 0) {
+				box.removeClass("ship_horizontal_1");
+			} else if (i == length - 1) {
+				box.removeClass("ship_horizontal_3");
+			} else {
+				box.removeClass("ship_horizontal_2");
+			}
+		}
+	}
 }
 };
