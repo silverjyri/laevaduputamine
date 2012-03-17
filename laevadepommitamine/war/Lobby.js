@@ -10,6 +10,9 @@ Lobby.prototype.onRender = function() {
 
 Lobby.prototype.render = function() {
 	if (this.el) {
+		if (Client.game) {
+			this.menu.items[1].setText("Tagasi m&auml;ngu");
+		}
 		return this.el;
 	}
 	

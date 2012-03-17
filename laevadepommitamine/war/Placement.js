@@ -10,6 +10,7 @@ Placement.prototype.onRender = function() {
 		value.onRender();
 	});
 	this.field.onRender();
+	this.readyBtn.onRender();
 },
 
 Placement.prototype.revertDrag = function() {
@@ -38,6 +39,7 @@ Placement.prototype.render = function() {
 	    	Client.startLobby();
 	    }}),
 	    new Button("L&otilde;peta m&auml;ng", {scope: this, fn: function() {
+	    	delete Client.game;
 	    	Client.startLobby();
 	    }}),
 	    new Button("Logi sisse"),
@@ -90,7 +92,8 @@ Placement.prototype.render = function() {
 		var clone = data.clone;
 		var coords = this.field.getEventCoords(e);
 		if (coords) {
-			var added = this.field.addShip(coords.x, coords.y, clone.length, clone.vertical);
+			var added = this.field.addShip(
+				{x: coords.x, y: coords.y, length: clone.length, vertical: clone.vertical});
 			if (added) {
 				if (!data.existing) {
 					var count = this.shipCounts[clone.length].html();
@@ -142,6 +145,10 @@ Placement.prototype.render = function() {
 	$.each(this.shipCounts, function(index, value) {
 		shipContainer.append(value);
 	});
+	this.readyBtn = new Button("Valmis", {scope: this, fn: function() {
+		Client.startGame(this.field.ships);
+	}, style: {position: 'absolute', left: 90, top: 200}});
+	shipContainer.append(this.readyBtn.render());
 	el.append(shipContainer);
 	
 	var onExistingDrag = function(e, data) {
@@ -155,12 +162,7 @@ Placement.prototype.render = function() {
 		$(document).mousemove(this.dragData, this.onDragMoveProxy);
 	}
 	
-	var onExistingDrop = function(e, data) {
-		e.preventDefault();
-		alert("drop");
-	}
-	
-	this.field = new Field('1', {onDrag: onExistingDrag, onDrop: onDrop, scope: this});
+	this.field = new Field('0', {onDrag: onExistingDrag, onDrop: onDrop, scope: this});
 	el.append(this.field.render());
 	
 	this.el = el;
