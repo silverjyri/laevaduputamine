@@ -1,8 +1,8 @@
-function Field(id, options) {
-	this.id = id;
+function Field(options) {
 	this.bombs = {};
 	this.ships = {};
 	if (options) {
+		this.id = options.id;
 		this.onMouseDown = options.onMouseDown;
 		this.onDrop = options.onDrop;
 		this.scope = options.scope;
@@ -80,6 +80,15 @@ render: function() {
 		el.attr("id", this.id);
 	}
 
+	if (this.id !== '0') {
+		el.append('<div class="name">M&auml;ngija: blabla' + this.id + '</div>');
+		if (this.id === '1') {
+			el.append('<div class="status_text">Sinu kord!</div>');
+		} else {
+			//el.append('<div class="status_text">Ootan vastase k&auml;iku...</div>');
+		}
+	}
+	
 	this.el = el;
 	return el;
 },
