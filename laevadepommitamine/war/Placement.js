@@ -40,6 +40,7 @@ Placement.prototype.render = function() {
 	    }}),
 	    new Button("L&otilde;peta m&auml;ng", {scope: this, fn: function() {
 	    	delete Client.game;
+	    	delete Client.placement;
 	    	Client.startLobby();
 	    }}),
 	    new Button("Logi sisse"),
@@ -78,8 +79,7 @@ Placement.prototype.render = function() {
 		var clone = ship.clone();
 		this.dragData = {clone: clone, x: e.pageX, y: e.pageY};
 		this.shipContainer.append(clone.render());
-		this.onDragMoveProxy = $.proxy(onDragMove, this);
-		$(document).mousemove(this.dragData, this.onDragMoveProxy);
+		$(document).mousemove(this.dragData, $.proxy(onDragMove, this));
 
 		return true;
 	};
@@ -151,18 +151,28 @@ Placement.prototype.render = function() {
 	shipContainer.append(this.readyBtn.render());
 	el.append(shipContainer);
 	
-	var onExistingDrag = function(e, data) {
-		var ship = data.ship;
-		var contPos = this.shipContainer.offset();
-		var clone = new ShipFloating(ship.length, ship.vertical, {left: e.pageX - contPos.left, top: e.pageY - contPos.top});
-		this.field.removeShip(ship.x, ship.y);
-		this.dragData = {clone: clone, x: e.pageX, y: e.pageY, existing: true};
-		this.shipContainer.append(clone.render());
-		this.onDragMoveProxy = $.proxy(onDragMove, this);
-		$(document).mousemove(this.dragData, this.onDragMoveProxy);
+	var onMouseUp = function(e) {
+		$.proxy(onDrop, this)(e, this.dragData.ship);
+		$(document).off('mouseup', onMouseUp);
+	};
+	
+	var onExistingDrag = function(e) {
+		var field = this.field;
+		var coords = field.getEventCoords(e);
+		var ship = field.getShipAtCoords(coords);
+
+		if (ship) {
+			var contPos = this.shipContainer.offset();
+			var clone = new ShipFloating(ship.length, ship.vertical, {left: e.pageX - contPos.left, top: e.pageY - contPos.top});
+			field.removeShip(ship);
+			this.dragData = {ship: ship, clone: clone, x: e.pageX, y: e.pageY, existing: true};
+			this.shipContainer.append(clone.render());
+			$(document).mousemove(this, $.proxy(onDragMove, this));
+			$(document).mouseup(this, $.proxy(onMouseUp, this));
+		}
 	}
 	
-	this.field = new Field('0', {onDrag: onExistingDrag, onDrop: onDrop, scope: this});
+	this.field = new Field('0', {onMouseDown: onExistingDrag, scope: this});
 	el.append(this.field.render());
 	
 	this.el = el;
