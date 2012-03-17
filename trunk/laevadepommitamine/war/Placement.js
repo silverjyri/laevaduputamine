@@ -15,6 +15,20 @@ Placement.prototype.onRender = function() {
 	this.field.onRender();
 },
 
+Placement.prototype.revertDrag = function() {
+	var data = this.dragData;
+	var clone = data.clone;
+	if (data.existing) {
+		var count = this.shipCounts[clone.length].html();
+		count++;
+		this.shipCounts[clone.length].html(count);
+		if (count != 0) {
+			this.ships['' + clone.length + 'h'].el.css('opacity', '');
+			this.ships['' + clone.length + 'v'].el.css('opacity', '');
+		}
+	}
+},
+
 Placement.prototype.render = function() {
 	if (this.el) {
 		this.onRender();
@@ -94,8 +108,11 @@ Placement.prototype.render = function() {
 					}
 				}
 			} else {
+				this.revertDrag();
 				//TODO: animate the ship to its original location				
 			}
+		} else {
+			this.revertDrag();
 		}
 		
 		this.field.clearShipPreview();
