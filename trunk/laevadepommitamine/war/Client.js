@@ -31,3 +31,9 @@ Client.startPlacement = function() {
 	$("#screen_container").html(this.placement.render());
 	this.placement.onRender();
 };
+
+Client.startGame = function() {
+	this.game = this.game || new Game(this.placement.field.ships);
+	$("#screen_container").html(this.game.render());
+	this.game.onRender();
+};

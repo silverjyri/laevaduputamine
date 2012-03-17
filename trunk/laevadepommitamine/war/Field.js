@@ -1,11 +1,12 @@
 function Field(id, options) {
 	this.id = id;
-	this.ships = {};
 	this.bombs = {};
+	this.ships = {};
 	if (options) {
 		this.onDrag = options.onDrag;
 		this.onDrop = options.onDrop;
 		this.scope = options.scope;
+		this.startShips = options.ships;
 	}
 }
 
@@ -71,6 +72,13 @@ onMouseDown: function(e) {
 
 onRender: function() {
 	this.el.mousedown($.proxy(this.onMouseDown, this));
+
+	var ships = this.startShips;
+	if (ships) {
+		for (i in ships) {
+			this.renderShip(ships[i]);
+		}
+	}
 },
 
 render: function() {
@@ -155,17 +163,25 @@ clearShipPreview: function() {
 	}
 },
 
-addShip: function(x, y, length, vertical) {
-	if (!this.verifyShipLocation(x, y, length, vertical)) {
+addShip: function(ship) {
+	if (!this.verifyShipLocation(ship.x, ship.y, ship.length, ship.vertical)) {
 		return false;
 	}
-	var ship = {x:x, y:y, length:length, vertical:vertical};
-	this.ships['' + x + y] = ship;
+	this.ships['' + ship.x + ship.y] = ship;
+	this.renderShip(ship);
+	return true;
+},
 
+renderShip: function(ship) {
+	var x = ship.x;
+	var y = ship.y;
+	var length = ship.length;
+	var vertical = ship.vertical;
+	
 	if (length == 1) {
 		var box = $('#'+this.getBoxId(x, y));
 		box.addClass('ship_single');
-		return true;
+		return;
 	}
 	
 	var i;
@@ -173,27 +189,25 @@ addShip: function(x, y, length, vertical) {
 		for (i = 0; i < length; i++) {
 			var box = $('#'+this.getBoxId(x, y + i));
 			if (i == 0) {
-				box.addClass("ship_vertical_1");
+				box.addClass('ship_vertical_1');
 			} else if (i == length - 1) {
-				box.addClass("ship_vertical_3");
+				box.addClass('ship_vertical_3');
 			} else {
-				box.addClass("ship_vertical_2");
+				box.addClass('ship_vertical_2');
 			}
 		}
 	} else {
 		for (i = 0; i < length; i++) {
 			var box = $('#'+this.getBoxId(x + i, y));
 			if (i == 0) {
-				box.addClass("ship_horizontal_1");
+				box.addClass('ship_horizontal_1');
 			} else if (i == length - 1) {
-				box.addClass("ship_horizontal_3");
+				box.addClass('ship_horizontal_3');
 			} else {
-				box.addClass("ship_horizontal_2");
+				box.addClass('ship_horizontal_2');
 			}
 		}
 	}
-	
-	return true;
 },
 
 removeShip: function(x, y) {
@@ -213,22 +227,22 @@ removeShip: function(x, y) {
 		for (i = 0; i < length; i++) {
 			var box = $('#'+this.getBoxId(x, y + i));
 			if (i == 0) {
-				box.removeClass("ship_vertical_1");
+				box.removeClass('ship_vertical_1');
 			} else if (i == length - 1) {
-				box.removeClass("ship_vertical_3");
+				box.removeClass('ship_vertical_3');
 			} else {
-				box.removeClass("ship_vertical_2");
+				box.removeClass('ship_vertical_2');
 			}
 		}
 	} else {
 		for (i = 0; i < length; i++) {
 			var box = $('#'+this.getBoxId(x + i, y));
 			if (i == 0) {
-				box.removeClass("ship_horizontal_1");
+				box.removeClass('ship_horizontal_1');
 			} else if (i == length - 1) {
-				box.removeClass("ship_horizontal_3");
+				box.removeClass('ship_horizontal_3');
 			} else {
-				box.removeClass("ship_horizontal_2");
+				box.removeClass('ship_horizontal_2');
 			}
 		}
 	}
