@@ -5,10 +5,7 @@ Placement.prototype = new Screen();
 Placement.constructor = Placement;
 
 Placement.prototype.onRender = function() {
-	this.endBtn.onRender();
-	this.loginBtn.onRender();
-	this.chartBtn.onRender();
-	this.historyBtn.onRender();
+	this.menu.onRender();
 	$.each(this.ships, function(index, value) {
 		value.onRender();
 	});
@@ -31,27 +28,24 @@ Placement.prototype.revertDrag = function() {
 
 Placement.prototype.render = function() {
 	if (this.el) {
-		this.onRender();
 		return this.el;
 	}
-	
-	var el = $('<div id="placement" class="screen">' +
-		'<div id="menu"></div>' +
-		'<div id="ship_container"></div>' +
-	'</div>');
-	
-	var menu = el.children("#menu");
-	this.endBtn = new Button("L&otilde;peta m&auml;ng", {scope: this, fn: function() {
-		Client.startLobby();
-	}});
-	this.loginBtn = new Button("Logi sisse");
-	this.chartBtn = new Button("Edetabel");
-	this.historyBtn = new Button("Ajalugu");
-	menu.append(this.endBtn.render());
-	menu.append(this.loginBtn.render());
-	menu.append(this.chartBtn.render());
-	menu.append(this.historyBtn.render());
-	
+
+	var el = $('<div id="placement" class="screen"></div>');
+
+	this.menu = new Menu([
+	    new Button("Esileht", {image: 'img/home.png', scope: this, fn: function() {
+	    	Client.startLobby();
+	    }}),
+	    new Button("L&otilde;peta m&auml;ng", {scope: this, fn: function() {
+	    	Client.startLobby();
+	    }}),
+	    new Button("Logi sisse"),
+	    new Button("Edetabel"),
+	    new Button("Ajalugu")
+	]);
+	el.append(this.menu.render());
+
 	var onDragMove = function(e) {
 		var data = this.dragData;
 		var clone = data.clone;
@@ -140,7 +134,7 @@ Placement.prototype.render = function() {
 	this.shipCounts[2] = $('<div class="ship_count" style="left:' + (64+s) + 'px; top:' + (64+2*s) + 'px;">3</div>');
 	this.shipCounts[1] = $('<div class="ship_count" style="left:32px; top:' + (96+3*s) + 'px;">4</div>');
 
-	var shipContainer = el.children('#ship_container');
+	var shipContainer = $('<div id="ship_container"></div>');
 	this.shipContainer = shipContainer;
 	$.each(this.ships, function(index, value) {
 		shipContainer.append(value.render());
@@ -149,7 +143,7 @@ Placement.prototype.render = function() {
 		shipContainer.append(value);
 	});
 	el.append(shipContainer);
-
+	
 	var onExistingDrag = function(e, data) {
 		var ship = data.ship;
 		var contPos = this.shipContainer.offset();

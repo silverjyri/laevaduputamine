@@ -10,10 +10,13 @@ function Field(id, options) {
 }
 
 Field.prototype = {
+
+// Returns the id of a box. id == 1, getBoxId(3,5) -> 'p1b35'
 getBoxId: function(x, y) {
 	return 'p' + this.id + 'b' + x + y;
 },
 
+// Finds in which box a mouse event took place.
 getEventCoords: function(e) {
 	var el = this.el;
 	var pos = el.offset();
@@ -33,6 +36,7 @@ getEventCoords: function(e) {
 	return null;
 },
 
+// Finds a ship at the specified location.
 getShipAtCoords: function(coords) {
 	var ships = this.ships;
 	for (i in ships) {
@@ -86,11 +90,10 @@ render: function() {
 	}
 
 	this.el = el;
-	this.onRender();
 	return el;
 },
 
-
+// Returns the screen position of the first box.
 offset: function() {
 	var el = this.el;
 	var offs = el.offset();
@@ -99,30 +102,29 @@ offset: function() {
 	return {left: offs.left + pl, top: offs.top + pt}
 },
 
+// Checks if a ship can be placed in this field.
 verifyShipLocation: function(x, y, length, vertical) {
 	if ((vertical ? y : x) + length > 10) {
 		return false;
 	}
 
-	var valid = true;
 	var ships = this.ships;
 	for (i in ships) {
 		var ship = ships[i];
-		var sx = ship.x;
-		var sy = ship.y;
 		var w = vertical ? 1 : length;
 		var h = vertical ? length : 1;
 		var sw = ship.vertical ? 1 : ship.length;
 		var sh = ship.vertical ? ship.length : 1;
-		if ((x + w >= sx) && (x <= sx + sw) &&
-			(y + h >= sy) && (y <= sy + sh)) {
-			valid = false;
+		if ((x + w >= ship.x) && (x <= ship.x + sw) &&
+			(y + h >= ship.y) && (y <= ship.y + sh)) {
+			return false;
 		}
 	}
 	
-	return valid;
+	return true;
 },
 
+// Colors the background of the ship green or red.
 showShipPreview: function(x, y, length, vertical) {
 	this.clearShipPreview();
 	
