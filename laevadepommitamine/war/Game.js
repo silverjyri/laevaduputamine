@@ -24,9 +24,7 @@ Game.prototype.render = function() {
 	    	Client.startLobby();
 	    }}),
 	    new Button("L&otilde;peta m&auml;ng", {scope: this, fn: function() {
-	    	delete Client.game;
-	    	delete Client.placement;
-	    	Client.startLobby();
+	    	Client.stopGame();
 	    }}),
 	]);
 	el.append(this.menu.render());
@@ -37,6 +35,10 @@ Game.prototype.render = function() {
 			if (e.data === this.field2) {
 				var coords = field.getEventCoords(e);
 				if (coords) {
+					if (field.hasBomb(coords)) {
+						return;
+					}
+					
 					field.addBomb({x: coords.x, y: coords.y, hit: this.player2.checkHit(coords)});
 					this.currentPlayer = this.player2;
 					this.field1.setStatus('');
