@@ -2,6 +2,7 @@ function Game(ships) {
 	this.ships = ships;
 	this.player1 = new Player("blabla");
 	this.player2 = new AI();
+	this.currentPlayer = this.player1;
 }
 Game.prototype = new Screen();
 Game.constructor = Game;
@@ -32,16 +33,27 @@ Game.prototype.render = function() {
 	el.append(this.menu.render());
 
 	var onMouseDown = function(e) {
-		var field = e.data;
-		if (e.data === this.field2) {
-			var coords = field.getEventCoords(e);
-			if (coords) {
-				field.addBomb({x: coords.x, y: coords.y, hit: this.player2.checkHit(coords)});
+		if (this.currentPlayer === this.player1) {
+			var field = e.data;
+			if (e.data === this.field2) {
+				var coords = field.getEventCoords(e);
+				if (coords) {
+					field.addBomb({x: coords.x, y: coords.y, hit: this.player2.checkHit(coords)});
+					this.currentPlayer = this.player2;
+					this.field1.setStatus('');
+					field.setStatus('Ootan vastase k&auml;iku...');
+					var scope = this;
+					setTimeout(function() {
+						scope.field1.setStatus('Sinu kord!');
+						scope.field2.setStatus('');
+						scope.currentPlayer = scope.player1;
+					}, 500);
+				}
 			}
 		}
 	}
 	
-	this.field1 = new FieldView({id: '1', onMouseDown: onMouseDown, scope: this, ships: this.ships});
+	this.field1 = new FieldView({id: '1', onMouseDown: onMouseDown, scope: this, ships: this.ships, status: "Sinu kord!"});
 	this.field2 = new FieldView({id: '2', onMouseDown: onMouseDown, scope: this});
 	el.append(this.field1.render());
 	el.append(this.field2.render());

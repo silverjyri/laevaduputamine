@@ -7,7 +7,9 @@ function FieldView(options) {
 		this.onDrop = options.onDrop;
 		this.scope = options.scope;
 		this.startShips = options.ships;
+		this.status = options.status;
 	}
+	this.status = this.status || '';
 }
 
 FieldView.prototype = {
@@ -69,11 +71,10 @@ render: function() {
 	if (this.id) {
 		if (this.id === '1') {
 			el.append('<div class="name">M&auml;ngija: ' + Client.game.player1.name + '</div>');
-			el.append('<div class="status_text">Sinu kord!</div>');
 		} else {
 			el.append('<div class="name">M&auml;ngija: ' + Client.game.player2.name + '</div>');
-			//el.append('<div class="status_text">Ootan vastase k&auml;iku...</div>');
 		}
+		el.append('<div class="status_text">' + this.status + '</div>');
 	}
 	
 	this.el = el;
@@ -220,5 +221,12 @@ renderBomb: function(bomb) {
 	} else {
 		box.addClass('empty');
 	}
+},
+
+setStatus: function(text) {
+	if (this.el) {
+		this.el.children('.status_text').html(text);
+	}
+	this.status = text;
 }
 };
