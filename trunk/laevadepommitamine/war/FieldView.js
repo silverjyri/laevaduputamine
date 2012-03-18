@@ -209,6 +209,10 @@ removeShip: function(coords) {
 	}
 },
 
+hasBomb: function(coords) {
+	return !!this.bombs['' + coords.x + coords.y];
+},
+
 addBomb: function(bomb) {
 	this.bombs['' + bomb.x + bomb.y] = bomb;
 	this.renderBomb(bomb);

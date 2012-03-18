@@ -40,9 +40,7 @@ Placement.prototype.render = function() {
 	    	Client.startLobby();
 	    }}),
 	    new Button("L&otilde;peta m&auml;ng", {scope: this, fn: function() {
-	    	delete Client.game;
-	    	delete Client.placement;
-	    	Client.startLobby();
+	    	Client.stopGame();
 	    }}),
 	]);
 	el.append(this.menu.render());

@@ -42,6 +42,12 @@ Client.startGame = function() {
 	this.game.onRender();
 };
 
+Client.stopGame = function() {
+	delete this.placement;
+	delete this.game;
+	Client.startLobby();
+}
+
 Client.rand = function(n) {
 	return Math.floor(Math.random()*(n+1));
 };
