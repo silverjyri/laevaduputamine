@@ -39,8 +39,8 @@ Game.prototype.render = function() {
 		}
 	}
 	
-	this.field1 = new Field({id: '1', onMouseDown: onMouseDown, scope: this, ships: this.ships});
-	this.field2 = new Field({id: '2', onMouseDown: onMouseDown, scope: this, ships: AI.generateShips()});
+	this.field1 = new FieldView({id: '1', onMouseDown: onMouseDown, scope: this, ships: this.ships});
+	this.field2 = new FieldView({id: '2', onMouseDown: onMouseDown, scope: this});
 	el.append(this.field1.render());
 	el.append(this.field2.render());
 

@@ -169,7 +169,7 @@ Placement.prototype.render = function() {
 		}
 	}
 	
-	this.field = new Field({onMouseDown: onExistingDrag, scope: this});
+	this.field = new FieldView({onMouseDown: onExistingDrag, scope: this});
 	el.append(this.field.render());
 	
 	this.el = el;
