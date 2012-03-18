@@ -156,7 +156,7 @@ Placement.prototype.render = function() {
 	var onExistingDrag = function(e) {
 		var field = this.field;
 		var coords = field.getEventCoords(e);
-		var ship = field.getShipAtCoords(coords);
+		var ship = Field.getShipAtCoords(this.field.ships, coords);
 
 		if (ship) {
 			var contPos = this.shipContainer.offset();

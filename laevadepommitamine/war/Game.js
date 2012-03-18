@@ -35,7 +35,9 @@ Game.prototype.render = function() {
 		var field = e.data;
 		if (e.data === this.field2) {
 			var coords = field.getEventCoords(e);
-			field.addBomb({x: coords.x, y: coords.y, hit: this.player2.checkHit(coords)});
+			if (coords) {
+				field.addBomb({x: coords.x, y: coords.y, hit: this.player2.checkHit(coords)});
+			}
 		}
 	}
 	

@@ -13,7 +13,7 @@ AI.generateShips = function() {
 	for (l in lengths) {
 		var valid = false;
 		while (!valid) {
-			var ship = {x:AI.rand(10), y: AI.rand(10), length: lengths[l], vertical: AI.rand(1)};
+			var ship = {x:AI.rand(9), y: AI.rand(9), length: lengths[l], vertical: AI.rand(1)};
 			valid = Field.checkLocation(ships, ship);
 		}
 		ships['' + ship.x + ship.y] = ship;

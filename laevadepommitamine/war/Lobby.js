@@ -22,7 +22,8 @@ Lobby.prototype.render = function() {
 
 	this.menu = new Menu([
   	    new Button("Esileht", {image: 'img/home.png'}),
-  	    new Button("Alusta m&auml;ngu", {scope: this, fn: function() {
+  	    new Button(Client.placement ? "Tagasi m&auml;ngu" : "Alusta m&auml;ngu",
+  	    	{scope: this, fn: function() {
   	    	if (Client.game) {
   	    		Client.startGame();
   	    	} else {
