@@ -38,3 +38,19 @@ Field.checkLocation = function(ships, ship) {
 	
 	return true;
 }
+
+Field.getShipAtCoords = function(ships, coords) {
+	if (!coords) {
+		return false;
+	}
+	
+	for (i in ships) {
+		var ship = ships[i];
+		var sw = ship.vertical ? 1 : ship.length;
+		var sh = ship.vertical ? ship.length : 1;
+		if ((coords.x >= ship.x) && (coords.x < ship.x + sw) &&
+			(coords.y >= ship.y) && (coords.y < ship.y + sh)) {
+			return ship;
+		}
+	}
+}
