@@ -1,7 +1,6 @@
 function Game(ships) {
-	this.ships = ships;
-	this.player1 = new Player("blabla");
-	this.player2 = new AI();
+	this.player1 = new LocalPlayer("blabla", ships);
+	this.player2 = new AIPlayer();
 	this.currentPlayer = this.player1;
 }
 Game.prototype = new Screen();
@@ -44,16 +43,20 @@ Game.prototype.render = function() {
 					field.setStatus('Ootan vastase k&auml;iku...');
 					var scope = this;
 					setTimeout(function() {
+						var bombCoords = scope.player2.makeMove();
+						var hit = scope.player1.checkHit(bombCoords);
+						scope.player2.moveResult(bombCoords, hit);
+						scope.field1.addBomb({x: bombCoords.x, y: bombCoords.y, hit: hit});
 						scope.field1.setStatus('Sinu kord!');
 						scope.field2.setStatus('');
 						scope.currentPlayer = scope.player1;
-					}, 500);
+					}, 200);
 				}
 			}
 		}
 	}
 	
-	this.field1 = new FieldView({id: '1', onMouseDown: onMouseDown, scope: this, ships: this.ships, status: "Sinu kord!"});
+	this.field1 = new FieldView({id: '1', onMouseDown: onMouseDown, scope: this, ships: this.player1.ships, status: "Sinu kord!"});
 	this.field2 = new FieldView({id: '2', onMouseDown: onMouseDown, scope: this});
 	el.append(this.field1.render());
 	el.append(this.field2.render());

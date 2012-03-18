@@ -1,8 +1,8 @@
-function Player(name) {
+function WebPlayer(name) {
 	this.name = name;
 }
 
-Player.prototype = {
+WebPlayer.prototype = {
 checkHit: function(coords) {
 	// TODO: Get result from server
 	return true;
