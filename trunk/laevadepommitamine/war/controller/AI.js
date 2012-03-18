@@ -3,25 +3,26 @@ function AI() {
 	this.name = "AI";
 }
 
+AI.rand = function(n) {
+	return Math.floor(Math.random()*(n+1));
+};
+
 AI.generateShips = function() {
 	var ships = {};
-	var ship = {x:1, y: 2, length: 3, vertical: true};
-	ships['' + ship.x + ship.y] = ship;
+	var lengths = [4,3,3,2,2,2,1,1,1,1];
+	for (l in lengths) {
+		var valid = false;
+		while (!valid) {
+			var ship = {x:AI.rand(10), y: AI.rand(10), length: lengths[l], vertical: AI.rand(1)};
+			valid = Field.checkLocation(ships, ship);
+		}
+		ships['' + ship.x + ship.y] = ship;
+	}
 	return ships;
 };
 
 AI.prototype = {
 checkHit: function(coords) {
-	var ships = this.ships;
-	for (i in ships) {
-		var ship = ships[i];
-		var sw = ship.vertical ? 1 : ship.length;
-		var sh = ship.vertical ? ship.length : 1;
-		if ((coords.x >= ship.x) && (coords.x < ship.x + sw) &&
-			(coords.y >= ship.y) && (coords.y < ship.y + sh)) {
-			return true;
-		}
-	}
-	return false;
+	return Field.checkHit(this.ships, coords);
 }
 };

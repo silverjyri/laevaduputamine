@@ -1,4 +1,4 @@
-function Field(options) {
+function FieldView(options) {
 	this.bombs = {};
 	this.ships = {};
 	if (options) {
@@ -10,7 +10,7 @@ function Field(options) {
 	}
 }
 
-Field.prototype = {
+FieldView.prototype = {
 
 // Returns the id of a box. id == 1, getBoxId(3,5) -> 'p1b35'
 getBoxId: function(x, y) {
@@ -35,20 +35,6 @@ getEventCoords: function(e) {
 				y: parseInt((e.pageY - fieldRect.top) / 33)};
 	}
 	return null;
-},
-
-// Finds a ship at the specified location.
-getShipAtCoords: function(coords) {
-	var ships = this.ships;
-	for (i in ships) {
-		var ship = ships[i];
-		var sw = ship.vertical ? 1 : ship.length;
-		var sh = ship.vertical ? ship.length : 1;
-		if ((coords.x >= ship.x) && (coords.x < ship.x + sw) &&
-			(coords.y >= ship.y) && (coords.y < ship.y + sh)) {
-			return ship;
-		}
-	}
 },
 
 onRender: function() {
@@ -103,34 +89,13 @@ offset: function() {
 	return {left: offs.left + pl, top: offs.top + pt}
 },
 
-// Checks if a ship can be placed in this field.
-verifyShipLocation: function(x, y, length, vertical) {
-	if ((vertical ? y : x) + length > 10) {
-		return false;
-	}
-
-	var ships = this.ships;
-	for (i in ships) {
-		var ship = ships[i];
-		var w = vertical ? 1 : length;
-		var h = vertical ? length : 1;
-		var sw = ship.vertical ? 1 : ship.length;
-		var sh = ship.vertical ? ship.length : 1;
-		if ((x + w >= ship.x) && (x <= ship.x + sw) &&
-			(y + h >= ship.y) && (y <= ship.y + sh)) {
-			return false;
-		}
-	}
-	
-	return true;
-},
-
 // Colors the background of the ship green or red.
 showShipPreview: function(x, y, length, vertical) {
 	this.clearShipPreview();
 	
-	var valid = this.verifyShipLocation(x, y, length, vertical);
-	this.preview = {x: x, y: y, length: length, vertical: vertical, valid: valid};
+	this.preview = {x: x, y: y, length: length, vertical: vertical};
+	var valid = Field.checkLocation(this.ships, this.preview);
+	this.preview.valid = valid;
 	var validClass = valid ? 'ship_preview_valid' : 'ship_preview_invalid';
 	var vp = vertical ? 1 : 0;
 	var hp = vertical ? 0 : 1;
@@ -157,7 +122,7 @@ clearShipPreview: function() {
 },
 
 addShip: function(ship) {
-	if (!this.verifyShipLocation(ship.x, ship.y, ship.length, ship.vertical)) {
+	if (!Field.checkLocation(this.ships, ship)) {
 		return false;
 	}
 	this.ships['' + ship.x + ship.y] = ship;
