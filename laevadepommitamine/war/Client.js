@@ -15,8 +15,9 @@ $LAB
 .script("ShipFloating.js")
 .script("Placement.js")
 .script("FieldView.js")
-.script("controller/Player.js")
-.script("controller/AI.js")
+.script("controller/LocalPlayer.js")
+.script("controller/WebPlayer.js")
+.script("controller/AIPlayer.js")
 .script("controller/Field.js")
 .wait(function() {
 	Client.startPlacement();
@@ -39,4 +40,8 @@ Client.startGame = function() {
 	this.game = this.game || new Game(this.placement.field.ships);
 	$("#screen_container").html(this.game.render());
 	this.game.onRender();
+};
+
+Client.rand = function(n) {
+	return Math.floor(Math.random()*(n+1));
 };
