@@ -14,6 +14,27 @@ Field.checkHit = function(ships, coords) {
 	return false;
 };
 
+Field.checkFullHit = function(ships, bombs, coords) {
+	if (!Field.checkHit(ships, coords)) {
+		return null;
+	}
+	
+	var ship = Field.getShipAtCoords(ships, coords);
+	var x = ship.x;
+	var y = ship.y;
+	var vp = ship.vertical ? 1 : 0;
+	var hp = ship.vertical ? 0 : 1;
+
+	var i;
+	for (i = 0; i < ship.length; i++) {
+		var id = '' + (x+i*hp) + (y+i*vp);
+		if (!bombs[id]) {
+			return null;
+		}
+	}
+	return ship;
+};
+
 Field.checkLocation = function(ships, ship) {
 	var x = ship.x;
 	var y = ship.y;

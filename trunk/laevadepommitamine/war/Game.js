@@ -39,7 +39,16 @@ Game.prototype.render = function() {
 						return;
 					}
 					
-					field.addBomb({x: coords.x, y: coords.y, hit: this.player2.checkHit(coords)});
+					var hit = this.player2.checkHit(coords);
+					field.addBomb({x: coords.x, y: coords.y, hit: hit});
+					if (hit) {
+						var fullHit = Field.checkFullHit(this.player2.ships, field.bombs, coords);
+					}
+					
+					if (fullHit) {
+						field.setShipSunk(fullHit);
+					}
+					
 					this.currentPlayer = this.player2;
 					this.field1.setStatus('');
 					field.setStatus('Ootan vastase k&auml;iku...');
