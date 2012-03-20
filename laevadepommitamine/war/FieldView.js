@@ -136,7 +136,7 @@ renderShip: function(ship) {
 	var y = ship.y;
 	var length = ship.length;
 	var vertical = ship.vertical;
-	
+
 	if (length == 1) {
 		var box = $('#'+this.getBoxId(x, y));
 		box.addClass('ship_single');
@@ -166,6 +166,26 @@ renderShip: function(ship) {
 				box.addClass('ship_horizontal_2');
 			}
 		}
+	}
+},
+
+setShipSunk: function(ship) {
+	var x = ship.x;
+	var y = ship.y;
+	var vp = ship.vertical ? 1 : 0;
+	var hp = ship.vertical ? 0 : 1;
+
+	var i, el;
+	for (i = 0; i < ship.length; i++) {
+		el = $('#'+this.getBoxId(x+i*hp, y+i*vp));
+		el.removeClass('ship_single');
+		el.removeClass('ship_vertical_1');
+		el.removeClass('ship_vertical_2');
+		el.removeClass('ship_vertical_3');
+		el.removeClass('ship_horizontal_1');
+		el.removeClass('ship_horizontal_2');
+		el.removeClass('ship_horizontal_3');
+		el.addClass('sunk');
 	}
 },
 
