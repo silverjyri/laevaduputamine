@@ -200,18 +200,35 @@ h1 {
 
 @keyframes anim1
 {
-0%   {background: #88FFC0;}
-100% {background: #99CCFF;}
+	0%   {background: #88FFC0;}
+	100% {background: #99CCFF;}
 }
-
 @-moz-keyframes anim1 /* Firefox */
 {
-0%   {background: #88FFC0;}
-100% {background: #99CCFF;}
+	0%   {background: #88FFC0;}
+	100% {background: #99CCFF;}
 }
-
 @-webkit-keyframes anim1 /* Safari and Chrome */
 {
-0%   {background: #88FFC0;}
-100% {background: #99CCFF;}
+	0%   {background: #88FFC0;}
+	100% {background: #99CCFF;}
+}
+
+@keyframes explosion
+{
+	0%   {background: #99CCFF;}
+	50%  {background: red;}
+	100% {background: #99CCFF;}
+}
+@-moz-keyframes explosion /* Firefox */
+{
+	0%   {background: #99CCFF;}
+	50%  {background: red;}
+	100% {background: #99CCFF;}
+}
+@-webkit-keyframes explosion /* Safari and Chrome */
+{
+	0%   {background: #99CCFF;}
+	50%  {background: red;}
+	100% {background: #99CCFF;}
 }
