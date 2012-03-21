@@ -58,6 +58,12 @@ Game.prototype.render = function() {
 						var hit = scope.player1.checkHit(bombCoords);
 						scope.player2.moveResult(bombCoords, hit);
 						scope.field1.addBomb({x: bombCoords.x, y: bombCoords.y, hit: hit});
+						if (hit) {
+							var fullHit = Field.checkFullHit(scope.player1.ships, scope.field1.bombs, bombCoords);
+						}
+						if (fullHit) {
+							scope.field1.setShipSunk(fullHit);
+						}
 						scope.field1.setStatus('Sinu kord!');
 						scope.field2.setStatus('');
 						scope.currentPlayer = scope.player1;
