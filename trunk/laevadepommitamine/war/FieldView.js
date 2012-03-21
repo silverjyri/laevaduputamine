@@ -137,6 +137,12 @@ setAnim1: function(box) {
 	box.css('-webkit-animation', 'anim1 1s linear');
 },
 
+setAnimExplosion: function(box) {
+	box.css('animation', 'explosion 1s linear');
+	box.css('-moz-animation', 'explosion 1s linear');
+	box.css('-webkit-animation', 'explosion 1s linear');
+},
+
 renderShip: function(ship) {
 	var x = ship.x;
 	var y = ship.y;
@@ -249,6 +255,7 @@ addBomb: function(bomb) {
 
 renderBomb: function(bomb) {
 	var box = $('#'+this.getBoxId(bomb.x, bomb.y));
+	this.setAnimExplosion(box);
 	if (bomb.hit) {
 		box.addClass('bomb');
 	} else {
