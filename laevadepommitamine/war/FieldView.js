@@ -131,15 +131,22 @@ addShip: function(ship) {
 	return true;
 },
 
+setAnim1: function(box) {
+	box.css('animation', 'anim1 1s linear');
+	box.css('-moz-animation', 'anim1 1s linear');
+	box.css('-webkit-animation', 'anim1 1s linear');
+},
+
 renderShip: function(ship) {
 	var x = ship.x;
 	var y = ship.y;
 	var length = ship.length;
 	var vertical = ship.vertical;
-
+	
 	if (length == 1) {
 		var box = $('#'+this.getBoxId(x, y));
 		box.addClass('ship_single');
+		this.setAnim1(box);
 		return;
 	}
 	
@@ -147,6 +154,7 @@ renderShip: function(ship) {
 	if (vertical) {
 		for (i = 0; i < length; i++) {
 			var box = $('#'+this.getBoxId(x, y + i));
+			this.setAnim1(box);
 			if (i == 0) {
 				box.addClass('ship_vertical_1');
 			} else if (i == length - 1) {
@@ -158,6 +166,7 @@ renderShip: function(ship) {
 	} else {
 		for (i = 0; i < length; i++) {
 			var box = $('#'+this.getBoxId(x + i, y));
+			this.setAnim1(box);
 			if (i == 0) {
 				box.addClass('ship_horizontal_1');
 			} else if (i == length - 1) {

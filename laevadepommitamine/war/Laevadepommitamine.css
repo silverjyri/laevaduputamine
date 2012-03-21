@@ -197,3 +197,21 @@ h1 {
 	float: right;
 	color: red;
 }
+
+@keyframes anim1
+{
+0%   {background: #88FFC0;}
+100% {background: #99CCFF;}
+}
+
+@-moz-keyframes anim1 /* Firefox */
+{
+0%   {background: #88FFC0;}
+100% {background: #99CCFF;}
+}
+
+@-webkit-keyframes anim1 /* Safari and Chrome */
+{
+0%   {background: #88FFC0;}
+100% {background: #99CCFF;}
+}
