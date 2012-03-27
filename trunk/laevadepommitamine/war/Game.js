@@ -64,7 +64,7 @@ Game.prototype.render = function() {
 	var p1status = (this.currentPlayer === this.player1) ? "Sinu kord!" : '';
 	var p2status = (this.currentPlayer === this.player2) ? "Ootan vastase k&auml;iku..." : '';
 	this.field1 = new FieldView({id: '1', onMouseDown: onMouseDown, scope: this, ships: this.player1.ships, status: p1status});
-	this.field2 = new FieldView({id: '2', onMouseDown: onMouseDown, scope: this});
+	this.field2 = new FieldView({id: '2', onMouseDown: onMouseDown, scope: this, status: p2status});
 	el.append(this.field1.render());
 	el.append(this.field2.render());
 

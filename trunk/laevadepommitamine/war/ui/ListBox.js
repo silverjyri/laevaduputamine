@@ -15,21 +15,20 @@ render: function() {
 	this.el = el;
 	
 	var items = this.items;
-	$.each(this.items, function(i, val) {
-		if (!(val instanceof ListItem)) {
-			val = new ListItem({text: val});
-			items[i] = val;
-		}
-		el.append(val.render());
+	$.each(this.items, function(i, item) {
+		el.append(item.render());
 	});
 	
 	return el;
 },
 add: function(item) {
+	if (Client.isString(item)) {
+		item = new ListItem({text: item});
+	}
 	this.items[this.items.length] = item;
 	
 	if (this.el) {
-		this.el.append(item);
+		this.el.append(item.render());
 	}
 },
 remove: function(item) {
