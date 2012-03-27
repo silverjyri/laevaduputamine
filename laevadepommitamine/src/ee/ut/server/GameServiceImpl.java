@@ -1,8 +1,6 @@
 package ee.ut.server;
 
-import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -22,77 +20,63 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 	public static JDBCDriver instance = null;
 	public static final String PROTOCOL = "jdbc:hsqldb:mem:myDb";
 	
-
-	public static java.io.OutputStream disableDerbyLogFile(){
-	     return new java.io.OutputStream() {
-	         public void write(int b) throws IOException {
-	             // Ignore all log messages
-	         }
-	     };
-	}
-	
-	@Override
-	public String getString() {
+	public static void ensureDatabase() {
 		if (instance == null) {
 			try {
 				instance = (JDBCDriver) Class.forName(DRIVER).newInstance();
 			} catch (InstantiationException e) {
 				e.printStackTrace();
-				return e.getMessage();
 			} catch (IllegalAccessException e) {
 				e.printStackTrace();
-				return e.getMessage();
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
-				return e.getMessage();
 			}
 		}
-		
+	}
+	
+	@Override
+	public void createGame() {
+		Database.ensure();
 		Connection conn;
 		try {
-			conn = DriverManager.getConnection(PROTOCOL);
-			//conn = instance.connect(PROTOCOL, null);
+			conn = Database.getConnection();
+
 			Statement sta = conn.createStatement();
-			ResultSet tables = conn.getMetaData().getTables(conn.getCatalog(), null, "%", null);
-			boolean exists = false;
-			while(tables.next()) {
-				if (tables.getString(3).equalsIgnoreCase("Edetabel")) {
-					exists = true;
-					break;
-				}
-			}
-			if (!exists) {
-				sta.executeUpdate("CREATE TABLE Edetabel ("
+			sta.executeUpdate("INSERT INTO Games VALUES (3, 'Mari vs. Helen')");
+			sta.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Override
+	public List<String> getGamesList() {
+		Database.ensure();
+		List<String> list = new ArrayList<String>();
+		Connection conn;
+
+		try {
+			conn = Database.getConnection();
+			Statement sta = conn.createStatement();
+			if (!Database.tableExists(conn, "Games")) {
+				sta.executeUpdate("CREATE TABLE Games ("
 						+ " ID INTEGER PRIMARY KEY,"
-						+ "Name char(50),"
-						+ "Score INTEGER)");
-				sta.executeUpdate("INSERT INTO Edetabel VALUES (1, 'Silver', 100)");
-				sta.executeUpdate("INSERT INTO Edetabel VALUES (2, 'Andres', 50)");
+						+ "Name char(50))");
+				sta.executeUpdate("INSERT INTO Games VALUES (1, 'Andres vs. P&auml;tris')");
+				sta.executeUpdate("INSERT INTO Games VALUES (2, 'Silver vs. AI')");
 			}
-			ResultSet resultSet = sta.executeQuery("SELECT Name, Score FROM Edetabel");
-			String list = "\nEdetabel:\n";
+			ResultSet resultSet = sta.executeQuery("SELECT Name FROM Games");
 			while (resultSet.next()) {
 				String name = resultSet.getString(1);
-				Integer score = resultSet.getInt(2);
-				list += name + score.toString() + "\n";
-				sta.executeUpdate("UPDATE Edetabel SET Score=" + Integer.toString(score + 10) + " WHERE Name='" + name + "'");
+				list.add(name);
 			}
 			sta.close();
 
 			conn.close();
-			
-			return "Database OK" + list;
 		} catch (SQLException e) {
 			e.printStackTrace();
-			return e.getMessage();
 		}
-	}
-
-	@Override
-	public List<String> getGamesList() {
-		List<String> games = new ArrayList<String>();
-		games.add("Andres vs. P&auml;tris");
-		games.add("Silver vs. AI");
-		return games;
+		
+		return list;
 	}
 }
