@@ -14,13 +14,12 @@ public class Laevadepommitamine implements EntryPoint {
 
 	public static void createGame()
 	{
-		gameService.getString(new AsyncCallback<String>() {
+		gameService.createGame(new AsyncCallback<Void>() {
 			public void onFailure(Throwable caught) {
 				Window.alert("RPC failed.");
 			}
 
-			public void onSuccess(String result) {
-				Window.alert("RPC OK." + result);
+			public void onSuccess(Void result) {
 			}
 		});
 	}
