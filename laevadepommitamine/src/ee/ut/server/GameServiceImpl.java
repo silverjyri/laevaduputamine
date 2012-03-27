@@ -6,6 +6,8 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.hsqldb.jdbc.JDBCDriver;
 
@@ -84,5 +86,13 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 			e.printStackTrace();
 			return e.getMessage();
 		}
+	}
+
+	@Override
+	public List<String> getGamesList() {
+		List<String> games = new ArrayList<String>();
+		games.add("Andres vs. P&auml;tris");
+		games.add("Silver vs. AI");
+		return games;
 	}
 }

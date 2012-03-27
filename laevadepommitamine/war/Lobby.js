@@ -38,12 +38,7 @@ Lobby.prototype.render = function() {
 
 	var lists = $('<div id="lists"></div>');
 	var gamesList = new ListBox();
-	gamesList.add("Game 1");
-	gamesList.add("Game 2");
-	gamesList.add("Game 4");
-	gamesList.add("Game 5");
-	gamesList.add("Game 6");
-	gamesList.add("Game 7");
+	window.getGamesList();
 	this.gamesList = gamesList;
 	var playersList = new ListBox();
 	lists.append(gamesList.render());

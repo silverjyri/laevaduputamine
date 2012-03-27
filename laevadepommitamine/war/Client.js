@@ -1,4 +1,5 @@
 Client = {};
+window.Client = Client;
 
 $LAB
 .script("ui/Button.js")
@@ -10,7 +11,7 @@ $LAB
 .wait()
 .script("Lobby.js")
 .wait(function() {
-	//Client.startLobby();
+	Client.startLobby();
 })
 .script("ShipFloating.js")
 .script("Placement.js")
@@ -20,7 +21,7 @@ $LAB
 .script("controller/AIPlayer.js")
 .script("controller/Field.js")
 .wait(function() {
-	Client.startPlacement();
+	//Client.startPlacement();
 })
 .script("Game.js");
 
@@ -50,4 +51,8 @@ Client.stopGame = function() {
 
 Client.rand = function(n) {
 	return Math.floor(Math.random()*(n+1));
+};
+
+Client.isString = function(value) {
+    return typeof value === 'string';
 };
