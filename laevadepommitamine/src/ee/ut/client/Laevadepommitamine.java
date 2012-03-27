@@ -11,7 +11,7 @@ public class Laevadepommitamine implements EntryPoint {
 
 	private static final GameServiceAsync gameService = (GameServiceAsync) GWT
 			.create(GameService.class);
-	
+
 	public static void createGame()
 	{
 		gameService.getString(new AsyncCallback<String>() {
@@ -28,7 +28,7 @@ public class Laevadepommitamine implements EntryPoint {
 	public native static void addGame(String game) /*-{
 		$wnd.Client.lobby.gamesList.add(game);
 	}-*/;
-	
+
 	public static void getGamesList()
 	{
 		gameService.getGamesList(new AsyncCallback<List<String>>() {
@@ -43,7 +43,7 @@ public class Laevadepommitamine implements EntryPoint {
 			}
 		});
 	}
-	
+
 	public native void exportMethods() /*-{
 		$wnd.createGame = $entry(@ee.ut.client.Laevadepommitamine::createGame());
 		$wnd.getGamesList = $entry(@ee.ut.client.Laevadepommitamine::getGamesList());

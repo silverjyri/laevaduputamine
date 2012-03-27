@@ -1,21 +1,28 @@
 Client = {};
 window.Client = Client;
 
+Client.rand = function(n) {
+	return Math.floor(Math.random()*(n+1));
+};
+
+Client.isString = function(value) {
+    return typeof value === 'string';
+};
+
 $LAB
-.script("ui/Button.js")
-.script("ui/ListItem.js")
-.script("ui/Menu.js")
-.script("Screen.js")
+.script("ui/components/Button.js")
+.script("ui/components/ListItem.js")
+.script("ui/components/Menu.js")
 .wait()
-.script("ui/ListBox.js")
+.script("ui/components/ListBox.js")
 .wait()
 .script("Lobby.js")
 .wait(function() {
 	Client.startLobby();
 })
-.script("ShipFloating.js")
+.script("ui/ShipFloating.js")
 .script("Placement.js")
-.script("FieldView.js")
+.script("ui/FieldView.js")
 .script("controller/LocalPlayer.js")
 .script("controller/WebPlayer.js")
 .script("controller/AIPlayer.js")
@@ -48,11 +55,3 @@ Client.stopGame = function() {
 	delete this.game;
 	Client.startLobby();
 }
-
-Client.rand = function(n) {
-	return Math.floor(Math.random()*(n+1));
-};
-
-Client.isString = function(value) {
-    return typeof value === 'string';
-};
