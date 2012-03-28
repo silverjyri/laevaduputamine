@@ -29,7 +29,9 @@ Lobby.prototype = {
 	  	    	}
 	  	    }}),
 	  	    new Button("Logi sisse"),
-	  	    new Button("Edetabel"),
+	  	    new Button("Edetabel", {fn: function() {
+	  	    	Client.startRankings();
+	  	    }}),
 	  	    new Button("Ajalugu")
 	  	]);
 	  	el.append(this.menu.render());

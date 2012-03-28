@@ -10,12 +10,20 @@
     <servlet-name>gameServlet</servlet-name>
     <servlet-class>ee.ut.server.GameServiceImpl</servlet-class>
   </servlet>
-  
+  <servlet>
+    <servlet-name>rankingsServlet</servlet-name>
+    <servlet-class>ee.ut.server.RankingsServiceImpl</servlet-class>
+  </servlet>
+
   <servlet-mapping>
     <servlet-name>gameServlet</servlet-name>
     <url-pattern>/laevadepommitamine/game</url-pattern>
   </servlet-mapping>
-  
+  <servlet-mapping>
+    <servlet-name>rankingsServlet</servlet-name>
+    <url-pattern>/laevadepommitamine/rankings</url-pattern>
+  </servlet-mapping>
+
   <!-- Default page to serve -->
   <welcome-file-list>
     <welcome-file>Laevadepommitamine.html</welcome-file>
