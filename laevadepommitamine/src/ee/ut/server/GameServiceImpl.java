@@ -42,7 +42,7 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 			conn = Database.getConnection();
 
 			Statement sta = conn.createStatement();
-			sta.executeUpdate("INSERT INTO Games VALUES (3, 'Mari vs. Helen')");
+			sta.executeUpdate("INSERT INTO Games VALUES (3, 'Mari ootab...')");
 			sta.close();
 		} catch (SQLException e) {
 			e.printStackTrace();

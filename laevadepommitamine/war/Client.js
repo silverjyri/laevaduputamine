@@ -30,7 +30,8 @@ $LAB
 .wait(function() {
 	//Client.startPlacement();
 })
-.script("Game.js");
+.script("Game.js")
+.script("Rankings.js");
 
 Client.startLobby = function() {
 	this.lobby = this.lobby || new Lobby();
@@ -48,6 +49,12 @@ Client.startGame = function() {
 	this.game = this.game || new Game(this.placement.field.ships);
 	$("#screen_container").html(this.game.render());
 	this.game.onRender();
+};
+
+Client.startRankings = function() {
+	this.rankings = this.rankings || new Rankings();
+	$("#screen_container").html(this.rankings.render());
+	this.rankings.onRender();
 };
 
 Client.stopGame = function() {

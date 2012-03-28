@@ -11,6 +11,8 @@ public class Laevadepommitamine implements EntryPoint {
 
 	private static final GameServiceAsync gameService = (GameServiceAsync) GWT
 			.create(GameService.class);
+	private static final RankingsServiceAsync rankingsService = (RankingsServiceAsync) GWT
+			.create(RankingsService.class);
 
 	public static void createGame()
 	{
@@ -28,6 +30,10 @@ public class Laevadepommitamine implements EntryPoint {
 		$wnd.Client.lobby.gamesList.add(game);
 	}-*/;
 
+	public native static void addRanking(String ranking) /*-{
+		$wnd.Client.rankings.rankingsList.add(ranking);
+	}-*/;
+
 	public static void getGamesList()
 	{
 		gameService.getGamesList(new AsyncCallback<List<String>>() {
@@ -43,9 +49,25 @@ public class Laevadepommitamine implements EntryPoint {
 		});
 	}
 
+	public static void getRankingsList()
+	{
+		rankingsService.getRankingsList(new AsyncCallback<List<String>>() {
+			public void onFailure(Throwable caught) {
+				Window.alert("RPC failed.");
+			}
+
+			public void onSuccess(List<String> result) {
+				for (String ranking : result) {
+					addRanking(ranking);
+				}
+			}
+		});
+	}
+
 	public native void exportMethods() /*-{
 		$wnd.createGame = $entry(@ee.ut.client.Laevadepommitamine::createGame());
 		$wnd.getGamesList = $entry(@ee.ut.client.Laevadepommitamine::getGamesList());
+		$wnd.getRankingsList = $entry(@ee.ut.client.Laevadepommitamine::getRankingsList());
 	}-*/;
 
 	public void onModuleLoad() {
