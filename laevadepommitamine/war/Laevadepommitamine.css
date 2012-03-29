@@ -48,6 +48,10 @@ h1 {
 	padding-top: 2px;
 }
 
+.field_error {
+	color: red;
+}
+
 .menu {
 	margin: 10px;
 }

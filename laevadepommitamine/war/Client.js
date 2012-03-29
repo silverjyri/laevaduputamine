@@ -13,6 +13,7 @@ $LAB
 .script("ui/components/Button.js")
 .script("ui/components/ListItem.js")
 .script("ui/components/Menu.js")
+.script("ui/components/TextField.js")
 .wait()
 .script("ui/components/ListBox.js")
 .wait()

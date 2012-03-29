@@ -36,6 +36,10 @@ Lobby.prototype = {
 	  	]);
 	  	el.append(this.menu.render());
 
+	  	var username = new TextField();
+	  	this.username = username;
+	  	el.append(username.render());
+	  	
 		var lists = $('<div id="lists"></div>');
 		var gamesList = new ListBox();
 		window.getGamesList();
