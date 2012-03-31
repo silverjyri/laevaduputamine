@@ -1,18 +1,20 @@
 function TextField( options) {
 	if (options) {
-		this.text = text;
+		this.text = options.text;
 		this.fn = options.fn;
 		this.scope = options.scope;
 		this.style = options.style;
+		this.errorText = options.error;
+		this.labelText = options.label;
 	}
 }
 
 TextField.prototype = {
 	onRender: function() {
 		if (this.scope) {
-			this.el.click($.proxy(this.fn, this.scope));
+			this.el.keydown($.proxy(this.fn, this.scope));
 		} else {
-			this.el.click(this.fn);
+			this.el.keydown(this.fn);
 		}
 	},
 
@@ -22,11 +24,17 @@ TextField.prototype = {
 		}
 
 		var el = $('<div class="input_field"></div>');
+		if (this.labelText) {
+			this.labelEl = $('<p class="field_label">' + this.labelText + '</p>');
+			el.append(this.labelEl);
+		}
 		var text = this.text ? ('value="' + this.text + '"') : '';
-		var inputEl = $('<input type="text" ' + text + ' />');
-		var errorEl = $('<p class="field_error">Nimi on juba v&otilde;etud!</p>');
-		el.append(inputEl);
-		el.append(errorEl);
+		this.inputEl = $('<input type="text" ' + text + ' />');
+		el.append(this.inputEl);
+		if (this.errorText) {
+			this.errorEl = $('<p class="field_error">' + this.errorText + '</p>');
+			el.append(this.errorEl);
+		}
 
 		if (this.style) {
 			el.css(this.style);
@@ -39,8 +47,27 @@ TextField.prototype = {
 
 	setText: function(text) {
 		this.text = text;
+		if (this.inputEl) {
+			this.inputEl.val(text);
+		}
+	},
+
+	setError: function(text) {
+		this.errorText = text;
 		if (this.el) {
-			this.el.html(text);
+			if (!text) {
+				if (this.errorEl) {
+					this.errorEl.remove();
+					delete this.errorEl;
+				}
+			} else {
+				if (this.errorEl) {
+					this.errorEl.text(text);
+				} else {
+					this.errorEl = $('<p class="field_error">' + text + '</p>');
+					this.el.append(this.errorEl);
+				}
+			}
 		}
 	}
 };

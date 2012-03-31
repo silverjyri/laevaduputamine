@@ -36,7 +36,11 @@ Lobby.prototype = {
 	  	]);
 	  	el.append(this.menu.render());
 
-	  	var username = new TextField();
+	  	var username = new TextField({label: 'Name:', fn: function(e) {
+	  		if (e.keyCode == 13) {
+	  			this.username.setError('Name already taken!');
+	  		}
+	  	}, scope: this});
 	  	this.username = username;
 	  	el.append(username.render());
 	  	
