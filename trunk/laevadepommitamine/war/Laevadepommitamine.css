@@ -54,12 +54,22 @@ h1 {
 	float: left;
 }
 
+.field_input {
+	float: left;
+}
+
 .field_error {
 	color: red;
+	margin: 0px 10px;
+	float: left;
 }
 
 .menu {
 	margin: 10px;
+}
+
+#lists {
+	clear: left;
 }
 
 .list {
