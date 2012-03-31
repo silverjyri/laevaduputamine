@@ -23,14 +23,6 @@ public class RankingsServiceImpl extends RemoteServiceServlet implements Ranking
 		try {
 			conn = Database.getConnection();
 			Statement sta = conn.createStatement();
-			if (!Database.tableExists(conn, "Rankings")) {
-				sta.executeUpdate("CREATE TABLE Rankings ("
-						+ " ID INTEGER PRIMARY KEY,"
-						+ "Name char(50),"
-						+ "Score INTEGER)");
-				sta.executeUpdate("INSERT INTO Rankings VALUES (1, 'Silver', 100)");
-				sta.executeUpdate("INSERT INTO Rankings VALUES (2, 'Andres', 50)");
-			}
 			ResultSet resultSet = sta.executeQuery("SELECT Name, Score FROM Rankings");
 			while (resultSet.next()) {
 				String name = resultSet.getString(1);
@@ -39,7 +31,6 @@ public class RankingsServiceImpl extends RemoteServiceServlet implements Ranking
 				sta.executeUpdate("UPDATE Rankings SET Score=" + Integer.toString(score + 10) + " WHERE Name='" + name + "'");
 			}
 			sta.close();
-
 			conn.close();
 			
 		} catch (SQLException e) {

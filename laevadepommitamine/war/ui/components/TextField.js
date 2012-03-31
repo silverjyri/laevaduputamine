@@ -29,7 +29,7 @@ TextField.prototype = {
 			el.append(this.labelEl);
 		}
 		var text = this.text ? ('value="' + this.text + '"') : '';
-		this.inputEl = $('<input type="text" ' + text + ' />');
+		this.inputEl = $('<input class="field_input" type="text" ' + text + ' />');
 		el.append(this.inputEl);
 		if (this.errorText) {
 			this.errorEl = $('<p class="field_error">' + this.errorText + '</p>');
