@@ -15,15 +15,15 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 	private static final long serialVersionUID = 1L;
 	
 	@Override
-	public void createGame() {
+	public void createGame(String playerName) {
 		Database.ensure();
 		Connection conn;
 		try {
 			conn = Database.getConnection();
-
 			Statement sta = conn.createStatement();
-			sta.executeUpdate("INSERT INTO Games (name) VALUES ('Mari ootab...')");
+			sta.executeUpdate("INSERT INTO Games (name) VALUES ('" + playerName + " ootab...')");
 			sta.close();
+			conn.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -44,12 +44,41 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 				list.add(name);
 			}
 			sta.close();
-
 			conn.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		
 		return list;
+	}
+
+	boolean isNameAvailable(String name) {
+		Database.ensure();
+		Connection conn;
+		try {
+			conn = Database.getConnection();
+			Statement sta = conn.createStatement();
+			ResultSet resultSet = sta.executeQuery("SELECT * FROM Players WHERE name='" + name + "'");
+			boolean available = !resultSet.next();
+			//int count = resultSet.getInt(1);
+			//boolean available = resultSet.getInt(1) == 0;
+			sta.close();
+			conn.close();
+			return available;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
+	@Override
+	public String getUniquePlayerName() {
+		Integer number = 1;
+		String name = "Player #" + number.toString();
+		while (!isNameAvailable(name)) {
+			number++;
+			name = "Player #" + number.toString();
+		}
+		return name;
 	}
 }

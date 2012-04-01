@@ -14,9 +14,9 @@ public class Laevadepommitamine implements EntryPoint {
 	private static final RankingsServiceAsync rankingsService = (RankingsServiceAsync) GWT
 			.create(RankingsService.class);
 
-	public static void createGame()
+	public static void createGame(String playerName)
 	{
-		gameService.createGame(new AsyncCallback<Void>() {
+		gameService.createGame(playerName, new AsyncCallback<Void>() {
 			public void onFailure(Throwable caught) {
 				Window.alert("RPC failed.");
 			}
@@ -30,10 +30,18 @@ public class Laevadepommitamine implements EntryPoint {
 		$wnd.Client.lobby.gamesList.add(game);
 	}-*/;
 
+	public native static void clearGames() /*-{
+		$wnd.Client.lobby.gamesList.clear();
+	}-*/;
+
 	public native static void addRanking(String ranking) /*-{
 		$wnd.Client.rankings.rankingsList.add(ranking);
 	}-*/;
 
+	public native static void setPlayerName(String name) /*-{
+		$wnd.Client.lobby.username.setText(name);
+	}-*/;
+	
 	public static void getGamesList()
 	{
 		gameService.getGamesList(new AsyncCallback<List<String>>() {
@@ -42,6 +50,7 @@ public class Laevadepommitamine implements EntryPoint {
 			}
 
 			public void onSuccess(List<String> result) {
+				clearGames();
 				for (String game : result) {
 					addGame(game);
 				}
@@ -49,6 +58,19 @@ public class Laevadepommitamine implements EntryPoint {
 		});
 	}
 
+	public static void getUniquePlayerName()
+	{
+		gameService.getUniquePlayerName(new AsyncCallback<String>() {
+			public void onFailure(Throwable caught) {
+				Window.alert("RPC failed.");
+			}
+
+			public void onSuccess(String result) {
+				setPlayerName(result);
+			}
+		});
+	}
+	
 	public static void getRankingsList()
 	{
 		rankingsService.getRankingsList(new AsyncCallback<List<String>>() {
@@ -65,8 +87,9 @@ public class Laevadepommitamine implements EntryPoint {
 	}
 
 	public native void exportMethods() /*-{
-		$wnd.createGame = $entry(@ee.ut.client.Laevadepommitamine::createGame());
+		$wnd.createGame = $entry(@ee.ut.client.Laevadepommitamine::createGame(Ljava/lang/String;));
 		$wnd.getGamesList = $entry(@ee.ut.client.Laevadepommitamine::getGamesList());
+		$wnd.getUniquePlayerName = $entry(@ee.ut.client.Laevadepommitamine::getUniquePlayerName());
 		$wnd.getRankingsList = $entry(@ee.ut.client.Laevadepommitamine::getRankingsList());
 	}-*/;
 

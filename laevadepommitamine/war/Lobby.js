@@ -4,6 +4,9 @@ function Lobby() {
 Lobby.prototype = {
 	onRender: function() {
 		this.menu.onRender();
+
+		window.getGamesList();
+		window.getUniquePlayerName();
 	},
 
 	render: function() {
@@ -46,7 +49,6 @@ Lobby.prototype = {
 	  	
 		var lists = $('<div id="lists"></div>');
 		var gamesList = new ListBox();
-		window.getGamesList();
 		this.gamesList = gamesList;
 		var playersList = new ListBox();
 		lists.append(gamesList.render());
