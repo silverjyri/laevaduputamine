@@ -46,5 +46,11 @@ ListBox.prototype = {
 		if (this.el && item instanceof ListItem) {
 			item.el.remove();
 		}
+	},
+	clear: function() {
+		this.items = [];
+		if (this.el) {
+			this.el.html('');
+		}
 	}
 };

@@ -41,7 +41,12 @@ Client.startLobby = function() {
 };
 
 Client.startPlacement = function() {
-	this.placement = this.placement || new Placement();
+	var username;
+	if (this.lobby) {
+		this.lobby.username.setEnabled(false);
+		username = this.lobby.username.getText();
+	}
+	this.placement = this.placement || new Placement(username);
 	$("#screen_container").html(this.placement.render());
 	this.placement.onRender();
 };

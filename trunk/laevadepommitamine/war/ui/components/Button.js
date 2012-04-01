@@ -6,6 +6,7 @@ function Button(text, options) {
 		this.scope = options.scope;
 		this.image = options.image;
 		this.style = options.style;
+		this.disabled = options.disabled;
 	}
 }
 
@@ -23,10 +24,14 @@ Button.prototype = {
 			return this.el;
 		}
 
+		var el;
 		if (this.image) {
-			var el = $('<img class="button_img" src="' + this.image + '" alt="' + this.text + '" />');
+			el = $('<img class="button_img" src="' + this.image + '" alt="' + this.text + '" />');
 		} else {
-			var el = $('<button type="button" class="button">' + this.text + '</button>');
+			el = $('<button type="button" class="button">' + this.text + '</button>');
+		}
+		if (this.disabled) {
+			el.attr('disabled', 'disabled');
 		}
 
 		if (this.style) {
@@ -42,6 +47,19 @@ Button.prototype = {
 		this.text = text;
 		if (this.el) {
 			this.el.html(text);
+		}
+	},
+
+	setEnabled: function(enabled) {
+		if (this.disabled == enabled) {
+			if (this.el) {
+				if (enabled) {
+					this.el.removeAttr('disabled');
+				} else {
+					this.el.attr('disabled', 'disabled');
+				}
+			}
+			this.disabled = !enabled;
 		}
 	}
 };

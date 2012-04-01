@@ -6,6 +6,7 @@ function TextField( options) {
 		this.style = options.style;
 		this.errorText = options.error;
 		this.labelText = options.label;
+		this.disabled = options.disabled;
 	}
 }
 
@@ -28,9 +29,14 @@ TextField.prototype = {
 			this.labelEl = $('<p class="field_label">' + this.labelText + '</p>');
 			el.append(this.labelEl);
 		}
+
 		var text = this.text ? ('value="' + this.text + '"') : '';
 		this.inputEl = $('<input class="field_input" type="text" ' + text + ' />');
+		if (this.disabled) {
+			this.inputEl.attr('disabled', 'disabled');
+		}
 		el.append(this.inputEl);
+
 		if (this.errorText) {
 			this.errorEl = $('<p class="field_error">' + this.errorText + '</p>');
 			el.append(this.errorEl);
@@ -45,10 +51,30 @@ TextField.prototype = {
 		return el;
 	},
 
+	getText: function() {
+		if (this.inputEl) {
+			return this.inputEl.val();
+		}
+		return this.text;
+	},
+	
 	setText: function(text) {
 		this.text = text;
 		if (this.inputEl) {
 			this.inputEl.val(text);
+		}
+	},
+
+	setEnabled: function(enabled) {
+		if (this.disabled == enabled) {
+			if (this.inputEl) {
+				if (enabled) {
+					this.inputEl.removeAttr('disabled');
+				} else {
+					this.inputEl.attr('disabled', 'disabled');
+				}
+			}
+			this.disabled = !enabled;
 		}
 	},
 

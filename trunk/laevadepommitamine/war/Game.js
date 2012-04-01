@@ -2,9 +2,6 @@ function Game(ships) {
 	this.player1 = new LocalPlayer("blabla", ships);
 	this.player2 = new AIPlayer();
 	this.currentPlayer = Client.rand(1) ? this.player1 : this.player2;
-
-	// Call to server
-	window.createGame();
 }
 
 Game.prototype = {
