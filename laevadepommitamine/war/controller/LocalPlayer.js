@@ -4,7 +4,11 @@ function LocalPlayer(name, ships) {
 }
 
 LocalPlayer.prototype = {
-checkHit: function(coords) {
-	return Field.checkHit(this.ships, coords);
-}
+	isRemote: function() {
+		return false;
+	},
+
+	checkHit: function(coords) {
+		return Field.checkHit(this.ships, coords);
+	}
 };
