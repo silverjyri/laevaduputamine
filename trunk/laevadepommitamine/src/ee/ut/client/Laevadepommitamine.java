@@ -27,7 +27,7 @@ public class Laevadepommitamine implements EntryPoint {
 	}
 
 	public native static void addGame(String game) /*-{
-		$wnd.Client.lobby.gamesList.add(game);
+		$wnd.Client.lobby.addGame(game);
 	}-*/;
 
 	public native static void clearGames() /*-{
@@ -36,6 +36,10 @@ public class Laevadepommitamine implements EntryPoint {
 
 	public native static void addRanking(String ranking) /*-{
 		$wnd.Client.rankings.rankingsList.add(ranking);
+	}-*/;
+
+	public native static void clearRankings() /*-{
+		$wnd.Client.rankings.rankingsList.clear();
 	}-*/;
 
 	public native static void setPlayerName(String name) /*-{
@@ -79,6 +83,7 @@ public class Laevadepommitamine implements EntryPoint {
 			}
 
 			public void onSuccess(List<String> result) {
+				clearRankings();
 				for (String ranking : result) {
 					addRanking(ranking);
 				}
@@ -87,10 +92,13 @@ public class Laevadepommitamine implements EntryPoint {
 	}
 
 	public native void exportMethods() /*-{
-		$wnd.createGame = $entry(@ee.ut.client.Laevadepommitamine::createGame(Ljava/lang/String;));
-		$wnd.getGamesList = $entry(@ee.ut.client.Laevadepommitamine::getGamesList());
-		$wnd.getUniquePlayerName = $entry(@ee.ut.client.Laevadepommitamine::getUniquePlayerName());
-		$wnd.getRankingsList = $entry(@ee.ut.client.Laevadepommitamine::getRankingsList());
+		if (!$wnd.Server) {
+			$wnd.Server = {};
+		}
+		$wnd.Server.createGame = $entry(@ee.ut.client.Laevadepommitamine::createGame(Ljava/lang/String;));
+		$wnd.Server.getGamesList = $entry(@ee.ut.client.Laevadepommitamine::getGamesList());
+		$wnd.Server.getUniquePlayerName = $entry(@ee.ut.client.Laevadepommitamine::getUniquePlayerName());
+		$wnd.Server.getRankingsList = $entry(@ee.ut.client.Laevadepommitamine::getRankingsList());
 	}-*/;
 
 	public void onModuleLoad() {

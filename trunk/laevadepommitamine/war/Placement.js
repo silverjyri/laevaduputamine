@@ -1,6 +1,6 @@
 function Placement(playerName) {
 	// Call to server
-	window.createGame(playerName);
+	Server.createGame(playerName);
 }
 
 Placement.prototype = {
@@ -140,7 +140,7 @@ Placement.prototype = {
 		$.each(this.shipCounts, function(index, value) {
 			shipContainer.append(value);
 		});
-		this.readyBtn = new Button("Valmis", {disabled: true, scope: this, fn: function() {
+		this.readyBtn = new Button("Valmis", {disabled: false, scope: this, fn: function() {
 			Client.startGame(this.field.ships);
 		}, style: {position: 'absolute', left: 90, top: 200}});
 		shipContainer.append(this.readyBtn.render());

@@ -5,8 +5,8 @@ Lobby.prototype = {
 	onRender: function() {
 		this.menu.onRender();
 
-		window.getGamesList();
-		window.getUniquePlayerName();
+		Server.getGamesList();
+		Server.getUniquePlayerName();
 	},
 
 	render: function() {
@@ -25,6 +25,7 @@ Lobby.prototype = {
 	  	    new Button("Esileht", {image: 'img/home.png'}),
 	  	    new Button(Client.placement ? "Tagasi m&auml;ngu" : "Alusta m&auml;ngu",
 	  	    	{scope: this, fn: function() {
+	  	    	this.username.setError('Name already taken!');
 	  	    	if (Client.game) {
 	  	    		Client.startGame();
 	  	    	} else {
@@ -47,15 +48,16 @@ Lobby.prototype = {
 	  	this.username = username;
 	  	el.append(username.render());
 	  	
-		var lists = $('<div id="lists"></div>');
 		var gamesList = new ListBox();
 		this.gamesList = gamesList;
-		var playersList = new ListBox();
-		lists.append(gamesList.render());
-		lists.append(playersList.render());
-		el.append(lists);
+		el.append(gamesList.render());
 
 		this.el = el;
 		return el;
 	},
+
+	addGame: function(name) {
+		var item = new ListItem({text: name, image: 'img/game.png'});
+		this.gamesList.add(item);
+	}
 };

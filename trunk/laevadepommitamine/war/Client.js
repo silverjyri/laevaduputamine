@@ -1,6 +1,11 @@
 Client = {};
 window.Client = Client;
 
+if (!window.Server) {
+	window.Server = {};
+}
+Server = window.Server;
+
 Client.rand = function(n) {
 	return Math.floor(Math.random()*(n+1));
 };
