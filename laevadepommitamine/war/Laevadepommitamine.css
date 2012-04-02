@@ -131,6 +131,16 @@ h1 {
 	background-color: #88BBEE;
 }
 
+.bomb_layer {
+	width: 32px;
+	height: 32px;
+}
+
+.ship_layer {
+	width: 32px;
+	height: 32px;
+}
+
 .ship_single {
 	background-image: url('img/vertic4.png');
 }

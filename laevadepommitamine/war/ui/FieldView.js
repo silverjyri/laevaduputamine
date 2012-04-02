@@ -150,7 +150,10 @@ FieldView.prototype = {
 
 		if (length == 1) {
 			var box = $('#'+this.getBoxId(x, y));
-			box.addClass('ship_single');
+			box.html('');
+			var shipLayer = $('<div class="ship_layer"></div>');
+			box.append(shipLayer);
+			shipLayer.addClass('ship_single');
 			this.setAnim1(box);
 			return;
 		}
@@ -159,25 +162,31 @@ FieldView.prototype = {
 		if (vertical) {
 			for (i = 0; i < length; i++) {
 				var box = $('#'+this.getBoxId(x, y + i));
+				box.html('');
+				var shipLayer = $('<div class="ship_layer"></div>');
+				box.append(shipLayer);
 				this.setAnim1(box);
 				if (i == 0) {
-					box.addClass('ship_vertical_1');
+					shipLayer.addClass('ship_vertical_1');
 				} else if (i == length - 1) {
-					box.addClass('ship_vertical_3');
+					shipLayer.addClass('ship_vertical_3');
 				} else {
-					box.addClass('ship_vertical_2');
+					shipLayer.addClass('ship_vertical_2');
 				}
 			}
 		} else {
 			for (i = 0; i < length; i++) {
 				var box = $('#'+this.getBoxId(x + i, y));
+				box.html('');
+				var shipLayer = $('<div class="ship_layer"></div>');
+				box.append(shipLayer);
 				this.setAnim1(box);
 				if (i == 0) {
-					box.addClass('ship_horizontal_1');
+					shipLayer.addClass('ship_horizontal_1');
 				} else if (i == length - 1) {
-					box.addClass('ship_horizontal_3');
+					shipLayer.addClass('ship_horizontal_3');
 				} else {
-					box.addClass('ship_horizontal_2');
+					shipLayer.addClass('ship_horizontal_2');
 				}
 			}
 		}
@@ -213,7 +222,7 @@ FieldView.prototype = {
 
 		if (length == 1) {
 			var box = $('#'+this.getBoxId(x, y));
-			box.removeClass('ship_single');
+			box.html('');
 			return true;
 		}
 
@@ -221,24 +230,12 @@ FieldView.prototype = {
 		if (ship.vertical) {
 			for (i = 0; i < length; i++) {
 				var box = $('#'+this.getBoxId(x, y + i));
-				if (i == 0) {
-					box.removeClass('ship_vertical_1');
-				} else if (i == length - 1) {
-					box.removeClass('ship_vertical_3');
-				} else {
-					box.removeClass('ship_vertical_2');
-				}
+				box.html('');
 			}
 		} else {
 			for (i = 0; i < length; i++) {
 				var box = $('#'+this.getBoxId(x + i, y));
-				if (i == 0) {
-					box.removeClass('ship_horizontal_1');
-				} else if (i == length - 1) {
-					box.removeClass('ship_horizontal_3');
-				} else {
-					box.removeClass('ship_horizontal_2');
-				}
+				box.html('');
 			}
 		}
 	},
@@ -254,11 +251,13 @@ FieldView.prototype = {
 
 	renderBomb: function(bomb) {
 		var box = $('#'+this.getBoxId(bomb.x, bomb.y));
+		var bombLayer = $('<div class="bomb_layer"></div>');
+		box.append(bombLayer);
 		this.setAnimExplosion(box);
 		if (bomb.hit) {
-			box.addClass('bomb');
+			bombLayer.addClass('bomb');
 		} else {
-			box.addClass('empty');
+			bombLayer.addClass('empty');
 		}
 	},
 
