@@ -2,6 +2,7 @@ function ListItem(options) {
 	if (options) {
 		this.id = options.id;
 		this.text = options.text;
+		this.image = options.image;
 	}
 }
 
@@ -11,7 +12,10 @@ ListItem.prototype = {
 		if (this.id) {
 			el.attr("id", this.id);
 		}
-		el.append(this.text);
+		if (this.image) {
+			el.append('<img class="button_img" src="' + this.image + '" alt="' + this.text + '" />');
+		}
+		el.append('<div class="listitem_text">' + this.text + '</div>');
 		this.el = el;
 		return el;
 	}

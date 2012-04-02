@@ -1,11 +1,10 @@
 function Rankings() {
-	// Call to server
-	//window.getRankingsList();
 }
 
 Rankings.prototype = {
 	onRender: function() {
 		this.menu.onRender();
+		Server.getRankingsList();
 	},
 
 	render: function() {
@@ -23,7 +22,6 @@ Rankings.prototype = {
 		el.append(this.menu.render());
 
 		this.rankingsList = new ListBox();
-		window.getRankingsList();
 		el.append(this.rankingsList.render());
 
 		this.el = el;

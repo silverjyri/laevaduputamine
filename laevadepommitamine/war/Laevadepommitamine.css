@@ -77,10 +77,6 @@ h1 {
 	margin: 10px;
 }
 
-#lists {
-	clear: left;
-}
-
 .list {
 	border-top: 1px solid #96d1f8;
 	background: #1eba48;
@@ -95,13 +91,29 @@ h1 {
 	margin-top:10px;
 	margin-bottom:15px;
 	float: left;
-	width: 200px;
+	clear: both;
+	width: 300px;
 	overflow-y: auto;
-	height: 60px;
+	height: 300px;
 }
 
 .listitem {
 	cursor: pointer;
+	clear: both;
+	height: 48px;
+}
+
+.listitem img {
+	padding: 0px;
+}
+
+.listitem:hover {
+	background: green;
+}
+
+.listitem_text {
+	float:left;
+	margin: 15px;
 }
 
 #screen_container {
