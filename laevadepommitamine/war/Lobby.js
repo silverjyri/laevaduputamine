@@ -25,11 +25,11 @@ Lobby.prototype = {
 	  	    new Button("Esileht", {image: 'img/home.png'}),
 	  	    new Button(Client.placement ? "Tagasi m&auml;ngu" : "Alusta m&auml;ngu",
 	  	    	{scope: this, fn: function() {
-	  	    	this.username.setError('Name already taken!');
 	  	    	if (Client.game) {
 	  	    		Client.startGame();
 	  	    	} else {
-	  	  	    	Client.startPlacement();
+		  	    	this.username.setError('Nimi juba v&otilde;etud!');
+	  	    		Client.startPlacement();
 	  	    	}
 	  	    }}),
 	  	    new Button("Logi sisse"),
@@ -40,9 +40,9 @@ Lobby.prototype = {
 	  	]);
 	  	el.append(this.menu.render());
 
-	  	var username = new TextField({label: 'Name:', fn: function(e) {
+	  	var username = new TextField({label: 'Nimi:', fn: function(e) {
 	  		if (e.keyCode == 13) {
-	  			this.username.setError('Name already taken!');
+	  			this.username.setError('Nimi juba v&otilde;etud!');
 	  		}
 	  	}, scope: this});
 	  	this.username = username;

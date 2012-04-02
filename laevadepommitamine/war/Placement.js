@@ -158,6 +158,12 @@ Placement.prototype = {
 
 			if (ship) {
 				var contPos = this.shipContainer.offset();
+				var coords = this.field.getEventCoords(e);
+				if (coords) {
+					var fieldPos = field.offset();
+					e.pageX = fieldPos.left + coords.x * 33;
+					e.pageY = fieldPos.top + coords.y * 33;
+				}
 				var clone = new ShipFloating(ship.length, ship.vertical, {left: e.pageX - contPos.left, top: e.pageY - contPos.top});
 				field.removeShip(ship);
 				this.dragData = {ship: ship, clone: clone, x: e.pageX, y: e.pageY, existing: true};
@@ -167,7 +173,7 @@ Placement.prototype = {
 			}
 		}
 
-		this.field = new FieldView({onMouseDown: onExistingDrag, scope: this});
+		this.field = new FieldView({id: 0, onMouseDown: onExistingDrag, scope: this});
 		el.append(this.field.render());
 
 		this.el = el;

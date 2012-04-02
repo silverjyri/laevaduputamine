@@ -26,7 +26,7 @@ TextField.prototype = {
 
 		var el = $('<div class="input_field"></div>');
 		if (this.labelText) {
-			this.labelEl = $('<p class="field_label">' + this.labelText + '</p>');
+			this.labelEl = $('<div class="field_label">' + this.labelText + '</div>');
 			el.append(this.labelEl);
 		}
 
@@ -38,7 +38,7 @@ TextField.prototype = {
 		el.append(this.inputEl);
 
 		if (this.errorText) {
-			this.errorEl = $('<p class="field_error">' + this.errorText + '</p>');
+			this.errorEl = $('<div class="field_error">' + this.errorText + '</div>');
 			el.append(this.errorEl);
 		}
 

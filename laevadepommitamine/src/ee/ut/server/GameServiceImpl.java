@@ -21,6 +21,8 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 		try {
 			conn = Database.getConnection();
 			Statement sta = conn.createStatement();
+			sta.executeUpdate("INSERT INTO Players (name) VALUES ('" + playerName + "')");
+			sta.executeUpdate("INSERT INTO Rankings (name, score) VALUES ('" + playerName + "', 0)");
 			sta.executeUpdate("INSERT INTO Games (name) VALUES ('" + playerName + " ootab...')");
 			sta.close();
 			conn.close();
@@ -58,7 +60,7 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 		try {
 			conn = Database.getConnection();
 			Statement sta = conn.createStatement();
-			ResultSet resultSet = sta.executeQuery("SELECT * FROM Players WHERE name='" + name + "'");
+			ResultSet resultSet = sta.executeQuery("SELECT * FROM Players WHERE Name='" + name + "'");
 			boolean available = !resultSet.next();
 			//int count = resultSet.getInt(1);
 			//boolean available = resultSet.getInt(1) == 0;
