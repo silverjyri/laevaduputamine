@@ -27,7 +27,7 @@ public class RankingsServiceImpl extends RemoteServiceServlet implements Ranking
 			while (resultSet.next()) {
 				String name = resultSet.getString(1);
 				Integer score = resultSet.getInt(2);
-				list.add(name + score.toString());
+				list.add(name + ' ' + score.toString());
 				sta.executeUpdate("UPDATE Rankings SET Score=" + Integer.toString(score + 10) + " WHERE Name='" + name + "'");
 			}
 			sta.close();

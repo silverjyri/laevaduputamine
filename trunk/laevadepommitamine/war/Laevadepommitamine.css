@@ -146,11 +146,13 @@ h1 {
 .bomb_layer {
 	width: 32px;
 	height: 32px;
+	position: absolute;
 }
 
 .ship_layer {
 	width: 32px;
 	height: 32px;
+	position: absolute;
 }
 
 .ship_single {

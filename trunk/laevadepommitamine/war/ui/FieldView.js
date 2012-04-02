@@ -130,7 +130,13 @@ FieldView.prototype = {
 		return true;
 	},
 
-	setAnim1: function(box) {
+	clearAnim: function(box) {
+		box.removeClass('animation');
+		box.removeClass('-moz-animation');
+		box.removeClass('-webkit-animation');
+	},
+
+	setAnimAdd: function(box) {
 		box.css('animation', 'anim1 1s linear');
 		box.css('-moz-animation', 'anim1 1s linear');
 		box.css('-webkit-animation', 'anim1 1s linear');
@@ -154,7 +160,7 @@ FieldView.prototype = {
 			var shipLayer = $('<div class="ship_layer"></div>');
 			box.append(shipLayer);
 			shipLayer.addClass('ship_single');
-			this.setAnim1(box);
+			this.setAnimAdd(box);
 			return;
 		}
 
@@ -165,7 +171,7 @@ FieldView.prototype = {
 				box.html('');
 				var shipLayer = $('<div class="ship_layer"></div>');
 				box.append(shipLayer);
-				this.setAnim1(box);
+				this.setAnimAdd(box);
 				if (i == 0) {
 					shipLayer.addClass('ship_vertical_1');
 				} else if (i == length - 1) {
@@ -180,7 +186,7 @@ FieldView.prototype = {
 				box.html('');
 				var shipLayer = $('<div class="ship_layer"></div>');
 				box.append(shipLayer);
-				this.setAnim1(box);
+				this.setAnimAdd(box);
 				if (i == 0) {
 					shipLayer.addClass('ship_horizontal_1');
 				} else if (i == length - 1) {
@@ -201,14 +207,9 @@ FieldView.prototype = {
 		var i, el;
 		for (i = 0; i < ship.length; i++) {
 			el = $('#'+this.getBoxId(x+i*hp, y+i*vp));
-			el.removeClass('ship_single');
-			el.removeClass('ship_vertical_1');
-			el.removeClass('ship_vertical_2');
-			el.removeClass('ship_vertical_3');
-			el.removeClass('ship_horizontal_1');
-			el.removeClass('ship_horizontal_2');
-			el.removeClass('ship_horizontal_3');
-			el.addClass('sunk');
+			var bombLayer = el.children('.bomb_layer').first();
+			bombLayer.removeClass('bomb');
+			bombLayer.addClass('sunk');
 		}
 	},
 
