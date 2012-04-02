@@ -3,8 +3,12 @@ function WebPlayer(name) {
 }
 
 WebPlayer.prototype = {
-checkHit: function(coords) {
-	// TODO: Get result from server
-	return true;
-}
+	isRemote: function() {
+		return true;
+	},
+
+	checkHit: function(coords) {
+		// TODO: Get result from server
+		return true;
+	}
 };

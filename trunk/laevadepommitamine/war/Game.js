@@ -1,5 +1,5 @@
 function Game(ships) {
-	this.player1 = new LocalPlayer("blabla", ships);
+	this.player1 = new AIPlayer();//new LocalPlayer("blabla", ships);
 	this.player2 = new AIPlayer();
 	this.currentPlayer = Client.rand(1) ? this.player1 : this.player2;
 }
@@ -51,7 +51,7 @@ Game.prototype = {
 						this.currentPlayer = this.player2;
 						this.field1.setStatus('');
 						field.setStatus('Ootan vastase k&auml;iku...');
-						setTimeout($.proxy(this.enemyMove, this), 400);
+						setTimeout($.proxy(this.remoteMove, this), 400);
 					}
 				}
 			}
@@ -64,29 +64,40 @@ Game.prototype = {
 		el.append(this.field1.render());
 		el.append(this.field2.render());
 
-		if (this.currentPlayer === this.player2) {
-			setTimeout($.proxy(this.enemyMove, this), 400);
+		if (this.currentPlayer.isRemote()) {
+			setTimeout($.proxy(this.remoteMove, this), 400);
 		}
 
 		this.el = el;
 		return el;
 	},
 
-	enemyMove: function() {
-		var bombCoords = this.player2.makeMove();
-		var hit = this.player1.checkHit(bombCoords);
-		this.player2.moveResult(bombCoords, hit);
-		this.field1.addBomb({x: bombCoords.x, y: bombCoords.y, hit: hit});
-		if (hit) {
-			var fullHit = Field.checkFullHit(this.player1.ships, this.field1.bombs, bombCoords);
-			if (fullHit) {
-				this.field1.setShipSunk(fullHit);
-			}
-			setTimeout($.proxy(this.enemyMove, this), 800);
-			return;
+	remoteMove: function() {
+		var player = this.currentPlayer;
+		var opponent = (player === this.player1) ? this.player2 : this.player1;
+		var playerField, opponentField;
+		if (player === this.player1) {
+			playerField = this.field1;
+			opponentField = this.field2;
+		} else {
+			playerField = this.field2;
+			opponentField = this.field1;
 		}
-		this.field1.setStatus('Sinu kord!');
-		this.field2.setStatus('');
-		this.currentPlayer = this.player1;
+
+		var bombCoords = player.makeMove();
+		var hit = opponent.checkHit(bombCoords);
+		player.moveResult(bombCoords, hit);
+		opponentField.addBomb({x: bombCoords.x, y: bombCoords.y, hit: hit});
+		if (hit) {
+			var fullHit = Field.checkFullHit(opponent.ships, opponentField.bombs, bombCoords);
+			if (fullHit) {
+				opponentField.setShipSunk(fullHit);
+			}
+		} else {
+			opponentField.setStatus('Sinu kord!');
+			playerField.setStatus('');
+			this.currentPlayer = opponent;
+		}
+		setTimeout($.proxy(this.remoteMove, this), 800);
 	}
 };

@@ -20,21 +20,25 @@ AIPlayer.generateShips = function() {
 };
 
 AIPlayer.prototype = {
-checkHit: function(coords) {
-	return Field.checkHit(this.ships, coords);
-},
+	isRemote: function() {
+		return true;
+	},
 
-makeMove: function() {
-	var valid = false;
-	var bomb;
-	while (!valid) {
-		bomb = {x: Client.rand(9), y: Client.rand(9)};
-		valid = !this.enemyBombs['' + bomb.x + bomb.y];
+	checkHit: function(coords) {
+		return Field.checkHit(this.ships, coords);
+	},
+
+	makeMove: function() {
+		var valid = false;
+		var bomb;
+		while (!valid) {
+			bomb = {x: Client.rand(9), y: Client.rand(9)};
+			valid = !this.enemyBombs['' + bomb.x + bomb.y];
+		}
+		return bomb;
+	},
+
+	moveResult: function(coords, hit) {
+		this.enemyBombs['' + coords.x + coords.y] = {x: coords.x, y: coords.y, hit: hit};
 	}
-	return bomb;
-},
-
-moveResult: function(coords, hit) {
-	this.enemyBombs['' + coords.x + coords.y] = {x: coords.x, y: coords.y, hit: hit};
-}
 };
