@@ -111,6 +111,10 @@ h1 {
 	background: green;
 }
 
+.listitem_selected {
+	background: #090 !important;
+}
+
 .listitem_text {
 	float:left;
 	margin: 15px;

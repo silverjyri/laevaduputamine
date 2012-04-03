@@ -40,7 +40,7 @@ FieldView.prototype = {
 
 	onRender: function() {
 		if (this.onMouseDown) {
-			this.el.mousedown(this, $.proxy(this.onMouseDown, this.scope || this));
+			this.el.mousedown(this, this.onMouseDown.bind(this.scope || this));
 		}
 	
 		var ships = this.startShips;

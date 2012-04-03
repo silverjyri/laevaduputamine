@@ -18,7 +18,7 @@ Rankings.prototype = {
 		this.menu.onRender();
 		if (!this.updateTimer) {
 			this.onUpdate();
-			this.updateTimer = setInterval(this.onUpdate.bind(this), 2000);
+			this.updateTimer = setInterval(this.onUpdate.bind(this), 3000);
 		}
 	},
 

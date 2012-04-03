@@ -15,7 +15,7 @@ import ee.ut.client.GameService;
 
 public class GameServiceImpl extends RemoteServiceServlet implements GameService {
 	private static final long serialVersionUID = 1L;
-	
+
 	@Override
 	public Integer createGame(String playerName) {
 		Database.ensure();
@@ -40,7 +40,7 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 		}
 		return 0;
 	}
-	
+
 	@Override
 	public List<String> getGamesList() {
 		Database.ensure();
@@ -79,13 +79,13 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 		}
 		return false;
 	}
-	
+
 	public static Integer uniqueId = 0;
 	public String getUniquePlayerName() {
 		uniqueId++;
 		return "Player #" + uniqueId.toString();
 	}
-	
+
 	/*
 	@Override
 	public String getUniquePlayerName() {
@@ -122,19 +122,19 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 				id = x * 10 + y;
 				valid = !bombs.containsKey(id);
 			}
-			
+
 			bombs.put(id, new Bomb(x, y));
 			String fieldEnc = Ship.encodeField(ships, bombs);
 			sta.executeUpdate("UPDATE Games SET PlayerField='" + fieldEnc +  "' WHERE ID=" + Integer.toString(gameId));
 
 			sta.close();
 			conn.close();
-			
+
 			return new int[] {x, y};
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		return new int[] {0,0};
 	}
 
