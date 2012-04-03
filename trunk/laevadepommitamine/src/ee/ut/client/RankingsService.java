@@ -8,5 +8,5 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 @RemoteServiceRelativePath("rankings")
 public interface RankingsService extends RemoteService {
 	public List<String> getRankingsList();
-	public Long getRankingsVersion();
+	public Integer getRankingsVersion();
 }

@@ -11,6 +11,7 @@ import java.util.Random;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
+import ee.ut.client.Game;
 import ee.ut.client.GameService;
 
 public class GameServiceImpl extends RemoteServiceServlet implements GameService {
@@ -42,18 +43,19 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 	}
 
 	@Override
-	public List<String> getGamesList() {
+	public List<Game> getGamesList() {
 		Database.ensure();
-		List<String> list = new ArrayList<String>();
+		List<Game> list = new ArrayList<Game>();
 		Connection conn;
 
 		try {
 			conn = Database.getConnection();
 			Statement sta = conn.createStatement();
-			ResultSet resultSet = sta.executeQuery("SELECT Name FROM Games");
+			ResultSet resultSet = sta.executeQuery("SELECT ID, Name FROM Games");
 			while (resultSet.next()) {
-				String name = resultSet.getString(1);
-				list.add(name);
+				int id = resultSet.getInt(1);
+				String name = resultSet.getString(2);
+				list.add(new Game(id, name));
 			}
 			sta.close();
 			conn.close();
@@ -62,6 +64,21 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 		}
 		
 		return list;
+	}
+
+	@Override
+	public void joinGame(int gameId, String playerName) {
+		Database.ensure();
+		Connection conn;
+		try {
+			conn = Database.getConnection();
+			Statement sta = conn.createStatement();
+			sta.executeUpdate("UPDATE Games SET Opponent='" + playerName + "' WHERE ID=" + Integer.toString(gameId));
+			sta.close();
+			conn.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	boolean isNameAvailable(String name) {
