@@ -1,10 +1,25 @@
 function Rankings() {
+	this.version = 0;
 }
 
 Rankings.prototype = {
+	onUpdate: function() {
+		Server.getRankingsList();
+	},
+
+	onHide: function() {
+		if (this.updateTimer) {
+			clearInterval(this.updateTimer);
+			delete this.updateTimer;
+		}
+	},
+
 	onRender: function() {
 		this.menu.onRender();
-		Server.getRankingsList();
+		if (!this.updateTimer) {
+			this.onUpdate();
+			this.updateTimer = setInterval(this.onUpdate.bind(this), 2000);
+		}
 	},
 
 	render: function() {

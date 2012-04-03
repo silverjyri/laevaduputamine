@@ -6,4 +6,5 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface RankingsServiceAsync {
 	public void getRankingsList(AsyncCallback<List<String>> callback);
+	public void getRankingsVersion(AsyncCallback<Long> callback);
 }
