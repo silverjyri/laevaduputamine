@@ -13,7 +13,7 @@ import ee.ut.client.RankingsService;
 
 public class RankingsServiceImpl extends RemoteServiceServlet implements RankingsService {
 	private static final long serialVersionUID = 1L;
-	private static long rankingsVersion = 1;
+	private static int rankingsVersion = 1;
 	
 	@Override
 	public List<String> getRankingsList() {
@@ -48,7 +48,7 @@ public class RankingsServiceImpl extends RemoteServiceServlet implements Ranking
 	}
 
 	@Override
-	public Long getRankingsVersion() {
+	public Integer getRankingsVersion() {
 		return rankingsVersion;
 	}
 }

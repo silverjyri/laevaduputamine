@@ -1,8 +1,9 @@
-function Placement(playerName) {
-	this.playerName = playerName;
-
-	// Call to server
-	Server.createGame(playerName);
+function Placement(playerName, gameId) {
+	if (gameId) {
+		Server.joinGame(playerName, gameId);
+	} else {
+		Server.createGame(playerName);
+	}
 }
 
 Placement.prototype = {

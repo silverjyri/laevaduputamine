@@ -3,6 +3,7 @@ function ListItem(options) {
 		this.id = options.id;
 		this.text = options.text;
 		this.image = options.image;
+		this.value = options.value;
 	}
 }
 

@@ -71,8 +71,8 @@ Lobby.prototype = {
 		return el;
 	},
 
-	addGame: function(name) {
-		var item = new ListItem({text: name, image: 'img/game.png'});
+	addGame: function(id, name) {
+		var item = new ListItem({value: id, text: name, image: 'img/game.png'});
 		this.gamesList.add(item);
 	},
 
