@@ -5,7 +5,6 @@ function Game(gameId, player1) {
 	this.currentPlayer = Client.rand(1) ? this.player1 : this.player2;
 
 	var fieldEnc = Field.encodeField(player1.ships, {});
-	console.log(fieldEnc);
 	Server.startGame(gameId, fieldEnc);
 }
 
@@ -69,8 +68,6 @@ Game.prototype = {
 		el.append(this.field1.render());
 		el.append(this.field2.render());
 
-		this.currentPlayer.makeMove(this.gameId);
-
 		this.el = el;
 		return el;
 	},
@@ -105,5 +102,9 @@ Game.prototype = {
 			this.currentPlayer = opponent;
 		}
 		setTimeout($.proxy(this.remoteMove, this), 800);
+	},
+
+	gameStarted: function() {
+		this.currentPlayer.makeMove(this.gameId);
 	}
 };

@@ -73,7 +73,14 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 		try {
 			conn = Database.getConnection();
 			Statement sta = conn.createStatement();
-			sta.executeUpdate("UPDATE Games SET Opponent='" + playerName + "' WHERE ID=" + Integer.toString(gameId));
+			sta.executeUpdate("INSERT INTO Players (name) VALUES ('" + playerName + "')");
+			ResultSet st = sta.executeQuery("SELECT ID FROM Players WHERE Name='" + playerName + "'");
+			st.next();
+			int playerId = st.getInt(1);
+			ResultSet resultSet = sta.executeQuery("SELECT Players.name FROM Games INNER JOIN Players ON Players.ID = Games.Player WHERE ID=" + Integer.toString(gameId));
+			resultSet.next();
+			String opponentName = resultSet.getString(1);
+			sta.executeUpdate("UPDATE Games SET Opponent=" + Integer.toString(playerId) + ", Name='" + opponentName + " vs. " + playerName + "' WHERE ID=" + Integer.toString(gameId));
 			sta.close();
 			conn.close();
 		} catch (SQLException e) {
