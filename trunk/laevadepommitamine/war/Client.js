@@ -15,7 +15,7 @@ Client.isString = function(value) {
 };
 
 Client.setScreen = function(screen) {
-	if (this.rankings && this.screen === this.rankings) {
+	if (this.screen && this.screen.onHide) {
 		this.screen.onHide();
 	}
 	this.screen = screen;

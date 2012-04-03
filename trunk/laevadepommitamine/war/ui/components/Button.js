@@ -12,10 +12,12 @@ function Button(text, options) {
 
 Button.prototype = {
 	onRender: function() {
-		if (this.scope) {
-			this.el.click($.proxy(this.fn, this.scope));
-		} else {
-			this.el.click(this.fn);
+		if (this.fn) {
+			if (this.scope) {
+				this.el.click(this.fn.bind(this.scope));
+			} else {
+				this.el.click(this.fn);
+			}
 		}
 	},
 

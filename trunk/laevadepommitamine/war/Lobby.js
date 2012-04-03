@@ -4,6 +4,10 @@ function Lobby() {
 Lobby.prototype = {
 	onRender: function() {
 		this.menu.onRender();
+		this.gamesList.onRender();
+		if (this.joinBtn) {
+			this.joinBtn.onRender();
+		}
 
 		if (!this.initialized) {
 			Server.getGamesList();
@@ -50,7 +54,16 @@ Lobby.prototype = {
 	  	this.username = username;
 	  	el.append(username.render());
 	  	
-		var gamesList = new ListBox();
+		var gamesList = new ListBox({scope: this, onSelectionChanged: function(selected) {
+			if (!this.joinBtn) {
+				this.joinBtn = new Button("Liitu m&auml;nguga", {scope: this, fn: function() {
+					Client.startPlacement();
+				}});
+				var joinBtnEl = this.joinBtn.render()
+				joinBtnEl.css('float', 'left');
+				this.el.append(joinBtnEl);
+			}
+		}});
 		this.gamesList = gamesList;
 		el.append(gamesList.render());
 
