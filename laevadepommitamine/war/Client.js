@@ -57,7 +57,7 @@ Client.startPlacement = function() {
 };
 
 Client.startGame = function() {
-	this.game = this.game || new Game(this.placement.field.ships);
+	this.game = this.game || new Game(this.placement.gameId, this.placement.player);
 	$("#screen_container").html(this.game.render());
 	this.game.onRender();
 };

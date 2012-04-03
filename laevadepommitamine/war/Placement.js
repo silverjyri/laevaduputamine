@@ -1,4 +1,6 @@
 function Placement(playerName) {
+	this.playerName = playerName;
+
 	// Call to server
 	Server.createGame(playerName);
 }
@@ -141,7 +143,8 @@ Placement.prototype = {
 			shipContainer.append(value);
 		});
 		this.readyBtn = new Button("Valmis", {disabled: false, scope: this, fn: function() {
-			Client.startGame(this.field.ships);
+			this.player = new LocalPlayer(this.playerName, this.field.ships);
+			Client.startGame();
 		}, style: {position: 'absolute', left: 90, top: 200}});
 		shipContainer.append(this.readyBtn.render());
 		el.append(shipContainer);

@@ -40,7 +40,7 @@ Lobby.prototype = {
 	  	]);
 	  	el.append(this.menu.render());
 
-	  	var username = new TextField({label: 'Nimi:', fn: function(e) {
+	  	var username = new TextField({label: 'Nimi:', disabled: true, fn: function(e) {
 	  		if (e.keyCode == 13) {
 	  			this.username.setError('Nimi juba v&otilde;etud!');
 	  		}
@@ -59,5 +59,10 @@ Lobby.prototype = {
 	addGame: function(name) {
 		var item = new ListItem({text: name, image: 'img/game.png'});
 		this.gamesList.add(item);
+	},
+
+	initialize: function(playerName) {
+		this.username.setText(playerName);
+		this.username.setEnabled(true);
 	}
 };

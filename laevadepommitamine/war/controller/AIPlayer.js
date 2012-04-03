@@ -12,6 +12,9 @@ AIPlayer.generateShips = function() {
 		var valid = false;
 		while (!valid) {
 			var ship = {x:Client.rand(9), y: Client.rand(9), length: lengths[l], vertical: Client.rand(1)};
+			if (ship.length == 1 && ship.vertical) {
+				ship.vertical = false;
+			}
 			valid = Field.checkLocation(ships, ship);
 		}
 		ships['' + ship.x + ship.y] = ship;
@@ -28,14 +31,8 @@ AIPlayer.prototype = {
 		return Field.checkHit(this.ships, coords);
 	},
 
-	makeMove: function() {
-		var valid = false;
-		var bomb;
-		while (!valid) {
-			bomb = {x: Client.rand(9), y: Client.rand(9)};
-			valid = !this.enemyBombs['' + bomb.x + bomb.y];
-		}
-		return bomb;
+	makeMove: function(gameId) {
+		Server.remoteMove(gameId);
 	},
 
 	moveResult: function(coords, hit) {

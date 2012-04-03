@@ -1,6 +1,7 @@
 function Field() {
 }
 
+// Checks if there is a ship at the given coordinates
 Field.checkHit = function(ships, coords) {
 	for (i in ships) {
 		var ship = ships[i];
@@ -14,6 +15,7 @@ Field.checkHit = function(ships, coords) {
 	return false;
 };
 
+// Checks if there is a ship at the given coordinates which is completely bombed
 Field.checkFullHit = function(ships, bombs, coords) {
 	if (!Field.checkHit(ships, coords)) {
 		return null;
@@ -35,6 +37,7 @@ Field.checkFullHit = function(ships, bombs, coords) {
 	return ship;
 };
 
+// Checks if a ship can be placed on the field
 Field.checkLocation = function(ships, ship) {
 	var x = ship.x;
 	var y = ship.y;
@@ -74,4 +77,43 @@ Field.getShipAtCoords = function(ships, coords) {
 			return ship;
 		}
 	}
+}
+
+// Returns a 100-character string that represents the playing field
+// 0 - empty
+// 1 - horizontal single
+// 2 - horizontal double
+// 3 - horizontal triple
+// 4 - horizontal quad
+// 5 - vertical double
+// 6 - vertical triple
+// 7 - vertical quad
+// a - bomb only
+// b-h instead of 1-7 to mark bomb+ship
+Field.encodeField = function(ships, bombs) {
+	var x, y, id;
+	var field = '';
+	var digit;
+	for (y = 0; y < 10; y++) {
+		for (x = 0; x < 10; x++) {
+			id = '' + x + y;
+			var ship = ships[id];
+			var bomb = bombs[id];
+			if (ship) {
+				digit = ship.length;
+				if (ship.length != 1 && ship.vertical) {
+					digit += 3;
+				}
+			} else {
+				digit = 0;
+			}
+			if (bomb) {
+				digit += 'a'.charCodeAt(0);
+			} else {
+				digit += '0'.charCodeAt(0);
+			}
+			field += String.fromCharCode(digit);
+		}
+	}
+	return field;
 }

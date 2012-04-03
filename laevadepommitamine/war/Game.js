@@ -1,7 +1,12 @@
-function Game(ships) {
-	this.player1 = new AIPlayer();//new LocalPlayer("blabla", ships);
+function Game(gameId, player1) {
+	this.gameId = gameId;
+	this.player1 = player1;
 	this.player2 = new AIPlayer();
 	this.currentPlayer = Client.rand(1) ? this.player1 : this.player2;
+
+	var fieldEnc = Field.encodeField(player1.ships, {});
+	console.log(fieldEnc);
+	Server.startGame(gameId, fieldEnc);
 }
 
 Game.prototype = {
@@ -64,15 +69,17 @@ Game.prototype = {
 		el.append(this.field1.render());
 		el.append(this.field2.render());
 
-		if (this.currentPlayer.isRemote()) {
-			setTimeout($.proxy(this.remoteMove, this), 400);
-		}
+		this.currentPlayer.makeMove(this.gameId);
 
 		this.el = el;
 		return el;
 	},
 
 	remoteMove: function() {
+		this.currentPlayer.makeMove(this.gameId);
+	},
+
+	remoteMoveResult: function(bombCoords) {
 		var player = this.currentPlayer;
 		var opponent = (player === this.player1) ? this.player2 : this.player1;
 		var playerField, opponentField;
@@ -84,7 +91,6 @@ Game.prototype = {
 			opponentField = this.field1;
 		}
 
-		var bombCoords = player.makeMove();
 		var hit = opponent.checkHit(bombCoords);
 		player.moveResult(bombCoords, hit);
 		opponentField.addBomb({x: bombCoords.x, y: bombCoords.y, hit: hit});

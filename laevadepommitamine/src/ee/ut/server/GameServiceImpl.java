@@ -6,6 +6,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
@@ -15,20 +17,28 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 	private static final long serialVersionUID = 1L;
 	
 	@Override
-	public void createGame(String playerName) {
+	public Integer createGame(String playerName) {
 		Database.ensure();
 		Connection conn;
 		try {
 			conn = Database.getConnection();
 			Statement sta = conn.createStatement();
 			sta.executeUpdate("INSERT INTO Players (name) VALUES ('" + playerName + "')");
+			ResultSet st = sta.executeQuery("SELECT ID FROM Players WHERE Name='" + playerName + "'");
+			st.next();
+			int playerId = st.getInt(1);
 			sta.executeUpdate("INSERT INTO Rankings (name, score) VALUES ('" + playerName + "', 0)");
-			sta.executeUpdate("INSERT INTO Games (name) VALUES ('" + playerName + " ootab...')");
+			sta.executeUpdate("INSERT INTO Games (Name, Player) VALUES ('" + playerName + " ootab...', " + Integer.toString(playerId) + ")");
+			st = sta.executeQuery("SELECT id FROM Games WHERE Player='" + Integer.toString(playerId) + "'");
+			st.next();
+			int gameId = st.getInt(1);
 			sta.close();
 			conn.close();
+			return new Integer(gameId);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		return 0;
 	}
 	
 	@Override
@@ -56,14 +66,11 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 
 	boolean isNameAvailable(String name) {
 		Database.ensure();
-		Connection conn;
 		try {
-			conn = Database.getConnection();
+			Connection conn = Database.getConnection();
 			Statement sta = conn.createStatement();
 			ResultSet resultSet = sta.executeQuery("SELECT * FROM Players WHERE Name='" + name + "'");
 			boolean available = !resultSet.next();
-			//int count = resultSet.getInt(1);
-			//boolean available = resultSet.getInt(1) == 0;
 			sta.close();
 			conn.close();
 			return available;
@@ -82,5 +89,58 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 			name = "Player #" + number.toString();
 		}
 		return name;
+	}
+
+	@Override
+	public int[] remoteMove(int gameId) {
+		Database.ensure();
+		Connection conn;
+
+		try {
+			conn = Database.getConnection();
+			Statement sta = conn.createStatement();
+			ResultSet resultSet = sta.executeQuery("SELECT PlayerField FROM Games WHERE ID=" + Integer.toString(gameId));
+			resultSet.next();
+			String field = resultSet.getString(1);
+			Map<Integer, Ship> ships = Ship.decodeShips(field);
+			Map<Integer, Bomb> bombs = Bomb.decodeBombs(field);
+
+			boolean valid = false;
+			Random random = new Random();
+			int x = 0, y = 0, id = 0;
+			while (!valid) {
+				x = random.nextInt(10);
+				y = random.nextInt(10);
+				id = x * 10 + y;
+				valid = !bombs.containsKey(id);
+			}
+			
+			bombs.put(id, new Bomb(x, y));
+			String fieldEnc = Ship.encodeField(ships, bombs);
+			sta.executeUpdate("UPDATE Games SET PlayerField='" + fieldEnc +  "' WHERE ID=" + Integer.toString(gameId));
+
+			sta.close();
+			conn.close();
+			
+			return new int[] {x, y};
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return new int[] {0,0};
+	}
+
+	@Override
+	public void startGame(int gameId, String fieldEnc) {
+		Database.ensure();
+		try {
+			Connection conn = Database.getConnection();
+			Statement sta = conn.createStatement();
+			sta.executeUpdate("UPDATE Games SET PlayerField='" + fieldEnc +  "' WHERE ID=" + Integer.toString(gameId));
+			sta.close();
+			conn.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 }
