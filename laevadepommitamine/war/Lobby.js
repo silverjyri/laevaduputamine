@@ -34,7 +34,8 @@ Lobby.prototype = {
 	  	    	if (Client.game) {
 	  	    		Client.startGame();
 	  	    	} else {
-		  	    	this.username.setError('Nimi juba v&otilde;etud!');
+		  	    	//this.username.setError('Nimi juba v&otilde;etud!');
+	  	    		delete this.joinGame;
 	  	    		Client.startPlacement();
 	  	    	}
 	  	    }}),
@@ -57,6 +58,7 @@ Lobby.prototype = {
 		var gamesList = new ListBox({scope: this, onSelectionChanged: function(selected) {
 			if (!this.joinBtn) {
 				this.joinBtn = new Button("Liitu m&auml;nguga", {scope: this, fn: function() {
+					this.joinGame = selected.value;
 					Client.startPlacement();
 				}});
 				var joinBtnEl = this.joinBtn.render()

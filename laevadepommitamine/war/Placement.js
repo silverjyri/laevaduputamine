@@ -1,12 +1,23 @@
 function Placement(playerName, gameId) {
-	if (gameId) {
-		Server.joinGame(playerName, gameId);
+	this.playerName = playerName;
+	if (gameId != undefined) {
+		this.gameId = gameId;
+		Server.joinGame(gameId, playerName);
 	} else {
 		Server.createGame(playerName);
 	}
 }
 
 Placement.prototype = {
+	gameCreated: function(gameId) {
+		this.gameId = gameId;
+		this.readyBtn.setEnabled(true);
+	},
+
+	gameJoined: function() {
+		this.readyBtn.setEnabled(true);
+	},
+
 	onRender: function() {
 		this.menu.onRender();
 		$.each(this.ships, function(index, value) {
@@ -143,7 +154,7 @@ Placement.prototype = {
 		$.each(this.shipCounts, function(index, value) {
 			shipContainer.append(value);
 		});
-		this.readyBtn = new Button("Valmis", {disabled: false, scope: this, fn: function() {
+		this.readyBtn = new Button("Valmis", {disabled: true, scope: this, fn: function() {
 			this.player = new LocalPlayer(this.playerName, this.field.ships);
 			Client.startGame();
 		}, style: {position: 'absolute', left: 90, top: 200}});
