@@ -10,5 +10,8 @@ LocalPlayer.prototype = {
 
 	checkHit: function(coords) {
 		return Field.checkHit(this.ships, coords);
+	},
+
+	makeMove: function() {
 	}
 };

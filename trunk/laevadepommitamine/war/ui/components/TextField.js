@@ -90,7 +90,7 @@ TextField.prototype = {
 				if (this.errorEl) {
 					this.errorEl.text(text);
 				} else {
-					this.errorEl = $('<p class="field_error">' + text + '</p>');
+					this.errorEl = $('<div class="field_error">' + text + '</div>');
 					this.el.append(this.errorEl);
 				}
 			}
