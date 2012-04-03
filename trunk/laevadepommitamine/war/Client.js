@@ -14,6 +14,49 @@ Client.isString = function(value) {
     return typeof value === 'string';
 };
 
+Client.setScreen = function(screen) {
+	if (this.rankings && this.screen === this.rankings) {
+		this.screen.onHide();
+	}
+	this.screen = screen;
+	$("#screen_container").html(this.screen.render());
+	this.screen.onRender();
+};
+
+Client.startLobby = function() {
+	this.lobby = this.lobby || new Lobby();
+	this.setScreen(this.lobby);
+};
+
+Client.startPlacement = function() {
+	var username;
+	if (this.lobby) {
+		this.lobby.username.setEnabled(false);
+		username = this.lobby.username.getText();
+	}
+	this.placement = this.placement || new Placement(username);
+	this.setScreen(this.placement);
+};
+
+Client.startGame = function() {
+	this.game = this.game || new Game(this.placement.gameId, this.placement.player);
+	this.setScreen(this.game);
+};
+
+Client.startRankings = function() {
+	this.rankings = this.rankings || new Rankings();
+	this.setScreen(this.rankings);
+};
+
+Client.stopGame = function() {
+	if (this.lobby) {
+		this.lobby.username.setEnabled(true);
+	}
+	delete this.placement;
+	delete this.game;
+	Client.startLobby();
+}
+
 $LAB
 .script("ui/components/Button.js")
 .script("ui/components/ListItem.js")
@@ -38,38 +81,3 @@ $LAB
 })
 .script("Game.js")
 .script("Rankings.js");
-
-Client.startLobby = function() {
-	this.lobby = this.lobby || new Lobby();
-	$("#screen_container").html(this.lobby.render());
-	this.lobby.onRender();
-};
-
-Client.startPlacement = function() {
-	var username;
-	if (this.lobby) {
-		this.lobby.username.setEnabled(false);
-		username = this.lobby.username.getText();
-	}
-	this.placement = this.placement || new Placement(username);
-	$("#screen_container").html(this.placement.render());
-	this.placement.onRender();
-};
-
-Client.startGame = function() {
-	this.game = this.game || new Game(this.placement.gameId, this.placement.player);
-	$("#screen_container").html(this.game.render());
-	this.game.onRender();
-};
-
-Client.startRankings = function() {
-	this.rankings = this.rankings || new Rankings();
-	$("#screen_container").html(this.rankings.render());
-	this.rankings.onRender();
-};
-
-Client.stopGame = function() {
-	delete this.placement;
-	delete this.game;
-	Client.startLobby();
-}

@@ -5,8 +5,10 @@ Lobby.prototype = {
 	onRender: function() {
 		this.menu.onRender();
 
-		Server.getGamesList();
-		Server.getUniquePlayerName();
+		if (!this.initialized) {
+			Server.getGamesList();
+			Server.getUniquePlayerName();
+		}
 	},
 
 	render: function() {
@@ -64,5 +66,6 @@ Lobby.prototype = {
 	initialize: function(playerName) {
 		this.username.setText(playerName);
 		this.username.setEnabled(true);
+		this.initialized = true;
 	}
 };

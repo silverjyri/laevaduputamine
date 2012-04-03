@@ -117,3 +117,20 @@ Field.encodeField = function(ships, bombs) {
 	}
 	return field;
 }
+
+Field.generateRandomShips = function() {
+	var ships = {};
+	var lengths = [4,3,3,2,2,2,1,1,1,1];
+	for (l in lengths) {
+		var valid = false;
+		while (!valid) {
+			var ship = {x:Client.rand(9), y: Client.rand(9), length: lengths[l], vertical: Client.rand(1)};
+			if (ship.length == 1 && ship.vertical) {
+				ship.vertical = false;
+			}
+			valid = Field.checkLocation(ships, ship);
+		}
+		ships['' + ship.x + ship.y] = ship;
+	}
+	return ships;
+};

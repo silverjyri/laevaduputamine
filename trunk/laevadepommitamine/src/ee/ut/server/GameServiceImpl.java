@@ -27,7 +27,7 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 			ResultSet st = sta.executeQuery("SELECT ID FROM Players WHERE Name='" + playerName + "'");
 			st.next();
 			int playerId = st.getInt(1);
-			sta.executeUpdate("INSERT INTO Rankings (name, score) VALUES ('" + playerName + "', 0)");
+			sta.executeUpdate("INSERT INTO Rankings (Player, Score) VALUES ('" + playerId + "', 0)");
 			sta.executeUpdate("INSERT INTO Games (Name, Player) VALUES ('" + playerName + " ootab...', " + Integer.toString(playerId) + ")");
 			st = sta.executeQuery("SELECT id FROM Games WHERE Player='" + Integer.toString(playerId) + "'");
 			st.next();
@@ -80,6 +80,13 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 		return false;
 	}
 	
+	public static Integer uniqueId = 0;
+	public String getUniquePlayerName() {
+		uniqueId++;
+		return "Player #" + uniqueId.toString();
+	}
+	
+	/*
 	@Override
 	public String getUniquePlayerName() {
 		Integer number = 1;
@@ -90,6 +97,7 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 		}
 		return name;
 	}
+	*/
 
 	@Override
 	public int[] remoteMove(int gameId) {

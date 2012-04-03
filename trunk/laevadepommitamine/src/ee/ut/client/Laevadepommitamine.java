@@ -22,14 +22,6 @@ public class Laevadepommitamine implements EntryPoint {
 		$wnd.Client.lobby.gamesList.clear();
 	}-*/;
 
-	public native static void addRanking(String ranking) /*-{
-		$wnd.Client.rankings.rankingsList.add(ranking);
-	}-*/;
-
-	public native static void clearRankings() /*-{
-		$wnd.Client.rankings.rankingsList.clear();
-	}-*/;
-
 	public native static void setPlayerName(String name) /*-{
 		$wnd.Client.lobby.initialize(name);
 	}-*/;
@@ -40,6 +32,18 @@ public class Laevadepommitamine implements EntryPoint {
 
 	public native static void setGameId(int id) /*-{
 		$wnd.Client.placement.gameId = id;
+	}-*/;
+
+	public native static void addRanking(String ranking) /*-{
+		$wnd.Client.rankings.rankingsList.add(ranking);
+	}-*/;
+
+	public native static void clearRankings() /*-{
+		$wnd.Client.rankings.rankingsList.clear();
+	}-*/;
+
+	public native static long getRankingsVersion() /*-{
+		return $wnd.Client.rankings.version;
 	}-*/;
 
 	public static void createGame(String playerName)
@@ -53,6 +57,10 @@ public class Laevadepommitamine implements EntryPoint {
 				setGameId(gameId);
 			}
 		});
+	}
+
+	public static void doPeriodicUpdate(String screenName) {
+		
 	}
 
 	public static void getGamesList()
@@ -86,16 +94,27 @@ public class Laevadepommitamine implements EntryPoint {
 	
 	public static void getRankingsList()
 	{
-		rankingsService.getRankingsList(new AsyncCallback<List<String>>() {
+		rankingsService.getRankingsVersion(new AsyncCallback<Long>() {
 			public void onFailure(Throwable caught) {
 				Window.alert("RPC failed.");
 			}
 
-			public void onSuccess(List<String> result) {
-				clearRankings();
-				for (String ranking : result) {
-					addRanking(ranking);
+			public void onSuccess(Long version) {
+				if (version == getRankingsVersion()) {
+					return;
 				}
+				rankingsService.getRankingsList(new AsyncCallback<List<String>>() {
+					public void onFailure(Throwable caught) {
+						Window.alert("RPC failed.");
+					}
+
+					public void onSuccess(List<String> result) {
+						clearRankings();
+						for (String ranking : result) {
+							addRanking(ranking);
+						}
+					}
+				});
 			}
 		});
 	}
@@ -133,9 +152,11 @@ public class Laevadepommitamine implements EntryPoint {
 		$wnd.Server.createGame = $entry(@ee.ut.client.Laevadepommitamine::createGame(Ljava/lang/String;));
 		$wnd.Server.getGamesList = $entry(@ee.ut.client.Laevadepommitamine::getGamesList());
 		$wnd.Server.getUniquePlayerName = $entry(@ee.ut.client.Laevadepommitamine::getUniquePlayerName());
-		$wnd.Server.getRankingsList = $entry(@ee.ut.client.Laevadepommitamine::getRankingsList());
 		$wnd.Server.remoteMove = $entry(@ee.ut.client.Laevadepommitamine::remoteMove(I));
 		$wnd.Server.startGame = $entry(@ee.ut.client.Laevadepommitamine::startGame(ILjava/lang/String;));
+		$wnd.Server.doPeriodicUpdate = $entry(@ee.ut.client.Laevadepommitamine::doPeriodicUpdate(Ljava/lang/String;));
+
+		$wnd.Server.getRankingsList = $entry(@ee.ut.client.Laevadepommitamine::getRankingsList());
 	}-*/;
 
 	public void onModuleLoad() {
