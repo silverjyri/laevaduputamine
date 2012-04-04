@@ -11,4 +11,5 @@ public interface GameServiceAsync {
 	public void joinGame(int gameId, String playerName, AsyncCallback<Void> callback);
 	public void remoteMove(int gameId, AsyncCallback<int[]> callback);
 	public void startGame(int gameId, String fieldEnc, AsyncCallback<Void> callback);
+	public void getGamesListVersion(AsyncCallback<Integer> callback);
 }

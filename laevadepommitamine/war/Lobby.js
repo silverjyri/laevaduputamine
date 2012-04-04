@@ -1,7 +1,19 @@
 function Lobby() {
+	this.gamesListVersion = 0;
 }
 
 Lobby.prototype = {
+	onUpdate: function() {
+		Server.getGamesList();
+	},
+
+	onHide: function() {
+		if (this.updateTimer) {
+			clearInterval(this.updateTimer);
+			delete this.updateTimer;
+		}
+	},
+
 	onRender: function() {
 		this.menu.onRender();
 		this.gamesList.onRender();
@@ -9,7 +21,11 @@ Lobby.prototype = {
 			this.joinBtn.onRender();
 		}
 
-		Server.getGamesList();
+		if (!this.updateTimer) {
+			this.onUpdate();
+			this.updateTimer = setInterval(this.onUpdate.bind(this), 1500);
+		}
+
 		if (!this.initialized) {
 			Server.getUniquePlayerName();
 		}

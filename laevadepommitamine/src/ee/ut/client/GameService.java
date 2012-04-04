@@ -13,4 +13,5 @@ public interface GameService extends RemoteService {
 	public String getUniquePlayerName();
 	public int[] remoteMove(int gameId);
 	public void startGame(int gameId, String fieldEnc);
+	public Integer getGamesListVersion();
 }
