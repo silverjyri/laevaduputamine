@@ -31,6 +31,7 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 			int playerId = st.getInt(1);
 			sta.executeUpdate("INSERT INTO Rankings (Player, Score) VALUES ('" + playerId + "', 0)");
 			sta.executeUpdate("INSERT INTO Games (Name, Player) VALUES ('" + playerName + " ootab...', " + Integer.toString(playerId) + ")");
+			gamesListVersion++;
 			st = sta.executeQuery("SELECT id FROM Games WHERE Player='" + Integer.toString(playerId) + "'");
 			st.next();
 			int gameId = st.getInt(1);
@@ -82,6 +83,7 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 			resultSet.next();
 			String opponentName = resultSet.getString(1);
 			sta.executeUpdate("UPDATE Games SET Opponent=" + Integer.toString(playerId) + ", Name='" + opponentName + " vs. " + playerName + "' WHERE ID=" + Integer.toString(gameId));
+			gamesListVersion++;
 			sta.close();
 			conn.close();
 		} catch (SQLException e) {

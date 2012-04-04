@@ -53,6 +53,14 @@ public class Laevadepommitamine implements EntryPoint {
 		return $wnd.Client.rankings.version;
 	}-*/;
 
+	public native static void setGamesListVersion(int version) /*-{
+		$wnd.Client.lobby.gamesListVersion = version;
+	}-*/;
+
+	public native static void setRankingsVersion(int version) /*-{
+		$wnd.Client.rankings.version = version;
+	}-*/;
+
 	public native static void gameCreated(int gameId) /*-{
 		$wnd.Client.placement.gameCreated(gameId);
 	}-*/;
@@ -65,11 +73,18 @@ public class Laevadepommitamine implements EntryPoint {
 		$wnd.Client.placement.gameJoined();
 	}-*/;
 
+	public native static void consoleError(String msg) /*-{
+		console.error(msg);
+		if ($wnd.Client.screen === $wnd.Client.lobby) {
+			$wnd.Client.lobby.username.setError("Viga: " + msg);
+		}
+	}-*/;
+
 	public static void createGame(String playerName)
 	{
 		gameService.createGame(playerName, new AsyncCallback<Integer>() {
 			public void onFailure(Throwable caught) {
-				Window.alert("createGame RPC failed. " + caught.getMessage());
+				Window.alert("createGame RPC failed.");
 				caught.printStackTrace();
 			}
 
@@ -87,19 +102,18 @@ public class Laevadepommitamine implements EntryPoint {
 	{
 		gameService.getGamesListVersion(new AsyncCallback<Integer>() {
 			public void onFailure(Throwable caught) {
-				Window.alert("RPC failed.");
-				caught.printStackTrace();
+				consoleError("getGamesListVersion RPC failed.");
 			}
 
 			public void onSuccess(Integer version) {
 				if (version == getGamesListVersion()) {
 					return;
 				}
-		
+				setGamesListVersion(version);
+
 				gameService.getGamesList(new AsyncCallback<List<Game>>() {
 					public void onFailure(Throwable caught) {
-						Window.alert("getGamesList RPC failed. " + caught.getMessage());
-						caught.printStackTrace();
+						consoleError("getGamesList RPC failed.");
 					}
 		
 					public void onSuccess(List<Game> result) {
@@ -122,8 +136,7 @@ public class Laevadepommitamine implements EntryPoint {
 	{
 		gameService.getUniquePlayerName(new AsyncCallback<String>() {
 			public void onFailure(Throwable caught) {
-				Window.alert("getUniquePlayerName RPC failed. " + caught.getMessage());
-				caught.printStackTrace();
+				consoleError("getUniquePlayerName RPC failed.");
 			}
 
 			public void onSuccess(String result) {
@@ -144,6 +157,8 @@ public class Laevadepommitamine implements EntryPoint {
 				if (version == getRankingsVersion()) {
 					return;
 				}
+				setRankingsVersion(version);
+
 				rankingsService.getRankingsList(new AsyncCallback<List<String>>() {
 					public void onFailure(Throwable caught) {
 						Window.alert("RPC failed.");
