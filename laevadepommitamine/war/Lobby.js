@@ -1,5 +1,6 @@
 function Lobby() {
 	this.gamesListVersion = 0;
+	this.updateinterval = 1500;
 }
 
 Lobby.prototype = {
@@ -23,7 +24,7 @@ Lobby.prototype = {
 
 		if (!this.updateTimer) {
 			this.onUpdate();
-			this.updateTimer = setInterval(this.onUpdate.bind(this), 1500);
+			this.updateTimer = setInterval(this.onUpdate.bind(this), this.updateinterval);
 		}
 
 		if (!this.initialized) {
@@ -54,6 +55,9 @@ Lobby.prototype = {
 	  	    		delete this.joinGame;
 	  	    		Client.startPlacement();
 	  	    	}
+	  	    	if (this.joinBtn) {
+	  	    		this.joinBtn.setEnabled(false);
+	  	    	}
 	  	    }}),
 	  	    new Button("Logi sisse"),
 	  	    new Button("Edetabel", {fn: function() {
@@ -75,6 +79,7 @@ Lobby.prototype = {
 			if (!this.joinBtn) {
 				this.joinBtn = new Button("Liitu m&auml;nguga", {scope: this, fn: function() {
 					this.joinGame = selected.value;
+					this.joinBtn.setEnabled(false);
 					Client.startPlacement();
 				}});
 				var joinBtnEl = this.joinBtn.render()

@@ -53,6 +53,9 @@ Client.startRankings = function() {
 Client.stopGame = function() {
 	if (this.lobby) {
 		this.lobby.username.setEnabled(true);
+		if (this.lobby.joinBtn) {
+			this.lobby.joinBtn.setEnabled(true);
+		}
 	}
 	delete this.placement;
 	delete this.game;

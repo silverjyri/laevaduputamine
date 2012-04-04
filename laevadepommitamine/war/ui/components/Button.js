@@ -8,6 +8,8 @@ function Button(text, options) {
 		this.style = options.style;
 		this.disabled = options.disabled;
 	}
+
+	this.disabled = !!this.disabled;
 }
 
 Button.prototype = {
