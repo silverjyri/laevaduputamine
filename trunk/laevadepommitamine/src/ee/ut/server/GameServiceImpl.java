@@ -16,6 +16,7 @@ import ee.ut.client.GameService;
 
 public class GameServiceImpl extends RemoteServiceServlet implements GameService {
 	private static final long serialVersionUID = 1L;
+	private static int gamesListVersion = 1;
 
 	@Override
 	public Integer createGame(String playerName) {
@@ -174,5 +175,10 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public Integer getGamesListVersion() {
+		return gamesListVersion;
 	}
 }

@@ -45,6 +45,10 @@ public class Laevadepommitamine implements EntryPoint {
 		$wnd.Client.rankings.rankingsList.clear();
 	}-*/;
 
+	public native static int getGamesListVersion() /*-{
+		return $wnd.Client.lobby.gamesListVersion;
+	}-*/;
+
 	public native static int getRankingsVersion() /*-{
 		return $wnd.Client.rankings.version;
 	}-*/;
@@ -81,22 +85,35 @@ public class Laevadepommitamine implements EntryPoint {
 
 	public static void getGamesList()
 	{
-		gameService.getGamesList(new AsyncCallback<List<Game>>() {
+		gameService.getGamesListVersion(new AsyncCallback<Integer>() {
 			public void onFailure(Throwable caught) {
-				Window.alert("getGamesList RPC failed. " + caught.getMessage());
+				Window.alert("RPC failed.");
 				caught.printStackTrace();
 			}
 
-			public void onSuccess(List<Game> result) {
-				int selected = clearGames();
-				for (Game game : result) {
-					int id = game.getId();
-					if (id == selected) {
-						addGameAndSelect(id, game.getName());
-					} else {
-						addGame(id, game.getName());
-					}
+			public void onSuccess(Integer version) {
+				if (version == getGamesListVersion()) {
+					return;
 				}
+		
+				gameService.getGamesList(new AsyncCallback<List<Game>>() {
+					public void onFailure(Throwable caught) {
+						Window.alert("getGamesList RPC failed. " + caught.getMessage());
+						caught.printStackTrace();
+					}
+		
+					public void onSuccess(List<Game> result) {
+						int selected = clearGames();
+						for (Game game : result) {
+							int id = game.getId();
+							if (id == selected) {
+								addGameAndSelect(id, game.getName());
+							} else {
+								addGame(id, game.getName());
+							}
+						}
+					}
+				});
 			}
 		});
 	}
