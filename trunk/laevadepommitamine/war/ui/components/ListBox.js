@@ -9,22 +9,26 @@ function ListBox(options) {
 }
 
 ListBox.prototype = {
+	select: function(item) {
+		if (this.selected && (this.selected !== item)) {
+			this.selected.el.removeClass('listitem_selected');
+		}
+		this.selected = item;
+		item.el.addClass('listitem_selected');
+		if (this.onSelectionChanged) {
+			if (this.scope) {
+				this.onSelectionChanged.call(this.scope, item);
+			} else {
+				this.onSelectionChanged(item);
+			}
+		}
+	},
+
 	onClick: function(e) {
 		var item = this;
 		var listbox = item.parent;
 
-		if (listbox.selected && (listbox.selected !== item)) {
-			listbox.selected.el.removeClass('listitem_selected');
-		}
-		listbox.selected = item;
-		item.el.addClass('listitem_selected');
-		if (listbox.onSelectionChanged) {
-			if (listbox.scope) {
-				listbox.onSelectionChanged.call(listbox.scope, item);
-			} else {
-				listbox.onSelectionChanged(item);
-			}
-		}
+		listbox.select(item);
 	},
 
 	onRender: function() {

@@ -18,8 +18,15 @@ public class Laevadepommitamine implements EntryPoint {
 		$wnd.Client.lobby.addGame(id, name);
 	}-*/;
 
-	public native static void clearGames() /*-{
-		$wnd.Client.lobby.gamesList.clear();
+	public native static void addGameAndSelect(int id, String name) /*-{
+		$wnd.Client.lobby.addGame(id, name, true);
+	}-*/;
+	
+	public native static int clearGames() /*-{
+		var list = $wnd.Client.lobby.gamesList;
+		var selectedId = list.selected ? list.selected.value : -1;
+		list.clear();
+		return selectedId;
 	}-*/;
 
 	public native static void setPlayerName(String name) /*-{
@@ -81,9 +88,14 @@ public class Laevadepommitamine implements EntryPoint {
 			}
 
 			public void onSuccess(List<Game> result) {
-				clearGames();
+				int selected = clearGames();
 				for (Game game : result) {
-					addGame(game.getId(), game.getName());
+					int id = game.getId();
+					if (id == selected) {
+						addGameAndSelect(id, game.getName());
+					} else {
+						addGame(id, game.getName());
+					}
 				}
 			}
 		});
