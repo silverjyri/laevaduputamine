@@ -9,8 +9,8 @@ Lobby.prototype = {
 			this.joinBtn.onRender();
 		}
 
+		Server.getGamesList();
 		if (!this.initialized) {
-			Server.getGamesList();
 			Server.getUniquePlayerName();
 		}
 	},
@@ -69,18 +69,25 @@ Lobby.prototype = {
 		this.gamesList = gamesList;
 		el.append(gamesList.render());
 
+		this.loadingGif = $('<img src="img/loading.gif" />');
+		el.append(this.loadingGif);
+		
 		this.el = el;
 		return el;
 	},
 
-	addGame: function(id, name) {
+	addGame: function(id, name, select) {
 		var item = new ListItem({value: id, text: name, image: 'img/game.png'});
 		this.gamesList.add(item);
+		if (select) {
+			this.gamesList.select(item);
+		}
 	},
 
 	initialize: function(playerName) {
 		this.username.setText(playerName);
 		this.username.setEnabled(true);
+		this.loadingGif.remove();
 		this.initialized = true;
 	}
 };
