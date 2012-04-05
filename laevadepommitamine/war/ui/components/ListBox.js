@@ -4,8 +4,14 @@ function ListBox(options) {
 		this.onSelectionChanged = options.onSelectionChanged;
 		this.scope = options.scope;
 		this.items = options.items;
+		this.style = options.style;
 	}
 	this.items = this.items || [];
+
+	$.each(this.items, function(i, item) {
+		item = this.convertItem(item);
+		item.parent = this;
+	}.bind(this));
 }
 
 ListBox.prototype = {
@@ -49,13 +55,23 @@ ListBox.prototype = {
 		$.each(this.items, function(i, item) {
 			el.append(item.render());
 		});
-		
+
+		if (this.style) {
+			el.css(this.style);
+		}
+
 		return el;
 	},
-	add: function(item) {
+
+	convertItem: function(item) {
 		if (Client.isString(item)) {
 			item = new ListItem({text: item});
 		}
+		return item;
+	},
+
+	add: function(item) {
+		item = this.convertItem(item);
 		item.parent = this;
 		this.items[this.items.length] = item;
 
@@ -66,6 +82,7 @@ ListBox.prototype = {
 			}
 		}
 	},
+
 	remove: function(item) {
 		var item = item;
 		var itemText = (item instanceof ListItem) ? item.text : item;
@@ -83,6 +100,7 @@ ListBox.prototype = {
 			delete item.parent;
 		}
 	},
+
 	clear: function() {
 		this.items = [];
 		if (this.el) {

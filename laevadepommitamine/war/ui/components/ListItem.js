@@ -16,8 +16,16 @@ ListItem.prototype = {
 		if (this.image) {
 			el.append('<img class="button_img" src="' + this.image + '" alt="' + this.text + '" />');
 		}
-		el.append('<div class="listitem_text">' + this.text + '</div>');
+		this.textEl = $('<div class="listitem_text">' + this.text + '</div>');
+		el.append(this.textEl);
 		this.el = el;
 		return el;
+	},
+
+	setText: function(text) {
+		this.text = text;
+		if (this.textEl) {
+			this.textEl.html(text);
+		}
 	}
 };

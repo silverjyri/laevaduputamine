@@ -1,9 +1,11 @@
 function Placement(playerName, gameId) {
 	this.playerName = playerName;
 	if (gameId != undefined) {
+		this.newGame = false;
 		this.gameId = gameId;
 		Server.joinGame(gameId, playerName);
 	} else {
+		this.newGame = true;
 		Server.createGame(playerName);
 	}
 }
@@ -15,6 +17,7 @@ Placement.prototype = {
 	},
 
 	gameJoined: function() {
+		this.webOpponentItem.setText('Vastane');
 		this.readyBtn.setEnabled(true);
 	},
 
@@ -25,6 +28,9 @@ Placement.prototype = {
 		});
 		this.field.onRender();
 		this.readyBtn.onRender();
+		if (this.opponentList) {
+			this.opponentList.onRender();
+		}
 	},
 
 	revertDrag: function() {
@@ -154,10 +160,24 @@ Placement.prototype = {
 		$.each(this.shipCounts, function(index, value) {
 			shipContainer.append(value);
 		});
+		this.webOpponentItem = new ListItem({text: 'Ootan vastast...', image: 'img/webplayer.png'});
+		if (this.newGame) {
+			this.aiOpponentItem = new ListItem({text: 'Arvuti vastu', image: 'img/aiplayer.png'});
+		}
+		this.opponentList = new ListBox({
+			items: (this.newGame ?
+				[this.webOpponentItem, this.aiOpponentItem] :
+				[this.webOpponentItem]),
+			style: {
+				position: 'absolute', left: 0, top: 190,
+				width: 190, height: 100
+			}
+		});
+		shipContainer.append(this.opponentList.render());
 		this.readyBtn = new Button("Valmis", {disabled: true, scope: this, fn: function() {
 			this.player = new LocalPlayer(this.playerName, this.field.ships);
 			Client.startGame();
-		}, style: {position: 'absolute', left: 90, top: 200}});
+		}, style: {position: 'absolute', left: 90, top: 305}});
 		shipContainer.append(this.readyBtn.render());
 		el.append(shipContainer);
 
