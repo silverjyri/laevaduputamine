@@ -49,6 +49,10 @@ public class Laevadepommitamine implements EntryPoint {
 		return $wnd.Client.lobby.gamesListVersion;
 	}-*/;
 
+	public native static void getGamePlayersCallback(String[] players) /*-{
+		$wnd.Client.placement.getPlayersCallback(players);
+	}-*/;
+	
 	public native static int getRankingsVersion() /*-{
 		return $wnd.Client.rankings.version;
 	}-*/;
@@ -75,6 +79,7 @@ public class Laevadepommitamine implements EntryPoint {
 
 	public native static void consoleError(String msg) /*-{
 		console.error(msg);
+		$wnd.Client.screen.updateInterval = 10000;
 		if ($wnd.Client.screen === $wnd.Client.lobby) {
 			$wnd.Client.lobby.username.setError("Viga: " + msg);
 		}
@@ -128,6 +133,20 @@ public class Laevadepommitamine implements EntryPoint {
 						}
 					}
 				});
+			}
+		});
+	}
+
+	public static void getGamePlayers(int gameId)
+	{
+		gameService.getGamePlayers(gameId, new AsyncCallback<String[]>() {
+			public void onFailure(Throwable caught) {
+				Window.alert("createGame RPC failed.");
+				caught.printStackTrace();
+			}
+
+			public void onSuccess(String[] players) {
+				getGamePlayersCallback(players);
 			}
 		});
 	}
@@ -225,6 +244,7 @@ public class Laevadepommitamine implements EntryPoint {
 		}
 		$wnd.Server.createGame = $entry(@ee.ut.client.Laevadepommitamine::createGame(Ljava/lang/String;));
 		$wnd.Server.getGamesList = $entry(@ee.ut.client.Laevadepommitamine::getGamesList());
+		$wnd.Server.getGamePlayers = $entry(@ee.ut.client.Laevadepommitamine::getGamePlayers(I));
 		$wnd.Server.getUniquePlayerName = $entry(@ee.ut.client.Laevadepommitamine::getUniquePlayerName());
 		$wnd.Server.joinGame = $entry(@ee.ut.client.Laevadepommitamine::joinGame(ILjava/lang/String;));
 		$wnd.Server.remoteMove = $entry(@ee.ut.client.Laevadepommitamine::remoteMove(I));
