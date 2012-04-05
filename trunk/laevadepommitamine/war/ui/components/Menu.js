@@ -4,7 +4,7 @@ function Menu(items) {
 
 Menu.prototype = {
 	onRender: function() {
-		for (i in this.items) {
+		for (var i in this.items) {
 			this.items[i].onRender();
 		}
 	},
@@ -14,7 +14,7 @@ Menu.prototype = {
 		}
 
 		var el = $('<div class="menu"></div>');
-		for (i in this.items) {
+		for (var i in this.items) {
 			el.append(this.items[i].render());
 		}
 		this.el = el;

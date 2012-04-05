@@ -3,7 +3,7 @@ function Field() {
 
 // Checks if there is a ship at the given coordinates
 Field.checkHit = function(ships, coords) {
-	for (i in ships) {
+	for (var i in ships) {
 		var ship = ships[i];
 		var sw = ship.vertical ? 1 : ship.length;
 		var sh = ship.vertical ? ship.length : 1;
@@ -48,7 +48,7 @@ Field.checkLocation = function(ships, ship) {
 		return false;
 	}
 
-	for (i in ships) {
+	for (var i in ships) {
 		var ship = ships[i];
 		var w = vertical ? 1 : length;
 		var h = vertical ? length : 1;
@@ -68,7 +68,7 @@ Field.getShipAtCoords = function(ships, coords) {
 		return false;
 	}
 	
-	for (i in ships) {
+	for (var i in ships) {
 		var ship = ships[i];
 		var sw = ship.vertical ? 1 : ship.length;
 		var sh = ship.vertical ? ship.length : 1;

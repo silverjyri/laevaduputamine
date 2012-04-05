@@ -50,7 +50,9 @@ public class Laevadepommitamine implements EntryPoint {
 	}-*/;
 
 	public native static void getGamePlayersCallback(String[] players) /*-{
-		$wnd.Client.placement.getPlayersCallback(players);
+		if ($wnd.Client.placement) {
+			$wnd.Client.placement.getPlayersCallback(players);
+		}
 	}-*/;
 	
 	public native static int getRankingsVersion() /*-{

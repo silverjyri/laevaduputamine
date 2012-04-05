@@ -10,16 +10,15 @@ function Button(text, options) {
 	}
 
 	this.disabled = !!this.disabled;
+	if (this.fn && this.scope) {
+		this.fn = this.fn.bind(this.scope);
+	}
 }
 
 Button.prototype = {
 	onRender: function() {
 		if (this.fn) {
-			if (this.scope) {
-				this.el.click(this.fn.bind(this.scope));
-			} else {
-				this.el.click(this.fn);
-			}
+			this.el.click(this.fn);
 		}
 	},
 
@@ -43,7 +42,6 @@ Button.prototype = {
 		}
 
 		this.el = el;
-		this.onRender();
 		return el;
 	},
 

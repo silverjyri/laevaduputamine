@@ -2,12 +2,15 @@ function Placement(playerName, gameId) {
 	this.playerName = playerName;
 	this.defaultUpdateInterval = 1500;
 	this.updateInterval = this.defaultUpdateInterval;
+	this.initialized = false;
+
 	if (gameId != undefined) {
-		this.newGame = false;
+		this.isOpponent = true;
+		this.opponentHasJoined = false;
 		this.gameId = gameId;
 		Server.joinGame(gameId, playerName);
 	} else {
-		this.newGame = true;
+		this.isOpponent = false;
 		Server.createGame(playerName);
 	}
 }
@@ -19,30 +22,34 @@ Placement.prototype = {
 	},
 
 	getPlayersCallback: function(players) {
-		if (this.newGame) {
-			if (players[1]) {
-				this.webOpponentItem.setText(players[1]);
+		if (this.isOpponent) {
+			if (players[0]) {
+				this.webOpponentItem.setText(players[0]);
 			}
 		} else {
-			
+			if (players[1]) {
+				this.webOpponentItem.setText(players[1]);
+				this.opponentHasJoined = true;
+				this.readyBtn.setEnabled(true);
+			}
 		}
 	},
 
 	gameCreated: function(gameId) {
 		this.gameId = gameId;
-		this.readyBtn.setEnabled(true);
 		
-		if (this.newGame) {
-			if (!this.updateTimer) {
-				this.onUpdate();
-				this.updateTimer = setTimeout(this.onUpdate.bind(this), this.updateInterval);
-			}
+		if (!this.isOpponent) {
+			this.onUpdate();
 		}
+		this.endGameBtn.setEnabled(true);
+		this.initialized = true;
 	},
 
 	gameJoined: function() {
-		this.webOpponentItem.setText('Vastane');
+		Server.getGamePlayers(this.gameId);
 		this.readyBtn.setEnabled(true);
+		this.endGameBtn.setEnabled(true);
+		this.initialized = true;
 	},
 
 	onHide: function() {
@@ -86,13 +93,22 @@ Placement.prototype = {
 
 		var el = $('<div id="placement" class="screen"></div>');
 
+		this.endGameBtn = new Button("L&otilde;peta m&auml;ng", {disabled: true, scope: this, fn: function() {
+	    	Client.stopGame();
+	    }});
+		this.readyBtn = new Button("Valmis", {disabled: true, scope: this, fn: function() {
+			this.player = new LocalPlayer(this.playerName, this.field.ships);
+			Client.startGame();
+		}});
 		this.menu = new Menu([
 		    new Button("Esileht", {image: 'img/home.png', scope: this, fn: function() {
 		    	Client.startLobby();
 		    }}),
-		    new Button("L&otilde;peta m&auml;ng", {scope: this, fn: function() {
+		    this.endGameBtn,
+		    new Button("Juhuslik asetus", {scope: this, fn: function() {
 		    	Client.stopGame();
 		    }}),
+		    this.readyBtn
 		]);
 		el.append(this.menu.render());
 
@@ -192,13 +208,13 @@ Placement.prototype = {
 			shipContainer.append(value);
 		});
 		this.webOpponentItem = new ListItem({text: 'Ootan vastast...', image: 'img/webplayer.png'});
-		if (this.newGame) {
+		if (!this.isOpponent) {
 			this.aiOpponentItem = new ListItem({text: 'Arvuti', image: 'img/aiplayer.png', value: -1});
 		}
 		this.opponentList = new ListBox({
-			items: (this.newGame ?
-				[this.webOpponentItem, this.aiOpponentItem] :
-				[this.webOpponentItem]),
+			items: (this.isOpponent ?
+				[this.webOpponentItem] :
+				[this.webOpponentItem, this.aiOpponentItem]),
 			style: {
 				position: 'absolute', left: 0, top: 190,
 				width: 190, height: 100
@@ -206,11 +222,6 @@ Placement.prototype = {
 		});
 		shipContainer.append(this.opponentList.render());
 		this.opponentList.select(this.webOpponentItem);
-		this.readyBtn = new Button("Valmis", {disabled: true, scope: this, fn: function() {
-			this.player = new LocalPlayer(this.playerName, this.field.ships);
-			Client.startGame();
-		}, style: {position: 'absolute', left: 90, top: 305}});
-		shipContainer.append(this.readyBtn.render());
 		el.append(shipContainer);
 
 		var onMouseUp = function(e) {
