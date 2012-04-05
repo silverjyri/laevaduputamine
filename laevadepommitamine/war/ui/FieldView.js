@@ -231,7 +231,7 @@ FieldView.prototype = {
 		if (length == 1) {
 			var box = $('#'+this.getBoxId(x, y));
 			this.clearBox(box);
-			return true;
+			return;
 		}
 
 		var i;
@@ -246,6 +246,16 @@ FieldView.prototype = {
 				this.clearBox(box);
 			}
 		}
+	},
+
+	setShips: function(ships) {
+		$.each(this.ships, function(index, value) {
+			this.removeShip(value);
+		}.bind(this));
+
+		$.each(ships, function(index, value) {
+			this.addShip(value);
+		}.bind(this));
 	},
 
 	hasBomb: function(coords) {
