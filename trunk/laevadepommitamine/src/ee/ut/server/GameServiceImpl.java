@@ -183,4 +183,27 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 	public Integer getGamesListVersion() {
 		return gamesListVersion;
 	}
+
+	@Override
+	public String[] getGamePlayers(int gameId) {
+		String[] players = new String[2];
+		Database.ensure();
+		try {
+			Connection conn = Database.getConnection();
+			Statement sta = conn.createStatement();
+			ResultSet playerName = sta.executeQuery("SELECT Players.Name FROM Games INNER JOIN Players ON Players.ID = Games.Player WHERE ID=" + Integer.toString(gameId));
+			if (playerName.next()) {
+				players[0] = playerName.getString(1);
+			}
+			ResultSet opponentName = sta.executeQuery("SELECT Players.Name FROM Games INNER JOIN Players ON Players.ID = Games.Opponent WHERE ID=" + Integer.toString(gameId));
+			if (opponentName.next()) {
+				players[1] = opponentName.getString(1);
+			}
+			sta.close();
+			conn.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return players;
+	}
 }

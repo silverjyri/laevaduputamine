@@ -1,16 +1,18 @@
 function Lobby() {
 	this.gamesListVersion = 0;
-	this.updateinterval = 1500;
+	this.defaultUpdateInterval = 1500;
+	this.updateInterval = this.defaultUpdateInterval;
 }
 
 Lobby.prototype = {
 	onUpdate: function() {
 		Server.getGamesList();
+		this.updateTimer = setTimeout(this.onUpdate.bind(this), this.updateInterval);
 	},
 
 	onHide: function() {
 		if (this.updateTimer) {
-			clearInterval(this.updateTimer);
+			clearTimeout(this.updateTimer);
 			delete this.updateTimer;
 		}
 	},
@@ -24,7 +26,7 @@ Lobby.prototype = {
 
 		if (!this.updateTimer) {
 			this.onUpdate();
-			this.updateTimer = setInterval(this.onUpdate.bind(this), this.updateinterval);
+			this.updateTimer = setTimeout(this.onUpdate.bind(this), this.updateInterval);
 		}
 
 		if (!this.initialized) {

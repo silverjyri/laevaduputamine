@@ -1,5 +1,7 @@
 function Placement(playerName, gameId) {
 	this.playerName = playerName;
+	this.defaultUpdateInterval = 1500;
+	this.updateInterval = this.defaultUpdateInterval;
 	if (gameId != undefined) {
 		this.newGame = false;
 		this.gameId = gameId;
@@ -11,14 +13,43 @@ function Placement(playerName, gameId) {
 }
 
 Placement.prototype = {
+	onUpdate: function() {
+		Server.getGamePlayers(this.gameId);
+		this.updateTimer = setTimeout(this.onUpdate.bind(this), this.updateInterval);
+	},
+
+	getPlayersCallback: function(players) {
+		if (this.newGame) {
+			if (players[1]) {
+				this.webOpponentItem.setText(players[1]);
+			}
+		} else {
+			
+		}
+	},
+
 	gameCreated: function(gameId) {
 		this.gameId = gameId;
 		this.readyBtn.setEnabled(true);
+		
+		if (this.newGame) {
+			if (!this.updateTimer) {
+				this.onUpdate();
+				this.updateTimer = setTimeout(this.onUpdate.bind(this), this.updateInterval);
+			}
+		}
 	},
 
 	gameJoined: function() {
 		this.webOpponentItem.setText('Vastane');
 		this.readyBtn.setEnabled(true);
+	},
+
+	onHide: function() {
+		if (this.updateTimer) {
+			clearTimeout(this.updateTimer);
+			delete this.updateTimer;
+		}
 	},
 
 	onRender: function() {
@@ -162,7 +193,7 @@ Placement.prototype = {
 		});
 		this.webOpponentItem = new ListItem({text: 'Ootan vastast...', image: 'img/webplayer.png'});
 		if (this.newGame) {
-			this.aiOpponentItem = new ListItem({text: 'Arvuti vastu', image: 'img/aiplayer.png'});
+			this.aiOpponentItem = new ListItem({text: 'Arvuti', image: 'img/aiplayer.png', value: -1});
 		}
 		this.opponentList = new ListBox({
 			items: (this.newGame ?
@@ -174,6 +205,7 @@ Placement.prototype = {
 			}
 		});
 		shipContainer.append(this.opponentList.render());
+		this.opponentList.select(this.webOpponentItem);
 		this.readyBtn = new Button("Valmis", {disabled: true, scope: this, fn: function() {
 			this.player = new LocalPlayer(this.playerName, this.field.ships);
 			Client.startGame();
