@@ -43,7 +43,10 @@ Field.checkLocation = function(ships, ship) {
 	var y = ship.y;
 	var length = ship.length;
 	var vertical = ship.vertical;
-	
+
+	if (x < 0 || y < 0) {
+		return false;
+	}
 	if ((vertical ? y : x) + length > 10) {
 		return false;
 	}

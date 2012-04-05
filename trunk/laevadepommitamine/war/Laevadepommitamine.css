@@ -141,11 +141,11 @@ h1 {
 	margin-right: -1px;
 	margin-bottom: -1px;
 }
-
+/*
 .box:hover {
 	background-color: #88BBEE;
 }
-
+*/
 .bomb_layer {
 	width: 32px;
 	height: 32px;
@@ -277,4 +277,15 @@ h1 {
 	0%   {background: #99CCFF;}
 	50%  {background: red;}
 	100% {background: #99CCFF;}
+}
+
+.addAnimation {
+	animation: anim1 1s linear;
+	-moz-animation: anim1 1s linear;
+	-webkit-animation: anim1 1s linear;
+}
+.explosionAnimation {
+	animation: explosion 1s linear;
+	-moz-animation: explosion 1s linear;
+	-webkit-animation: explosion 1s linear;
 }

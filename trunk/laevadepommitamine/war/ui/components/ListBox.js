@@ -12,6 +12,10 @@ function ListBox(options) {
 		item = this.convertItem(item);
 		item.parent = this;
 	}.bind(this));
+
+	if (this.onSelectionChanged && this.scope) {
+		this.onSelectionChanged = this.onSelectionChanged.bind(this.scope);
+	}
 }
 
 ListBox.prototype = {
@@ -22,11 +26,7 @@ ListBox.prototype = {
 		this.selected = item;
 		item.el.addClass('listitem_selected');
 		if (this.onSelectionChanged) {
-			if (this.scope) {
-				this.onSelectionChanged.call(this.scope, item);
-			} else {
-				this.onSelectionChanged(item);
-			}
+			this.onSelectionChanged(item);
 		}
 	},
 

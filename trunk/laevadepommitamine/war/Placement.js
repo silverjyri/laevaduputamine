@@ -69,6 +69,10 @@ Placement.prototype = {
 		if (this.opponentList) {
 			this.opponentList.onRender();
 		}
+
+		if (this.initialized && !this.isOpponent) {
+			this.onUpdate();
+		}
 	},
 
 	revertDrag: function() {
@@ -112,6 +116,26 @@ Placement.prototype = {
 		]);
 		el.append(this.menu.render());
 
+		var adjustDropLocation = function(ship, coords, offset) {
+			if (offset) {
+				coords.x += offset.x;
+				coords.y += offset.y;
+			}
+			if (ship.vertical) {
+				if (coords.y < 0) {
+					coords.y = 0;
+				} else if (coords.y + ship.length >= 10) {
+					coords.y = 10 - ship.length;
+				}
+			} else {
+				if (coords.x < 0) {
+					coords.x = 0;
+				} else if (coords.x + ship.length >= 10) {
+					coords.x = 10 - ship.length;
+				}
+			}
+		};
+
 		var onDragMove = function(e) {
 			var data = this.dragData;
 			var clone = data.clone;
@@ -120,6 +144,7 @@ Placement.prototype = {
 			if (coords) {
 				var contPos = this.shipContainer.offset();
 				var fieldPos = field.offset();
+				adjustDropLocation(clone, coords, data.dragOffset);
 				var newPos = {left: fieldPos.left - contPos.left + coords.x * 33,
 					top: fieldPos.top - contPos.top + coords.y * 33};
 				var oldPos = clone.position();
@@ -155,6 +180,7 @@ Placement.prototype = {
 			var clone = data.clone;
 			var coords = this.field.getEventCoords(e);
 			if (coords) {
+				adjustDropLocation(clone, coords, data.dragOffset);
 				var added = this.field.addShip(
 					{x: coords.x, y: coords.y, length: clone.length, vertical: clone.vertical});
 				if (added) {
@@ -218,6 +244,16 @@ Placement.prototype = {
 			style: {
 				position: 'absolute', left: 0, top: 190,
 				width: 190, height: 100
+			},
+			scope: this,
+			onSelectionChanged: function(selected) {
+				if (selected === this.aiOpponentItem) {
+					this.readyBtn.setEnabled(true);
+				} else {
+					if (!this.opponentHasJoined) {
+						this.readyBtn.setEnabled(false);
+					}
+				}
 			}
 		});
 		shipContainer.append(this.opponentList.render());
@@ -229,29 +265,30 @@ Placement.prototype = {
 			$(document).off('mouseup', onMouseUp);
 		};
 
-		var onExistingDrag = function(e) {
+		this.field = new FieldView({id: 0, onMouseDown: function(e) {
+			if (e.button != 0) {
+				return;
+			}
+			e.preventDefault();
 			var field = this.field;
 			var coords = field.getEventCoords(e);
 			var ship = Field.getShipAtCoords(this.field.ships, coords);
 
 			if (ship) {
+				var dragOffset = {x: ship.x - coords.x, y: ship.y - coords.y};
 				var contPos = this.shipContainer.offset();
-				var coords = this.field.getEventCoords(e);
-				if (coords) {
-					var fieldPos = field.offset();
-					e.pageX = fieldPos.left + coords.x * 33;
-					e.pageY = fieldPos.top + coords.y * 33;
-				}
+				var fieldPos = field.offset();
+				e.pageX = fieldPos.left + ship.x * 33;
+				e.pageY = fieldPos.top + ship.y * 33;
 				var clone = new ShipFloating(ship.length, ship.vertical, {left: e.pageX - contPos.left, top: e.pageY - contPos.top});
 				field.removeShip(ship);
-				this.dragData = {ship: ship, clone: clone, x: e.pageX, y: e.pageY, existing: true};
+				field.showShipPreview(ship.x, ship.y, clone.length, clone.vertical);
+				this.dragData = {ship: ship, clone: clone, x: e.pageX, y: e.pageY, dragOffset: dragOffset, existing: true};
 				this.shipContainer.append(clone.render());
 				$(document).mousemove(this, $.proxy(onDragMove, this));
 				$(document).mouseup(this, $.proxy(onMouseUp, this));
 			}
-		}
-
-		this.field = new FieldView({id: 0, onMouseDown: onExistingDrag, scope: this});
+		}, scope: this});
 		el.append(this.field.render());
 
 		this.el = el;

@@ -29,14 +29,16 @@ Client.startLobby = function() {
 };
 
 Client.startPlacement = function() {
-	var username;
-	var gameId;
-	if (this.lobby) {
-		this.lobby.username.setEnabled(false);
-		username = this.lobby.username.getText();
-		gameId = this.lobby.joinGame;
+	if (!this.placement) {
+		var username;
+		var gameId;
+		if (this.lobby) {
+			this.lobby.username.setEnabled(false);
+			username = this.lobby.username.getText();
+			gameId = this.lobby.joinGame;
+		}
+		this.placement = new Placement(username, gameId);
 	}
-	this.placement = this.placement || new Placement(username, gameId);
 	this.setScreen(this.placement);
 };
 
