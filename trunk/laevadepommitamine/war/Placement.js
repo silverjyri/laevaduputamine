@@ -110,7 +110,7 @@ Placement.prototype = {
 		    }}),
 		    this.endGameBtn,
 		    new Button("Juhuslik asetus", {scope: this, fn: function() {
-		    	Client.stopGame();
+		    	this.field.setShips(Field.generateRandomShips());
 		    }}),
 		    this.readyBtn
 		]);
