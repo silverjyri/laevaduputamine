@@ -45,7 +45,7 @@ FieldView.prototype = {
 	
 		var ships = this.startShips;
 		if (ships) {
-			for (i in ships) {
+			for (var i in ships) {
 				this.renderShip(ships[i]);
 			}
 		}

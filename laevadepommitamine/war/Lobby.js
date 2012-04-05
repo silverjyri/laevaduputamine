@@ -111,6 +111,7 @@ Lobby.prototype = {
 		this.username.setText(playerName);
 		this.username.setEnabled(true);
 		this.loadingGif.remove();
+		delete this.loadingGif;
 		this.initialized = true;
 	}
 };
