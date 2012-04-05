@@ -8,15 +8,15 @@ function TextField( options) {
 		this.labelText = options.label;
 		this.disabled = options.disabled;
 	}
+
+	if (this.fn && this.scope) {
+		this.fn = this.fn.bind(this.scope);
+	}
 }
 
 TextField.prototype = {
 	onRender: function() {
-		if (this.scope) {
-			this.el.keydown($.proxy(this.fn, this.scope));
-		} else {
-			this.el.keydown(this.fn);
-		}
+		this.el.keydown(this.fn);
 	},
 
 	render: function() {

@@ -80,14 +80,15 @@ Lobby.prototype = {
 		var gamesList = new ListBox({scope: this, onSelectionChanged: function(selected) {
 			if (!this.joinBtn) {
 				this.joinBtn = new Button("Liitu m&auml;nguga", {scope: this, fn: function() {
-					this.joinGame = selected.value;
 					this.joinBtn.setEnabled(false);
 					Client.startPlacement();
 				}});
 				var joinBtnEl = this.joinBtn.render()
+				this.joinBtn.onRender();
 				joinBtnEl.css('float', 'left');
 				this.el.append(joinBtnEl);
 			}
+			this.joinGame = selected.value;
 		}});
 		this.gamesList = gamesList;
 		el.append(gamesList.render());

@@ -130,22 +130,22 @@ FieldView.prototype = {
 		return true;
 	},
 
+	clearBox: function(box) {
+		this.clearAnim(box);
+		box.html('');
+	},
+
 	clearAnim: function(box) {
-		box.removeClass('animation');
-		box.removeClass('-moz-animation');
-		box.removeClass('-webkit-animation');
+		box.removeClass('addAnimation');
+		box.removeClass('explosionAnimation');
 	},
 
 	setAnimAdd: function(box) {
-		box.css('animation', 'anim1 1s linear');
-		box.css('-moz-animation', 'anim1 1s linear');
-		box.css('-webkit-animation', 'anim1 1s linear');
+		box.addClass('addAnimation');
 	},
 
 	setAnimExplosion: function(box) {
-		box.css('animation', 'explosion 1s linear');
-		box.css('-moz-animation', 'explosion 1s linear');
-		box.css('-webkit-animation', 'explosion 1s linear');
+		box.addClass('explosionAnimation');
 	},
 
 	renderShip: function(ship, animate) {
@@ -230,7 +230,7 @@ FieldView.prototype = {
 
 		if (length == 1) {
 			var box = $('#'+this.getBoxId(x, y));
-			box.html('');
+			this.clearBox(box);
 			return true;
 		}
 
@@ -238,12 +238,12 @@ FieldView.prototype = {
 		if (ship.vertical) {
 			for (i = 0; i < length; i++) {
 				var box = $('#'+this.getBoxId(x, y + i));
-				box.html('');
+				this.clearBox(box);
 			}
 		} else {
 			for (i = 0; i < length; i++) {
 				var box = $('#'+this.getBoxId(x + i, y));
-				box.html('');
+				this.clearBox(box);
 			}
 		}
 	},
