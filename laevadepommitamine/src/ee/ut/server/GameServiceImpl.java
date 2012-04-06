@@ -179,6 +179,7 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 			conn = Database.getConnection();
 			Statement sta = conn.createStatement();
 			ResultSet resultSet;
+
 			if (isOpponent) {
 				resultSet = sta.executeQuery("SELECT OpponentField FROM Games WHERE ID=" + Integer.toString(gameId));
 			} else {
@@ -189,7 +190,14 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 			Map<Integer, Ship> ships = Ship.decodeShips(field);
 			Map<Integer, Bomb> bombs = Bomb.decodeBombs(field);
 
-			boolean ai = true;
+			boolean ai;
+			if (isOpponent) {
+				ai = false;
+			} else {
+				resultSet = sta.executeQuery("SELECT Opponent FROM Games WHERE ID=" + Integer.toString(gameId));
+				ai = resultSet.getInt(1) == -1;
+			}
+
 			int x = 0, y = 0;
 			if (ai) {
 				Bomb bomb = Bomb.getAiBomb(bombs);
@@ -238,7 +246,7 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 					Map<Integer, Ship> ships = Ship.generateRandomShips();
 					Map<Integer, Bomb> bombs = new HashMap<Integer, Bomb>();
 					fieldEnc = Ship.encodeField(ships, bombs);
-					sta.executeUpdate("UPDATE Games SET OpponentField='" + fieldEnc +  "' WHERE ID=" + Integer.toString(gameId));
+					sta.executeUpdate("UPDATE Games SET Opponent=-1, OpponentField='" + fieldEnc +  "' WHERE ID=" + Integer.toString(gameId));
 				}
 			}
 			sta.close();

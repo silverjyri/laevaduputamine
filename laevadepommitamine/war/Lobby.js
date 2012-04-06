@@ -26,7 +26,6 @@ Lobby.prototype = {
 
 		if (!this.updateTimer) {
 			this.onUpdate();
-			this.updateTimer = setTimeout(this.onUpdate.bind(this), this.updateInterval);
 		}
 
 		if (!this.initialized) {
@@ -52,11 +51,9 @@ Lobby.prototype = {
 	  	    	{scope: this, fn: function() {
 	  	    	if (Client.game) {
 	  	    		Client.startGame();
-	  	    	} else if (Client.placement) {
+	  	    	} else {
 		  	    	//this.username.setError('Nimi juba v&otilde;etud!');
 	  	    		delete this.joinGame;
-	  	    		Client.startPlacement();
-	  	    	} else {
 	  	    		Client.startPlacement();
 	  	    	}
 	  	    	if (this.joinBtn) {
