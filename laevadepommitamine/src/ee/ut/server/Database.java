@@ -41,6 +41,8 @@ public class Database {
 							+ "OpponentField CHAR(100),"
 							+ "Name VARCHAR(50),"
 							+ "PlayerStarts BOOLEAN,"
+							+ "Active BOOLEAN DEFAULT false,"
+							+ "LastMove INTEGER DEFAULT -1,"
 							+ "FOREIGN KEY (Player) REFERENCES Players(ID))");
 					sta.executeUpdate("CREATE TABLE Rankings ("
 							+ "Player INTEGER,"

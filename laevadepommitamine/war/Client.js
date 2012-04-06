@@ -96,8 +96,7 @@ $LAB
 .script("Placement.js")
 .script("ui/FieldView.js")
 .script("controller/LocalPlayer.js")
-.script("controller/WebPlayer.js")
-.script("controller/AIPlayer.js").wait(function() {
+.script("controller/WebPlayer.js").wait(function() {
 	//Client.startPlacement();
 })
 .script("Game.js")

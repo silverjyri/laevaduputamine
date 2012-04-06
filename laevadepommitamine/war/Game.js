@@ -84,7 +84,7 @@ Game.prototype = {
 
 	remoteMoveResult: function(bombCoords) {
 		if (bombCoords.x == -1 && bombCoords.y == -1) {
-			console.log("not AI");
+			setTimeout($.proxy(this.makeMove, this), 500);
 			return;
 		}
 
@@ -105,9 +105,27 @@ Game.prototype = {
 	},
 
 	gameStarted: function(firstMove) {
+		this.firstMove = firstMove;
+
+		this.playerField.setStatus('Ootan vastast...');
+		this.opponentField.setStatus('');
+
+		this.isOpponentReady();
+	},
+
+	isOpponentReady: function() {
+		Server.isOpponentReady(this.gameId, this.isOpponent);
+	},
+
+	isOpponentReadyCallback: function(ready) {
+		if (!ready) {
+			setTimeout($.proxy(this.isOpponentReady, this), 500);
+			return;
+		}
+
 		var p1status, p2status;
 
-		if (firstMove) {
+		if (this.firstMove) {
 			this.currentPlayer = Client.player;
 			p1status = "Sinu kord!";
 			p2status = '';

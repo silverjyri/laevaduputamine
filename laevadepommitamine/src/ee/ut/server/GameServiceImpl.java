@@ -27,15 +27,15 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 			conn = Database.getConnection();
 			Statement sta = conn.createStatement();
 			sta.executeUpdate("INSERT INTO Players (name) VALUES ('" + playerName + "')");
-			ResultSet st = sta.executeQuery("SELECT ID FROM Players WHERE Name='" + playerName + "'");
-			st.next();
-			int playerId = st.getInt(1);
+			ResultSet rs = sta.executeQuery("SELECT ID FROM Players WHERE Name='" + playerName + "'");
+			rs.next();
+			int playerId = rs.getInt(1);
 			sta.executeUpdate("INSERT INTO Rankings (Player, Victories, Defeats) VALUES ('" + playerId + "', 0, 0)");
-			sta.executeUpdate("INSERT INTO Games (Name, Player) VALUES ('" + playerName + " ootab...', " + Integer.toString(playerId) + ")");
+			sta.executeUpdate("INSERT INTO Games (Name, Player, Active) VALUES ('" + playerName + " ootab...', " + Integer.toString(playerId) + ", false)");
 			gamesListVersion++;
-			st = sta.executeQuery("SELECT id FROM Games WHERE Player='" + Integer.toString(playerId) + "'");
-			st.next();
-			int gameId = st.getInt(1);
+			rs = sta.executeQuery("SELECT id FROM Games WHERE Player='" + Integer.toString(playerId) + "'");
+			rs.next();
+			int gameId = rs.getInt(1);
 			sta.close();
 			conn.close();
 			return new Integer(gameId);
@@ -54,10 +54,10 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 		try {
 			conn = Database.getConnection();
 			Statement sta = conn.createStatement();
-			ResultSet resultSet = sta.executeQuery("SELECT ID, Name FROM Games");
-			while (resultSet.next()) {
-				int id = resultSet.getInt(1);
-				String name = resultSet.getString(2);
+			ResultSet rs = sta.executeQuery("SELECT ID, Name FROM Games");
+			while (rs.next()) {
+				int id = rs.getInt(1);
+				String name = rs.getString(2);
 				list.add(new Game(id, name));
 			}
 			sta.close();
@@ -76,15 +76,19 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 		try {
 			conn = Database.getConnection();
 			Statement sta = conn.createStatement();
+
 			sta.executeUpdate("INSERT INTO Players (name) VALUES ('" + playerName + "')");
-			ResultSet st = sta.executeQuery("SELECT ID FROM Players WHERE Name='" + playerName + "'");
-			st.next();
-			int playerId = st.getInt(1);
-			ResultSet resultSet = sta.executeQuery("SELECT Players.name FROM Games INNER JOIN Players ON Players.ID = Games.Player WHERE ID=" + Integer.toString(gameId));
-			resultSet.next();
-			String opponentName = resultSet.getString(1);
+
+			ResultSet rs = sta.executeQuery("SELECT ID FROM Players WHERE Name='" + playerName + "'");
+			rs.next();
+			int playerId = rs.getInt(1);
+			rs = sta.executeQuery("SELECT Players.name FROM Games INNER JOIN Players ON Players.ID = Games.Player WHERE ID=" + Integer.toString(gameId));
+			rs.next();
+			String opponentName = rs.getString(1);
+
 			sta.executeUpdate("UPDATE Games SET Opponent=" + Integer.toString(playerId) + ", Name='" + opponentName + " vs. " + playerName + "' WHERE ID=" + Integer.toString(gameId));
 			gamesListVersion++;
+
 			sta.close();
 			conn.close();
 		} catch (SQLException e) {
@@ -97,8 +101,10 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 		try {
 			Connection conn = Database.getConnection();
 			Statement sta = conn.createStatement();
-			ResultSet resultSet = sta.executeQuery("SELECT * FROM Players WHERE Name='" + name + "'");
-			boolean available = !resultSet.next();
+
+			ResultSet rs = sta.executeQuery("SELECT * FROM Players WHERE Name='" + name + "'");
+			boolean available = !rs.next();
+
 			sta.close();
 			conn.close();
 			return available;
@@ -128,6 +134,90 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 	*/
 
 	@Override
+	public boolean isOpponentReady(int gameId, boolean isOpponent) {
+		Database.ensure();
+		Connection conn;
+
+		try {
+			conn = Database.getConnection();
+			Statement sta = conn.createStatement();
+
+			ResultSet rs = sta.executeQuery("SELECT Active FROM Games WHERE ID=" + Integer.toString(gameId));
+			rs.next();
+			boolean active = rs.getBoolean(1);
+
+			boolean ready;
+			if (active) {
+				ready = true;
+			} else {
+				rs = sta.executeQuery("SELECT PlayerField FROM Games WHERE ID=" + Integer.toString(gameId));
+				rs.next();
+				boolean playerReady = rs.getString(1) != null;
+				rs = sta.executeQuery("SELECT OpponentField FROM Games WHERE ID=" + Integer.toString(gameId));
+				rs.next();
+				boolean opponentReady = rs.getString(1) != null;
+
+				ready = isOpponent ? playerReady : opponentReady;
+
+				if (playerReady && opponentReady) {
+					sta.executeUpdate("UPDATE Games SET Active=true WHERE ID=" + Integer.toString(gameId));
+				}
+			}
+
+			sta.close();
+			conn.close();
+
+			return ready;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return false;
+	}
+
+	@Override
+	public boolean isOpponentMoveReady(int gameId, boolean isOpponent) {
+		Database.ensure();
+		Connection conn;
+
+		try {
+			conn = Database.getConnection();
+			Statement sta = conn.createStatement();
+
+			ResultSet rs = sta.executeQuery("SELECT Active FROM Games WHERE ID=" + Integer.toString(gameId));
+			rs.next();
+			boolean active = rs.getBoolean(1);
+
+			boolean ready;
+			if (!active) {
+				rs = sta.executeQuery("SELECT PlayerField FROM Games WHERE ID=" + Integer.toString(gameId));
+				rs.next();
+				boolean playerReady = rs.getString(1) != null;
+				rs = sta.executeQuery("SELECT OpponentField FROM Games WHERE ID=" + Integer.toString(gameId));
+				rs.next();
+				boolean opponentReady = rs.getString(1) != null;
+
+				ready = isOpponent ? playerReady : opponentReady;
+
+				if (playerReady && opponentReady) {
+					sta.executeUpdate("UPDATE Games SET Active=true WHERE ID=" + Integer.toString(gameId));
+				}
+			} else {
+				ready = false;
+			}
+
+			sta.close();
+			conn.close();
+
+			return ready;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return false;
+	}
+
+	@Override
 	public boolean playerMove(int gameId, boolean isOpponent, int x, int y) {
 		Database.ensure();
 		Connection conn;
@@ -135,14 +225,14 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 		try {
 			conn = Database.getConnection();
 			Statement sta = conn.createStatement();
-			ResultSet resultSet;
+			ResultSet rs;
 			if (isOpponent) {
-				resultSet = sta.executeQuery("SELECT PlayerField FROM Games WHERE ID=" + Integer.toString(gameId));
+				rs = sta.executeQuery("SELECT PlayerField FROM Games WHERE ID=" + Integer.toString(gameId));
 			} else {
-				resultSet = sta.executeQuery("SELECT OpponentField FROM Games WHERE ID=" + Integer.toString(gameId));
+				rs = sta.executeQuery("SELECT OpponentField FROM Games WHERE ID=" + Integer.toString(gameId));
 			}
-			resultSet.next();
-			String field = resultSet.getString(1);
+			rs.next();
+			String field = rs.getString(1);
 			Map<Integer, Ship> ships = Ship.decodeShips(field);
 			Map<Integer, Bomb> bombs = Bomb.decodeBombs(field);
 
@@ -158,6 +248,8 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 			} else {
 				sta.executeUpdate("UPDATE Games SET OpponentField='" + fieldEnc +  "' WHERE ID=" + Integer.toString(gameId));
 			}
+
+			sta.executeUpdate("UPDATE Games SET LastMove=" + Integer.toString(id) + " WHERE ID=" + Integer.toString(gameId));
 
 			sta.close();
 			conn.close();
@@ -178,15 +270,15 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 		try {
 			conn = Database.getConnection();
 			Statement sta = conn.createStatement();
-			ResultSet resultSet;
+			ResultSet rs;
 
 			if (isOpponent) {
-				resultSet = sta.executeQuery("SELECT OpponentField FROM Games WHERE ID=" + Integer.toString(gameId));
+				rs = sta.executeQuery("SELECT OpponentField FROM Games WHERE ID=" + Integer.toString(gameId));
 			} else {
-				resultSet = sta.executeQuery("SELECT PlayerField FROM Games WHERE ID=" + Integer.toString(gameId));
+				rs = sta.executeQuery("SELECT PlayerField FROM Games WHERE ID=" + Integer.toString(gameId));
 			}
-			resultSet.next();
-			String field = resultSet.getString(1);
+			rs.next();
+			String field = rs.getString(1);
 			Map<Integer, Ship> ships = Ship.decodeShips(field);
 			Map<Integer, Bomb> bombs = Bomb.decodeBombs(field);
 
@@ -194,8 +286,9 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 			if (isOpponent) {
 				ai = false;
 			} else {
-				resultSet = sta.executeQuery("SELECT Opponent FROM Games WHERE ID=" + Integer.toString(gameId));
-				ai = resultSet.getInt(1) == -1;
+				rs = sta.executeQuery("SELECT Opponent FROM Games WHERE ID=" + Integer.toString(gameId));
+				rs.next();
+				ai = rs.getInt(1) == -1;
 			}
 
 			int x = 0, y = 0;
@@ -212,9 +305,18 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 					sta.executeUpdate("UPDATE Games SET PlayerField='" + fieldEnc +  "' WHERE ID=" + Integer.toString(gameId));
 				}
 			} else {
-				// Opponent move not ready
-				x = -1;
-				y = -1;
+				rs = sta.executeQuery("SELECT LastMove FROM Games WHERE ID=" + Integer.toString(gameId));
+				rs.next();
+				int id = rs.getInt(1);
+				if (id == -1) {
+					// Opponent move not ready
+					x = -1;
+					y = -1;
+				} else {
+					x = id / 10;
+					y = id % 10;
+					sta.executeUpdate("UPDATE Games SET LastMove=-1 WHERE ID=" + Integer.toString(gameId));
+				}
 			}
 
 			sta.close();
@@ -238,6 +340,7 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 			if (playerType.equalsIgnoreCase("opponent")) {
 				sta.executeUpdate("UPDATE Games SET OpponentField='" + fieldEnc +  "' WHERE ID=" + Integer.toString(gameId));
 				ResultSet rs = sta.executeQuery("SELECT PlayerStarts FROM Games WHERE ID=" + Integer.toString(gameId));
+				rs.next();
 				startFirst = !rs.getBoolean(1);
 			} else {
 				startFirst = new Random().nextBoolean();
@@ -270,6 +373,7 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 		try {
 			Connection conn = Database.getConnection();
 			Statement sta = conn.createStatement();
+
 			ResultSet playerName = sta.executeQuery("SELECT Players.Name FROM Games INNER JOIN Players ON Players.ID = Games.Player WHERE ID=" + Integer.toString(gameId));
 			if (playerName.next()) {
 				players[0] = playerName.getString(1);
@@ -278,6 +382,7 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 			if (opponentName.next()) {
 				players[1] = opponentName.getString(1);
 			}
+
 			sta.close();
 			conn.close();
 		} catch (SQLException e) {

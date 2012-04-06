@@ -29,6 +29,14 @@ public class Laevadepommitamine implements EntryPoint {
 		return selectedId;
 	}-*/;
 
+	public native static void isOpponentReadyCallback(boolean result) /*-{
+		$wnd.Client.game.isOpponentReadyCallback(result);
+	}-*/;
+
+	public native static void isOpponentMoveReadyCallback(boolean result) /*-{
+		$wnd.Client.game.isOpponentMoveReadyCallback(result);
+	}-*/;
+
 	public native static void setPlayerName(String name) /*-{
 		$wnd.Client.lobby.initialize(name);
 	}-*/;
@@ -197,6 +205,32 @@ public class Laevadepommitamine implements EntryPoint {
 		});
 	}
 
+	public static void isOpponentReady(int gameId, boolean isOpponent)
+	{
+		gameService.isOpponentReady(gameId, isOpponent, new AsyncCallback<Boolean>() {
+			public void onFailure(Throwable caught) {
+				Window.alert("isOpponentReady RPC failed.");
+			}
+
+			public void onSuccess(Boolean result) {
+				isOpponentReadyCallback(result);
+			}
+		});
+	}
+
+	public static void isOpponentMoveReady(int gameId, boolean isOpponent)
+	{
+		gameService.isOpponentMoveReady(gameId, isOpponent, new AsyncCallback<Boolean>() {
+			public void onFailure(Throwable caught) {
+				Window.alert("isOpponentMoveReady RPC failed.");
+			}
+
+			public void onSuccess(Boolean result) {
+				isOpponentMoveReadyCallback(result);
+			}
+		});
+	}
+
 	public static void joinGame(int gameId, String playerName)
 	{
 		gameService.joinGame(gameId, playerName, new AsyncCallback<Void>() {
@@ -260,6 +294,8 @@ public class Laevadepommitamine implements EntryPoint {
 		$wnd.Server.getGamesList = $entry(@ee.ut.client.Laevadepommitamine::getGamesList());
 		$wnd.Server.getGamePlayers = $entry(@ee.ut.client.Laevadepommitamine::getGamePlayers(I));
 		$wnd.Server.getUniquePlayerName = $entry(@ee.ut.client.Laevadepommitamine::getUniquePlayerName());
+		$wnd.Server.isOpponentReady = $entry(@ee.ut.client.Laevadepommitamine::isOpponentReady(IZ));
+		$wnd.Server.isOpponentMoveReady = $entry(@ee.ut.client.Laevadepommitamine::isOpponentMoveReady(IZ));
 		$wnd.Server.joinGame = $entry(@ee.ut.client.Laevadepommitamine::joinGame(ILjava/lang/String;));
 		$wnd.Server.playerMove = $entry(@ee.ut.client.Laevadepommitamine::playerMove(IZII));
 		$wnd.Server.remoteMove = $entry(@ee.ut.client.Laevadepommitamine::remoteMove(IZ));
