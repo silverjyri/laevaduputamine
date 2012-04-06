@@ -66,6 +66,10 @@ Field.checkLocation = function(ships, ship) {
 	return true;
 }
 
+Field.checkShipsPlaced = function(ships) {
+	return (Client.sizeOf(ships) == 10);
+}
+
 Field.getShipAtCoords = function(ships, coords) {
 	if (!coords) {
 		return false;
