@@ -1,10 +1,8 @@
-function Game(gameId, player1) {
+function Game(gameId) {
 	this.gameId = gameId;
-	this.player1 = player1;
-	this.player2 = new AIPlayer();
-	this.currentPlayer = Client.rand(1) ? this.player1 : this.player2;
+	this.currentPlayer = Client.rand(1) ? Client.player : Client.opponent;
 
-	var fieldEnc = Field.encodeField(player1.ships, {});
+	var fieldEnc = Field.encodeField(Client.player.ships, {});
 	Server.startGame(gameId, fieldEnc);
 }
 
@@ -33,7 +31,7 @@ Game.prototype = {
 		el.append(this.menu.render());
 
 		var onMouseDown = function(e) {
-			if (this.currentPlayer === this.player1) {
+			if (this.currentPlayer === Client.player) {
 				var field = e.data;
 				if (e.data === this.field2) {
 					var coords = field.getEventCoords(e);
@@ -42,17 +40,17 @@ Game.prototype = {
 							return;
 						}
 
-						var hit = this.player2.checkHit(coords);
+						var hit = Client.opponent.checkHit(coords);
 						field.addBomb({x: coords.x, y: coords.y, hit: hit});
 						if (hit) {
-							var fullHit = Field.checkFullHit(this.player2.ships, field.bombs, coords);
+							var fullHit = Field.checkFullHit(Client.opponent.ships, field.bombs, coords);
 							if (fullHit) {
 								field.setShipSunk(fullHit);
 							}
 							return;
 						}
 
-						this.currentPlayer = this.player2;
+						this.currentPlayer = Client.opponent;
 						this.field1.setStatus('');
 						field.setStatus('Ootan vastase k&auml;iku...');
 						setTimeout($.proxy(this.remoteMove, this), 400);
@@ -61,10 +59,10 @@ Game.prototype = {
 			}
 		}
 
-		var p1status = (this.currentPlayer === this.player1) ? "Sinu kord!" : '';
-		var p2status = (this.currentPlayer === this.player2) ? "Ootan vastase k&auml;iku..." : '';
-		this.field1 = new FieldView({id: '1', onMouseDown: onMouseDown, scope: this, ships: this.player1.ships, status: p1status});
-		this.field2 = new FieldView({id: '2', onMouseDown: onMouseDown, scope: this, status: p2status});
+		var p1status = (this.currentPlayer === Client.player) ? "Sinu kord!" : '';
+		var p2status = (this.currentPlayer === Client.opponent) ? "Ootan vastase k&auml;iku..." : '';
+		this.field1 = new FieldView(Client.player, {id: '1', onMouseDown: onMouseDown, scope: this, status: p1status});
+		this.field2 = new FieldView(Client.opponent, {id: '2', onMouseDown: onMouseDown, scope: this, status: p2status});
 		el.append(this.field1.render());
 		el.append(this.field2.render());
 
@@ -78,9 +76,9 @@ Game.prototype = {
 
 	remoteMoveResult: function(bombCoords) {
 		var player = this.currentPlayer;
-		var opponent = (player === this.player1) ? this.player2 : this.player1;
+		var opponent = (player === Client.player) ? Client.opponent : Client.player;
 		var playerField, opponentField;
-		if (player === this.player1) {
+		if (player === Client.player) {
 			playerField = this.field1;
 			opponentField = this.field2;
 		} else {
