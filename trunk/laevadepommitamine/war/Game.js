@@ -1,16 +1,14 @@
-function Game(gameId) {
+function Game(gameId, playerType) {
 	this.gameId = gameId;
-	this.currentPlayer = Client.rand(1) ? Client.player : Client.opponent;
-
-	var fieldEnc = Field.encodeField(Client.player.ships, {});
-	Server.startGame(gameId, fieldEnc);
+	this.isOpponent = playerType == 'opponent';
+	Server.startGame(gameId, playerType, Client.player.field.encode());
 }
 
 Game.prototype = {
 	onRender: function() {
 		this.menu.onRender();
-		this.field1.onRender();
-		this.field2.onRender();
+		this.playerField.onRender();
+		this.opponentField.onRender();
 	},
 
 	render: function() {
@@ -18,7 +16,7 @@ Game.prototype = {
 			return this.el;
 		}
 
-		var el = $('<div id="placement" class="screen"></div>');
+		var el = $('<div id="game" class="screen"></div>');
 
 		this.menu = new Menu([
 	  	    new Button("Esileht", {image: 'img/home.png', scope: this, fn: function() {
@@ -31,78 +29,97 @@ Game.prototype = {
 		el.append(this.menu.render());
 
 		var onMouseDown = function(e) {
-			if (this.currentPlayer === Client.player) {
-				var field = e.data;
-				if (e.data === this.field2) {
-					var coords = field.getEventCoords(e);
-					if (coords) {
-						if (field.hasBomb(coords)) {
-							return;
-						}
+			if (e.button != 0) {
+				return;
+			}
+			e.preventDefault();
+			if (this.currentPlayer !== Client.player) {
+				return;
+			}
 
-						var hit = Client.opponent.checkHit(coords);
-						field.addBomb({x: coords.x, y: coords.y, hit: hit});
-						if (hit) {
-							var fullHit = Field.checkFullHit(Client.opponent.ships, field.bombs, coords);
-							if (fullHit) {
-								field.setShipSunk(fullHit);
-							}
-							return;
-						}
+			var fieldView = e.data;
+			if (fieldView !== this.opponentField) {
+				return;
+			}
 
-						this.currentPlayer = Client.opponent;
-						this.field1.setStatus('');
-						field.setStatus('Ootan vastase k&auml;iku...');
-						setTimeout($.proxy(this.remoteMove, this), 400);
-					}
+			var coords = fieldView.getEventCoords(e);
+			if (coords) {
+				var field = fieldView.field;
+				if (field.hasBomb(coords)) {
+					return;
 				}
+
+				Client.player.fieldCallback(this.gameId, this.isOpponent, coords);
+				return;
 			}
 		}
 
-		var p1status = (this.currentPlayer === Client.player) ? "Sinu kord!" : '';
-		var p2status = (this.currentPlayer === Client.opponent) ? "Ootan vastase k&auml;iku..." : '';
-		this.field1 = new FieldView(Client.player, {id: '1', onMouseDown: onMouseDown, scope: this, status: p1status});
-		this.field2 = new FieldView(Client.opponent, {id: '2', onMouseDown: onMouseDown, scope: this, status: p2status});
-		el.append(this.field1.render());
-		el.append(this.field2.render());
+		this.playerField = new FieldView(Client.player.field, {id: '1', onMouseDown: onMouseDown, scope: this, playerName: Client.player.name});
+		this.opponentField = new FieldView(Client.opponent.field, {id: '2', onMouseDown: onMouseDown, scope: this, playerName: Client.opponent.name});
+		el.append(this.playerField.render());
+		el.append(this.opponentField.render());
 
 		this.el = el;
 		return el;
 	},
 
-	remoteMove: function() {
-		this.currentPlayer.makeMove(this.gameId);
+	playerMoveResult: function(coords, hit) {
+		this.opponentField.addBomb({x: coords.x, y: coords.y, hit: hit});
+		if (hit) {
+			if (this.opponentField.field.checkFullHit(coords)) {
+				this.opponentField.setShipSunk(coords);
+			}
+			return;
+		}
+
+		this.currentPlayer = Client.opponent;
+		this.playerField.setStatus('');
+		this.opponentField.setStatus('Ootan vastase k&auml;iku...');
+		setTimeout($.proxy(this.makeMove, this), 800);
+	},
+
+	makeMove: function() {
+		this.currentPlayer.makeMove(this.gameId, this.isOpponent);
 	},
 
 	remoteMoveResult: function(bombCoords) {
-		var player = this.currentPlayer;
-		var opponent = (player === Client.player) ? Client.opponent : Client.player;
-		var playerField, opponentField;
-		if (player === Client.player) {
-			playerField = this.field1;
-			opponentField = this.field2;
-		} else {
-			playerField = this.field2;
-			opponentField = this.field1;
+		if (bombCoords.x == -1 && bombCoords.y == -1) {
+			console.log("not AI");
+			return;
 		}
 
-		var hit = opponent.checkHit(bombCoords);
-		player.moveResult(bombCoords, hit);
-		opponentField.addBomb({x: bombCoords.x, y: bombCoords.y, hit: hit});
+		var fieldView = this.playerField;
+		var field = fieldView.field;
+		var hit = field.checkHit(bombCoords);
+		fieldView.addBomb({x: bombCoords.x, y: bombCoords.y, hit: hit});
 		if (hit) {
-			var fullHit = Field.checkFullHit(opponent.ships, opponentField.bombs, bombCoords);
-			if (fullHit) {
-				opponentField.setShipSunk(fullHit);
+			if (field.checkFullHit(bombCoords)) {
+				fieldView.setShipSunk(bombCoords);
 			}
 		} else {
-			opponentField.setStatus('Sinu kord!');
-			playerField.setStatus('');
-			this.currentPlayer = opponent;
+			fieldView.setStatus('Sinu kord!');
+			this.opponentField.setStatus('');
+			this.currentPlayer = Client.player;
 		}
-		setTimeout($.proxy(this.remoteMove, this), 800);
+		setTimeout($.proxy(this.makeMove, this), 800);
 	},
 
-	gameStarted: function() {
-		this.currentPlayer.makeMove(this.gameId);
+	gameStarted: function(firstMove) {
+		var p1status, p2status;
+
+		if (firstMove) {
+			this.currentPlayer = Client.player;
+			p1status = "Sinu kord!";
+			p2status = '';
+		} else {
+			this.currentPlayer = Client.opponent;
+			p1status = '';
+			p2status = "Ootan vastase k&auml;iku...";
+		}
+
+		this.playerField.setStatus(p1status);
+		this.opponentField.setStatus(p2status);
+
+		setTimeout($.proxy(this.makeMove, this), 800);
 	}
 };

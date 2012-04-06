@@ -1,13 +1,16 @@
-function FieldView(player, options) {
-	this.player = player;
+// View component for the Field model
+function FieldView(field, options) {
+	this.field = field;
 	if (options) {
 		this.id = options.id;
 		this.onMouseDown = options.onMouseDown;
 		this.onDrop = options.onDrop;
 		this.scope = options.scope;
 		this.status = options.status;
+		this.playerName = options.playerName;
 	}
 	this.status = this.status || '';
+	this.shipsRendered = false;
 }
 
 FieldView.prototype = {
@@ -40,13 +43,20 @@ FieldView.prototype = {
 		if (this.onMouseDown) {
 			this.el.mousedown(this, this.onMouseDown.bind(this.scope || this));
 		}
+		if (!this.shipsRendered) {
+			var ships = this.field.ships;
+			for (var i in ships) {
+				this.renderShip(ships[i]);
+			}
+			this.shipsRendered = true;
+		}
 	},
 
 	render: function() {
 		var html = '';
 		var x, y;
 		for (y = 0; y < 10; y++) {
-			html += '<div>';
+			html += '<div class="box_row">';
 			for (x = 0; x < 10; x++) {
 				html += '<div id="' + this.getBoxId(x,y) + '" class="box"></div>';
 			}
@@ -58,13 +68,10 @@ FieldView.prototype = {
 			el.attr("id", this.id);
 		}
 
-		el.append('<div class="name">M&auml;ngija: ' + this.player.name + '</div>');
-		el.append('<div class="status_text">' + this.status + '</div>');
-
-		var ships = this.player.ships;
-		for (var i in ships) {
-			this.renderShip(ships[i]);
+		if (this.playerName) {
+			el.append('<div class="name">M&auml;ngija: ' + this.playerName + '</div>');
 		}
+		el.append('<div class="status_text">' + this.status + '</div>');
 
 		this.el = el;
 		return el;
@@ -84,7 +91,7 @@ FieldView.prototype = {
 		this.clearShipPreview();
 
 		this.preview = {x: x, y: y, length: length, vertical: vertical};
-		var valid = Field.checkLocation(this.player.ships, this.preview);
+		var valid = this.field.checkLocation(this.preview);
 		this.preview.valid = valid;
 		var validClass = valid ? 'ship_preview_valid' : 'ship_preview_invalid';
 		var vp = vertical ? 1 : 0;
@@ -112,13 +119,7 @@ FieldView.prototype = {
 	},
 
 	addShip: function(ship) {
-		var ships = this.player.ships;
-		if (!Field.checkLocation(ships, ship)) {
-			return false;
-		}
-		ships['' + ship.x + ship.y] = ship;
 		this.renderShip(ship, true);
-		return true;
 	},
 
 	clearBox: function(box) {
@@ -195,7 +196,8 @@ FieldView.prototype = {
 		}
 	},
 
-	setShipSunk: function(ship) {
+	setShipSunk: function(coords) {
+		var ship = this.field.getShipAtCoords(coords);
 		var x = ship.x;
 		var y = ship.y;
 		var vp = ship.vertical ? 1 : 0;
@@ -211,14 +213,10 @@ FieldView.prototype = {
 		}
 	},
 
-	removeShip: function(coords) {
-		var x = coords.x;
-		var y = coords.y;
-		var ships = this.player.ships;
-		var ship = ships['' + x + y];
+	removeShip: function(ship) {
+		var x = ship.x;
+		var y = ship.y;
 		var length = ship.length;
-
-		delete ships['' + x + y];
 
 		if (length == 1) {
 			var box = $('#'+this.getBoxId(x, y));
@@ -240,8 +238,8 @@ FieldView.prototype = {
 		}
 	},
 
-	setShips: function(ships) {
-		$.each(this.player.ships, function(index, value) {
+	setShips: function(ships, oldShips) {
+		$.each(oldShips, function(index, value) {
 			this.removeShip(value);
 		}.bind(this));
 
@@ -250,12 +248,8 @@ FieldView.prototype = {
 		}.bind(this));
 	},
 
-	hasBomb: function(coords) {
-		return !!this.player.bombs['' + coords.x + coords.y];
-	},
-
 	addBomb: function(bomb) {
-		this.player.bombs['' + bomb.x + bomb.y] = bomb;
+		this.field.bombs['' + bomb.x + bomb.y] = bomb;
 		this.renderBomb(bomb);
 	},
 

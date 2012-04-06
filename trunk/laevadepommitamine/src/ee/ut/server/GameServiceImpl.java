@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -29,7 +30,7 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 			ResultSet st = sta.executeQuery("SELECT ID FROM Players WHERE Name='" + playerName + "'");
 			st.next();
 			int playerId = st.getInt(1);
-			sta.executeUpdate("INSERT INTO Rankings (Player, Score) VALUES ('" + playerId + "', 0)");
+			sta.executeUpdate("INSERT INTO Rankings (Player, Victories, Defeats) VALUES ('" + playerId + "', 0, 0)");
 			sta.executeUpdate("INSERT INTO Games (Name, Player) VALUES ('" + playerName + " ootab...', " + Integer.toString(playerId) + ")");
 			gamesListVersion++;
 			st = sta.executeQuery("SELECT id FROM Games WHERE Player='" + Integer.toString(playerId) + "'");
@@ -127,32 +128,86 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 	*/
 
 	@Override
-	public int[] remoteMove(int gameId) {
+	public boolean playerMove(int gameId, boolean isOpponent, int x, int y) {
 		Database.ensure();
 		Connection conn;
 
 		try {
 			conn = Database.getConnection();
 			Statement sta = conn.createStatement();
-			ResultSet resultSet = sta.executeQuery("SELECT PlayerField FROM Games WHERE ID=" + Integer.toString(gameId));
+			ResultSet resultSet;
+			if (isOpponent) {
+				resultSet = sta.executeQuery("SELECT PlayerField FROM Games WHERE ID=" + Integer.toString(gameId));
+			} else {
+				resultSet = sta.executeQuery("SELECT OpponentField FROM Games WHERE ID=" + Integer.toString(gameId));
+			}
 			resultSet.next();
 			String field = resultSet.getString(1);
 			Map<Integer, Ship> ships = Ship.decodeShips(field);
 			Map<Integer, Bomb> bombs = Bomb.decodeBombs(field);
 
-			boolean valid = false;
-			Random random = new Random();
-			int x = 0, y = 0, id = 0;
-			while (!valid) {
-				x = random.nextInt(10);
-				y = random.nextInt(10);
-				id = x * 10 + y;
-				valid = !bombs.containsKey(id);
+			Bomb bomb = new Bomb(x, y);
+			boolean hit = Bomb.checkHit(ships, bomb);
+
+			int id = x * 10 + y;
+			bombs.put(id, bomb);
+
+			String fieldEnc = Ship.encodeField(ships, bombs);
+			if (isOpponent) {
+				sta.executeUpdate("UPDATE Games SET PlayerField='" + fieldEnc +  "' WHERE ID=" + Integer.toString(gameId));
+			} else {
+				sta.executeUpdate("UPDATE Games SET OpponentField='" + fieldEnc +  "' WHERE ID=" + Integer.toString(gameId));
 			}
 
-			bombs.put(id, new Bomb(x, y));
-			String fieldEnc = Ship.encodeField(ships, bombs);
-			sta.executeUpdate("UPDATE Games SET PlayerField='" + fieldEnc +  "' WHERE ID=" + Integer.toString(gameId));
+			sta.close();
+			conn.close();
+
+			return hit;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return false;
+	}
+
+	@Override
+	public int[] remoteMove(int gameId, boolean isOpponent) {
+		Database.ensure();
+		Connection conn;
+
+		try {
+			conn = Database.getConnection();
+			Statement sta = conn.createStatement();
+			ResultSet resultSet;
+			if (isOpponent) {
+				resultSet = sta.executeQuery("SELECT OpponentField FROM Games WHERE ID=" + Integer.toString(gameId));
+			} else {
+				resultSet = sta.executeQuery("SELECT PlayerField FROM Games WHERE ID=" + Integer.toString(gameId));
+			}
+			resultSet.next();
+			String field = resultSet.getString(1);
+			Map<Integer, Ship> ships = Ship.decodeShips(field);
+			Map<Integer, Bomb> bombs = Bomb.decodeBombs(field);
+
+			boolean ai = true;
+			int x = 0, y = 0;
+			if (ai) {
+				Bomb bomb = Bomb.getAiBomb(bombs);
+				x = bomb.getX();
+				y = bomb.getY();
+				int id = x * 10 + y;
+				bombs.put(id, bomb);
+				String fieldEnc = Ship.encodeField(ships, bombs);
+				if (isOpponent) {
+					sta.executeUpdate("UPDATE Games SET OpponentField='" + fieldEnc +  "' WHERE ID=" + Integer.toString(gameId));
+				} else {
+					sta.executeUpdate("UPDATE Games SET PlayerField='" + fieldEnc +  "' WHERE ID=" + Integer.toString(gameId));
+				}
+			} else {
+				// Opponent move not ready
+				x = -1;
+				y = -1;
+			}
 
 			sta.close();
 			conn.close();
@@ -162,21 +217,37 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 			e.printStackTrace();
 		}
 
-		return new int[] {0,0};
+		return new int[] {-1,-1};
 	}
 
 	@Override
-	public void startGame(int gameId, String fieldEnc) {
+	public boolean startGame(int gameId, String playerType, String fieldEnc) {
 		Database.ensure();
 		try {
 			Connection conn = Database.getConnection();
 			Statement sta = conn.createStatement();
-			sta.executeUpdate("UPDATE Games SET PlayerField='" + fieldEnc +  "' WHERE ID=" + Integer.toString(gameId));
+			boolean startFirst;
+			if (playerType.equalsIgnoreCase("opponent")) {
+				sta.executeUpdate("UPDATE Games SET OpponentField='" + fieldEnc +  "' WHERE ID=" + Integer.toString(gameId));
+				ResultSet rs = sta.executeQuery("SELECT PlayerStarts FROM Games WHERE ID=" + Integer.toString(gameId));
+				startFirst = !rs.getBoolean(1);
+			} else {
+				startFirst = new Random().nextBoolean();
+				sta.executeUpdate("UPDATE Games SET PlayerField='" + fieldEnc +  "', PlayerStarts=" + Boolean.toString(startFirst) +  " WHERE ID=" + Integer.toString(gameId));
+				if (playerType.equalsIgnoreCase("againstai")) {
+					Map<Integer, Ship> ships = Ship.generateRandomShips();
+					Map<Integer, Bomb> bombs = new HashMap<Integer, Bomb>();
+					fieldEnc = Ship.encodeField(ships, bombs);
+					sta.executeUpdate("UPDATE Games SET OpponentField='" + fieldEnc +  "' WHERE ID=" + Integer.toString(gameId));
+				}
+			}
 			sta.close();
 			conn.close();
+			return startFirst;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		return false;
 	}
 
 	@Override

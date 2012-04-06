@@ -24,13 +24,13 @@ public class RankingsServiceImpl extends RemoteServiceServlet implements Ranking
 		try {
 			conn = Database.getConnection();
 			Statement sta = conn.createStatement();
-			ResultSet resultSet = sta.executeQuery("SELECT Players.name, Score, Player FROM Rankings INNER JOIN Players ON Rankings.Player = Players.ID");
+			ResultSet resultSet = sta.executeQuery("SELECT Players.name, Victories, Player FROM Rankings INNER JOIN Players ON Rankings.Player = Players.ID");
 			while (resultSet.next()) {
 				String name = resultSet.getString(1);
 				Integer score = resultSet.getInt(2);
 				Integer playerId = resultSet.getInt(3);
 				list.add(name + ' ' + score.toString());
-				sta.executeUpdate("UPDATE Rankings SET Score=" + Integer.toString(score + 10) + " WHERE Player='" + playerId + "'");
+				sta.executeUpdate("UPDATE Rankings SET Victories=" + Integer.toString(score + 1) + " WHERE Player='" + playerId + "'");
 				rankingsVersion++;
 			}
 			sta.close();

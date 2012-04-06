@@ -1,14 +1,19 @@
 function LocalPlayer(name) {
 	this.name = name;
-	this.ships = {};
-	this.bombs = {};
+	this.field = new Field();
 }
 
 LocalPlayer.prototype = {
-	checkHit: function(coords) {
-		return Field.checkHit(this.ships, coords);
+	makeMove : function(gameId, isOpponent) {
+		// Nothing to do here, wait for fieldCallback from the opponent field
 	},
 
-	makeMove: function() {
+	fieldCallback : function(gameId, isOpponent, coords) {
+		this.moveCoords = coords;
+		Server.playerMove(gameId, isOpponent, coords.x, coords.y);
+	},
+	
+	moveResult : function(hit) {
+		Client.game.playerMoveResult(this.moveCoords, hit);
 	}
 };

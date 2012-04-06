@@ -36,7 +36,7 @@ Lobby.prototype = {
 
 	render: function() {
 		if (this.el) {
-			if (Client.placement) {
+			if (Client.placement || Client.game) {
 				this.menu.items[1].setText("Tagasi m&auml;ngu");
 			} else {
 				this.menu.items[1].setText("Alusta m&auml;ngu");
@@ -52,9 +52,11 @@ Lobby.prototype = {
 	  	    	{scope: this, fn: function() {
 	  	    	if (Client.game) {
 	  	    		Client.startGame();
-	  	    	} else {
+	  	    	} else if (Client.placement) {
 		  	    	//this.username.setError('Nimi juba v&otilde;etud!');
 	  	    		delete this.joinGame;
+	  	    		Client.startPlacement();
+	  	    	} else {
 	  	    		Client.startPlacement();
 	  	    	}
 	  	    	if (this.joinBtn) {
