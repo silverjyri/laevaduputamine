@@ -1,15 +1,18 @@
 function Rankings() {
 	this.version = 0;
+	this.defaultUpdateInterval = 3000;
+	this.updateInterval = this.defaultUpdateInterval;
 }
 
 Rankings.prototype = {
 	onUpdate: function() {
 		Server.getRankingsList();
+		this.updateTimer = setTimeout(this.onUpdate.bind(this), this.updateInterval);
 	},
 
 	onHide: function() {
 		if (this.updateTimer) {
-			clearInterval(this.updateTimer);
+			clearTimeout(this.updateTimer);
 			delete this.updateTimer;
 		}
 	},
@@ -18,7 +21,6 @@ Rankings.prototype = {
 		this.menu.onRender();
 		if (!this.updateTimer) {
 			this.onUpdate();
-			this.updateTimer = setInterval(this.onUpdate.bind(this), 3000);
 		}
 	},
 

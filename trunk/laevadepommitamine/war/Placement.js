@@ -342,7 +342,7 @@ Placement.prototype = {
 			style : {
 				position : 'absolute',
 				left : 0,
-				top : 190,
+				top : 210,
 				width : 190,
 				height : 100
 			},
