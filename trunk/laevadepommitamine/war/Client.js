@@ -7,19 +7,20 @@ if (!window.Server) {
 Server = window.Server;
 
 Client.rand = function(n) {
-	return Math.floor(Math.random()*(n+1));
+	return Math.floor(Math.random() * (n + 1));
 };
 
 Client.isString = function(value) {
-    return typeof value === 'string';
+	return typeof value === 'string';
 };
 
 Client.sizeOf = function(obj) {
-    var size = 0, key;
-    for (key in obj) {
-        if (obj.hasOwnProperty(key)) size++;
-    }
-    return size;
+	var size = 0, key;
+	for (var key in obj) {
+		if (obj.hasOwnProperty(key))
+			size++;
+	}
+	return size;
 };
 
 Client.setScreen = function(screen) {
@@ -45,13 +46,18 @@ Client.startPlacement = function() {
 			username = this.lobby.username.getText();
 			gameId = this.lobby.joinGame;
 		}
-		this.placement = new Placement(username, gameId);
+		this.player = new LocalPlayer(username);
+		this.placement = new Placement(gameId);
 	}
 	this.setScreen(this.placement);
 };
 
 Client.startGame = function() {
-	this.game = this.game || new Game(this.placement.gameId, this.placement.player);
+	if (!this.game) {
+		var ai = this.placement.opponentList.selected === this.placement.aiOpponentItem;
+		this.opponent = new AIPlayer();
+		this.game = new Game(this.placement.gameId);
+	}
 	this.setScreen(this.game);
 };
 
@@ -69,6 +75,8 @@ Client.stopGame = function() {
 	}
 	delete this.placement;
 	delete this.game;
+	delete this.player;
+	delete this.opponent;
 	Client.startLobby();
 }
 
@@ -76,12 +84,9 @@ $LAB
 .script("ui/components/Button.js")
 .script("ui/components/ListItem.js")
 .script("ui/components/Menu.js")
-.script("ui/components/TextField.js")
-.wait()
-.script("ui/components/ListBox.js")
-.wait()
-.script("Lobby.js")
-.wait(function() {
+.script("ui/components/TextField.js").wait()
+.script("ui/components/ListBox.js").wait()
+.script("Lobby.js").wait(function() {
 	Client.startLobby();
 })
 .script("ui/ShipFloating.js")
@@ -90,8 +95,7 @@ $LAB
 .script("controller/LocalPlayer.js")
 .script("controller/WebPlayer.js")
 .script("controller/AIPlayer.js")
-.script("controller/Field.js")
-.wait(function() {
+.script("model/Field.js").wait(function() {
 	//Client.startPlacement();
 })
 .script("Game.js")

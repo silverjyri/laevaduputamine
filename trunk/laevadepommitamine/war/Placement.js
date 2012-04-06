@@ -1,5 +1,4 @@
-function Placement(playerName, gameId) {
-	this.playerName = playerName;
+function Placement(gameId) {
 	this.defaultUpdateInterval = 1500;
 	this.updateInterval = this.defaultUpdateInterval;
 	this.initialized = false;
@@ -8,10 +7,10 @@ function Placement(playerName, gameId) {
 		this.isOpponent = true;
 		this.opponentHasJoined = false;
 		this.gameId = gameId;
-		Server.joinGame(gameId, playerName);
+		Server.joinGame(gameId, Client.player.name);
 	} else {
 		this.isOpponent = false;
-		Server.createGame(playerName);
+		Server.createGame(Client.player.name);
 	}
 }
 
@@ -103,7 +102,7 @@ Placement.prototype = {
 	},
 
 	checkReady : function() {
-		if (!this.initialized || !Field.checkShipsPlaced(this.field.ships)) {
+		if (!this.initialized || !Field.checkShipsPlaced(Client.player.ships)) {
 
 		} else if (this.opponentList.selected === this.aiOpponentItem) {
 			this.readyBtn.setEnabled(true);
@@ -135,8 +134,6 @@ Placement.prototype = {
 			disabled : true,
 			scope : this,
 			fn : function() {
-				this.player = new LocalPlayer(this.playerName,
-						this.field.ships);
 				Client.startGame();
 			}
 		});
@@ -212,7 +209,6 @@ Placement.prototype = {
 			}
 
 			var shipPos = ship.el.offset();
-			console.log(e.pageX - shipPos.left);
 			var clone = ship.clone();
 			this.dragData = {
 				clone : clone,
@@ -359,8 +355,9 @@ Placement.prototype = {
 			$(document).off('mouseup', onMouseUp);
 		};
 
-		this.field = new FieldView({
+		this.field = new FieldView(Client.player, {
 			id : 0,
+			status: 'Aseta laevad v&auml;ljale',
 			scope : this,
 			onMouseDown : function(e) {
 				if (e.button != 0) {
@@ -369,7 +366,7 @@ Placement.prototype = {
 				e.preventDefault();
 				var field = this.field;
 				var coords = field.getEventCoords(e);
-				var ship = Field.getShipAtCoords(this.field.ships, coords);
+				var ship = Field.getShipAtCoords(Client.player.ships, coords);
 
 				if (ship) {
 					var contPos = this.shipContainer.offset();

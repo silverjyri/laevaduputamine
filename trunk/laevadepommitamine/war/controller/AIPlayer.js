@@ -1,5 +1,6 @@
 function AIPlayer() {
 	this.ships = Field.generateRandomShips();
+	this.bombs = {};
 	this.name = "AI";
 	this.enemyBombs = {};
 	this.enemyShips = {};

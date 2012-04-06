@@ -1,13 +1,10 @@
-function LocalPlayer(name, ships) {
+function LocalPlayer(name) {
 	this.name = name;
-	this.ships = ships;
+	this.ships = {};
+	this.bombs = {};
 }
 
 LocalPlayer.prototype = {
-	isRemote: function() {
-		return false;
-	},
-
 	checkHit: function(coords) {
 		return Field.checkHit(this.ships, coords);
 	},
