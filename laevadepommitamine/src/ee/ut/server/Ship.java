@@ -2,6 +2,8 @@ package ee.ut.server;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Random;
 
 public class Ship {
 	public Ship(int x, int y, int length, boolean vertical) {
@@ -48,6 +50,7 @@ public class Ship {
 		this.vertical = vertical;
 	}
 
+	// Encodes a string that represents a playing field (see ui/Field.js)
 	public static String encodeField(Map<Integer, Ship> ships, Map<Integer, Bomb> bombs) {
 		int x, y, id;
 		String field = "";
@@ -97,6 +100,57 @@ public class Ship {
 					ships.put(x*10 + y, new Ship(x,y,cp,vertical));
 				}
 			}
+		}
+		return ships;
+	}
+
+	// Checks if a ship can be placed on the field
+	public static boolean checkLocation(Map<Integer, Ship> ships, Ship ship) {
+		int x = ship.getX();
+		int y = ship.getY();
+		int length = ship.getLength();
+		boolean vertical = ship.isVertical();
+
+		if (x < 0 || y < 0) {
+			return false;
+		}
+		if ((vertical ? y : x) + length > 10) {
+			return false;
+		}
+
+		for ( Entry<Integer, Ship> s : ships.entrySet()) {
+			Ship iship = s.getValue();
+			int w = vertical ? 1 : length;
+			int h = vertical ? length : 1;
+			int sw = iship.isVertical() ? 1 : iship.getLength();
+			int sh = iship.isVertical() ? iship.getLength() : 1;
+			if ((x + w >= iship.getX()) && (x <= iship.getX() + sw) &&
+				(y + h >= iship.getY()) && (y <= iship.getY() + sh)) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	public static Map<Integer, Ship> generateRandomShips() {
+		Map<Integer, Ship> ships = new HashMap<Integer, Ship>();
+		int[] lengths = new int[]{ 4, 3, 3, 2, 2, 2, 1, 1, 1, 1 };
+		Random random = new Random();
+		for (int l : lengths) {
+			boolean valid = false;
+			Ship ship = new Ship(0, 0, 0);
+			while (!valid) {
+				ship.setX(random.nextInt(10));
+				ship.setY(random.nextInt(10));
+				ship.setLength(l);
+				ship.setVertical(random.nextBoolean());
+				if (ship.getLength() == 1 && ship.isVertical()) {
+					ship.setVertical(false);
+				}
+				valid = Ship.checkLocation(ships, ship);
+			}
+			ships.put(ship.getX()*10 + ship.getY(), ship);
 		}
 		return ships;
 	}

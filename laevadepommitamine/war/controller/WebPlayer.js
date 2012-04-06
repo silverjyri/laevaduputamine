@@ -1,10 +1,14 @@
 function WebPlayer(name) {
 	this.name = name;
+	this.field = new Field();
 }
 
 WebPlayer.prototype = {
-	checkHit: function(coords) {
-		// TODO: Get result from server
-		return true;
+	makeMove: function(gameId, isOpponent) {
+		Server.remoteMove(gameId, isOpponent);
+	},
+
+	moveResult: function(coords) {
+		Client.game.remoteMoveResult(coords);
 	}
 };

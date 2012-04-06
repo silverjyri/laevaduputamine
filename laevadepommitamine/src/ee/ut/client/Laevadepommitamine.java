@@ -33,8 +33,12 @@ public class Laevadepommitamine implements EntryPoint {
 		$wnd.Client.lobby.initialize(name);
 	}-*/;
 
+	public native static void playerMoveResult(boolean hit) /*-{
+		$wnd.Client.player.moveResult(hit);
+	}-*/;
+
 	public native static void remoteMoveResult(int[] bomb) /*-{
-		$wnd.Client.game.remoteMoveResult({x: bomb[0], y: bomb[1]});
+		$wnd.Client.opponent.moveResult({x: bomb[0], y: bomb[1]});
 	}-*/;
 
 	public native static void addRanking(String ranking) /*-{
@@ -71,8 +75,8 @@ public class Laevadepommitamine implements EntryPoint {
 		$wnd.Client.placement.gameCreated(gameId);
 	}-*/;
 
-	public native static void gameStarted() /*-{
-		$wnd.Client.game.gameStarted();
+	public native static void gameStarted(boolean firstMove) /*-{
+		$wnd.Client.game.gameStarted(firstMove);
 	}-*/;
 
 	public native static void gameJoined() /*-{
@@ -99,10 +103,6 @@ public class Laevadepommitamine implements EntryPoint {
 				gameCreated(gameId);
 			}
 		});
-	}
-
-	public static void doPeriodicUpdate(String screenName) {
-		
 	}
 
 	public static void getGamesList()
@@ -202,7 +202,6 @@ public class Laevadepommitamine implements EntryPoint {
 		gameService.joinGame(gameId, playerName, new AsyncCallback<Void>() {
 			public void onFailure(Throwable caught) {
 				Window.alert("joinGame RPC failed. " + caught.getMessage());
-				caught.printStackTrace();
 			}
 
 			public void onSuccess(Void result) {
@@ -211,9 +210,22 @@ public class Laevadepommitamine implements EntryPoint {
 		});
 	}
 
-	public static void remoteMove(int gameId)
+	public static void playerMove(int gameId, boolean isOpponent, int x, int y)
 	{
-		gameService.remoteMove(gameId, new AsyncCallback<int[]>() {
+		gameService.playerMove(gameId, isOpponent, x, y, new AsyncCallback<Boolean>() {
+			public void onFailure(Throwable caught) {
+				Window.alert("playerMove RPC failed. " + caught.getMessage());
+			}
+
+			public void onSuccess(Boolean result) {
+				playerMoveResult(result);
+			}
+		});
+	}
+
+	public static void remoteMove(int gameId, boolean isOpponent)
+	{
+		gameService.remoteMove(gameId, isOpponent, new AsyncCallback<int[]>() {
 			public void onFailure(Throwable caught) {
 				Window.alert("remoteMove RPC failed. " + caught.getMessage());
 				caught.printStackTrace();
@@ -225,17 +237,17 @@ public class Laevadepommitamine implements EntryPoint {
 		});
 	}
 
-	public static void startGame(int gameId, String fieldEnd)
+	public static void startGame(int gameId, String playerType, String fieldEnc)
 	{
-		gameService.startGame(gameId, fieldEnd, new AsyncCallback<Void>() {
+		gameService.startGame(gameId, playerType, fieldEnc, new AsyncCallback<Boolean>() {
 			public void onFailure(Throwable caught) {
 				Window.alert("startGame RPC failed. " + caught.getMessage());
 				caught.printStackTrace();
 			}
 
 			@Override
-			public void onSuccess(Void result) {
-				gameStarted();
+			public void onSuccess(Boolean result) {
+				gameStarted(result);
 			}
 		});
 	}
@@ -249,9 +261,9 @@ public class Laevadepommitamine implements EntryPoint {
 		$wnd.Server.getGamePlayers = $entry(@ee.ut.client.Laevadepommitamine::getGamePlayers(I));
 		$wnd.Server.getUniquePlayerName = $entry(@ee.ut.client.Laevadepommitamine::getUniquePlayerName());
 		$wnd.Server.joinGame = $entry(@ee.ut.client.Laevadepommitamine::joinGame(ILjava/lang/String;));
-		$wnd.Server.remoteMove = $entry(@ee.ut.client.Laevadepommitamine::remoteMove(I));
-		$wnd.Server.startGame = $entry(@ee.ut.client.Laevadepommitamine::startGame(ILjava/lang/String;));
-		$wnd.Server.doPeriodicUpdate = $entry(@ee.ut.client.Laevadepommitamine::doPeriodicUpdate(Ljava/lang/String;));
+		$wnd.Server.playerMove = $entry(@ee.ut.client.Laevadepommitamine::playerMove(IZII));
+		$wnd.Server.remoteMove = $entry(@ee.ut.client.Laevadepommitamine::remoteMove(IZ));
+		$wnd.Server.startGame = $entry(@ee.ut.client.Laevadepommitamine::startGame(ILjava/lang/String;Ljava/lang/String;));
 
 		$wnd.Server.getRankingsList = $entry(@ee.ut.client.Laevadepommitamine::getRankingsList());
 	}-*/;

@@ -55,8 +55,10 @@ Client.startPlacement = function() {
 Client.startGame = function() {
 	if (!this.game) {
 		var ai = this.placement.opponentList.selected === this.placement.aiOpponentItem;
-		this.opponent = new AIPlayer();
-		this.game = new Game(this.placement.gameId);
+		this.opponent = new WebPlayer(ai ? "AI" : this.placement.webOpponentItem.value);
+		var playerType = this.placement.isOpponent ? 'opponent' : (ai ? 'againstai' : 'player');
+		this.game = new Game(this.placement.gameId, playerType);
+		delete this.placement;
 	}
 	this.setScreen(this.game);
 };
@@ -89,13 +91,13 @@ $LAB
 .script("Lobby.js").wait(function() {
 	Client.startLobby();
 })
+.script("model/Field.js")
 .script("ui/ShipFloating.js")
 .script("Placement.js")
 .script("ui/FieldView.js")
 .script("controller/LocalPlayer.js")
 .script("controller/WebPlayer.js")
-.script("controller/AIPlayer.js")
-.script("model/Field.js").wait(function() {
+.script("controller/AIPlayer.js").wait(function() {
 	//Client.startPlacement();
 })
 .script("Game.js")

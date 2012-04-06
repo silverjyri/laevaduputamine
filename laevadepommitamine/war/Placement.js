@@ -25,10 +25,12 @@ Placement.prototype = {
 		if (this.isOpponent) {
 			if (players[0]) {
 				this.webOpponentItem.setText(players[0]);
+				this.webOpponentItem.value = players[0];
 			}
 		} else {
 			if (players[1]) {
 				this.webOpponentItem.setText(players[1]);
+				this.webOpponentItem.value = players[1];
 				this.opponentHasJoined = true;
 			}
 		}
@@ -64,7 +66,7 @@ Placement.prototype = {
 		$.each(this.ships, function(index, value) {
 			value.onRender();
 		});
-		this.field.onRender();
+		this.fieldView.onRender();
 		this.readyBtn.onRender();
 		if (this.opponentList) {
 			this.opponentList.onRender();
@@ -91,7 +93,9 @@ Placement.prototype = {
 	},
 
 	placeRandomShips : function() {
-		this.field.setShips(Field.generateRandomShips());
+		var oldShips = Client.player.field.ships;
+		Client.player.field.generateRandomShips();
+		this.fieldView.setShips(Client.player.field.ships, oldShips);
 		for ( var i = 1; i <= 4; i++) {
 			this.shipCounts['' + i].html('0');
 		}
@@ -102,18 +106,15 @@ Placement.prototype = {
 	},
 
 	checkReady : function() {
-		if (!this.initialized || !Field.checkShipsPlaced(Client.player.ships)) {
-
-		} else if (this.opponentList.selected === this.aiOpponentItem) {
-			this.readyBtn.setEnabled(true);
-			return;
-		} else {
-			if (this.opponentHasJoined) {
-				this.readyBtn.setEnabled(true);
-				return;
+		var enableReady = false;
+		if (this.initialized && Client.player.field.checkShipsPlaced()) {
+			if (this.opponentList.selected === this.aiOpponentItem) {
+				enableReady = true;
+			} else if (this.isOpponent || this.opponentHasJoined) {
+				enableReady = true;
 			}
 		}
-		this.readyBtn.setEnabled(false);
+		this.readyBtn.setEnabled(enableReady);
 	},
 
 	render : function() {
@@ -179,7 +180,7 @@ Placement.prototype = {
 		var onDragMove = function(e) {
 			var data = this.dragData;
 			var clone = data.clone;
-			var field = this.field;
+			var field = this.fieldView;
 			var coords = field.getEventCoords(e);
 			if (coords) {
 				var contPos = this.shipContainer.offset();
@@ -242,23 +243,25 @@ Placement.prototype = {
 
 			var data = this.dragData;
 			var clone = data.clone;
-			var coords = this.field.getEventCoords(e);
+			var coords = this.fieldView.getEventCoords(e);
 			if (coords) {
 				adjustDropLocation(data, coords);
-				var added = this.field.addShip({
+				var ship = {
 					x : coords.x,
 					y : coords.y,
 					length : clone.length,
 					vertical : clone.vertical
-				});
-				if (!added) {
+				}
+				if (this.fieldView.field.addShip(ship)) {
+					this.fieldView.addShip(ship);
+				} else {
 					this.revertDrag();
 				}
 			} else {
 				this.revertDrag();
 			}
 
-			this.field.clearShipPreview();
+			this.fieldView.clearShipPreview();
 			clone.el.remove();
 			delete this.onDragMoveProxy;
 			delete this.dragData;
@@ -355,30 +358,32 @@ Placement.prototype = {
 			$(document).off('mouseup', onMouseUp);
 		};
 
-		this.field = new FieldView(Client.player, {
+		this.fieldView = new FieldView(Client.player.field, {
 			id : 0,
 			status: 'Aseta laevad v&auml;ljale',
+			playerName: Client.player.name,
 			scope : this,
 			onMouseDown : function(e) {
 				if (e.button != 0) {
 					return;
 				}
 				e.preventDefault();
-				var field = this.field;
-				var coords = field.getEventCoords(e);
-				var ship = Field.getShipAtCoords(Client.player.ships, coords);
+				var fieldView = this.fieldView;
+				var coords = fieldView.getEventCoords(e);
+				var ship = Client.player.field.getShipAtCoords(coords);
 
 				if (ship) {
 					var contPos = this.shipContainer.offset();
-					var fieldPos = field.offset();
+					var fieldPos = fieldView.offset();
 					e.pageX = fieldPos.left + ship.x * 33;
 					e.pageY = fieldPos.top + ship.y * 33;
 					var clone = new ShipFloating(ship.length, ship.vertical, {
 						left : e.pageX - contPos.left,
 						top : e.pageY - contPos.top
 					});
-					field.removeShip(ship);
-					field.showShipPreview(ship.x, ship.y, clone.length,
+					fieldView.removeShip(ship);
+					fieldView.field.removeShip(ship);
+					fieldView.showShipPreview(ship.x, ship.y, clone.length,
 							clone.vertical);
 					this.dragData = {
 						ship : ship,
@@ -396,7 +401,7 @@ Placement.prototype = {
 				}
 			}
 		});
-		el.append(this.field.render());
+		el.append(this.fieldView.render());
 
 		this.el = el;
 		return el;
