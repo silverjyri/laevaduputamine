@@ -14,6 +14,14 @@ Client.isString = function(value) {
     return typeof value === 'string';
 };
 
+Client.sizeOf = function(obj) {
+    var size = 0, key;
+    for (key in obj) {
+        if (obj.hasOwnProperty(key)) size++;
+    }
+    return size;
+};
+
 Client.setScreen = function(screen) {
 	if (this.screen && this.screen.onHide) {
 		this.screen.onHide();
