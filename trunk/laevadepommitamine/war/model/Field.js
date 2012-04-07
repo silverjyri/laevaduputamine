@@ -107,6 +107,101 @@ Field.prototype = {
 		}
 	},
 
+	// Guess if there is a ship at the given coordinates which is completely bombed.
+	// The ships on this field are not all known, so need to look at surrounding boxes.
+	guessFullHit : function(coords) {
+		// Try to find the start of the ship (upper-left part)
+		var x1 = coords.x;
+		var y1 = coords.y;
+		var id;
+		while (1) {
+			if (x1 == 0) {
+				break;
+			}
+			id = '' + (x1 - 1) + y1;
+			if (!this.bombs[id]) {
+				break;
+			}
+			if (!this.bombs[id].hit) {
+				break;
+			}
+			x1--;
+		}
+		while (1) {
+			if (y1 == 0) {
+				break;
+			}
+			id = '' + x1 + (y1 - 1);
+			if (!this.bombs[id]) {
+				break;
+			}
+			if (!this.bombs[id].hit) {
+				break;
+			}
+			y1--;
+		}
+
+		// Try to find the end of the ship (bottom-right part)
+		var x2 = coords.x;
+		var y2 = coords.y;
+		var id;
+		while (1) {
+			if (x2 == 9) {
+				break;
+			}
+			id = '' + (x2 + 1) + y2;
+			if (!this.bombs[id]) {
+				break;
+			}
+			if (!this.bombs[id].hit) {
+				break;
+			}
+			x2++;
+		}
+		while (1) {
+			if (y2 == 9) {
+				break;
+			}
+			id = '' + x2 + (y2 + 1);
+			if (!this.bombs[id]) {
+				break;
+			}
+			if (!this.bombs[id].hit) {
+				break;
+			}
+			y2++;
+		}
+
+		// Test ship direction
+		var vertical;
+		if (x1 == x2 && y1 != y2) {
+			vertical = true;
+		} else if (x1 != x2 && y1 == y2) {
+			vertical = false;
+		}
+
+		// If we have a direction, just check the endpoints
+		var hasShip = false;
+		var length;
+		if (vertical === true) {
+			if ((y1 == 0 || this.bombs['' + x1 + (y1 - 1)]) && (y2 == 9 || this.bombs['' + x2 + (y2 + 1)])) {
+				hasShip = true;
+				length = y2 - y1 + 1;
+			}
+		} else if (vertical === false) {
+			if ((x1 == 0 || this.bombs['' + (x1 + 1) + y1]) && (x2 == 9 || this.bombs['' + (x2 + 1) + y2])) {
+				hasShip = true;
+				length = x2 - x1 + 1;
+			}
+		}
+		if (hasShip) {
+			var ship = {x: x1, y: y1, length: length, vertical: vertical};
+			return ship;
+		}
+		console.log(x1,y1,x2,y2, hasShip);
+		return null;
+	},
+
 	// Returns a 100-character string that represents the playing field
 	// 0 - empty
 	// 1 - horizontal single

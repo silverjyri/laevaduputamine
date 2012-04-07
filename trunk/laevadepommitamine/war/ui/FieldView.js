@@ -196,8 +196,7 @@ FieldView.prototype = {
 		}
 	},
 
-	setShipSunk: function(coords) {
-		var ship = this.field.getShipAtCoords(coords);
+	setShipSunk: function(ship) {
 		var x = ship.x;
 		var y = ship.y;
 		var vp = ship.vertical ? 1 : 0;

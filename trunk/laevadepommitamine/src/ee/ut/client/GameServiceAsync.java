@@ -11,7 +11,6 @@ public interface GameServiceAsync {
 	public void getUniquePlayerName(AsyncCallback<String> callback);
 	public void joinGame(int gameId, String playerName, AsyncCallback<Void> callback);
 	public void isOpponentReady(int gameId, boolean isOpponent, AsyncCallback<Boolean> callback);
-	public void isOpponentMoveReady(int gameId, boolean isOpponent, AsyncCallback<Boolean> callback);
 	public void playerMove(int gameId, boolean isOpponent, int x, int y, AsyncCallback<Boolean> callback);
 	public void remoteMove(int gameId, boolean isOpponent, AsyncCallback<int[]> callback);
 	public void startGame(int gameId, String playerType, String fieldEnc, AsyncCallback<Boolean> callback);

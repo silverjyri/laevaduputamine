@@ -1,7 +1,8 @@
 function TextField( options) {
 	if (options) {
 		this.text = options.text;
-		this.fn = options.fn;
+		this.keydown = options.keydown;
+		this.keyup = options.keyup;
 		this.scope = options.scope;
 		this.style = options.style;
 		this.errorText = options.error;
@@ -9,14 +10,18 @@ function TextField( options) {
 		this.disabled = options.disabled;
 	}
 
-	if (this.fn && this.scope) {
-		this.fn = this.fn.bind(this.scope);
+	if (this.keydown && this.scope) {
+		this.keydown = this.keydown.bind(this.scope);
+	}
+	if (this.keyup && this.scope) {
+		this.keyup = this.keyup.bind(this.scope);
 	}
 }
 
 TextField.prototype = {
 	onRender: function() {
-		this.el.keydown(this.fn);
+		this.el.change(this.keydown);
+		this.el.keyup(this.keyup);
 	},
 
 	render: function() {

@@ -66,8 +66,10 @@ Game.prototype = {
 	playerMoveResult: function(coords, hit) {
 		this.opponentField.addBomb({x: coords.x, y: coords.y, hit: hit});
 		if (hit) {
-			if (this.opponentField.field.checkFullHit(coords)) {
-				this.opponentField.setShipSunk(coords);
+			var ship = this.opponentField.field.guessFullHit(coords);
+			if (ship) {
+				this.opponentField.field.addShip(ship);
+				this.opponentField.setShipSunk(ship);
 			}
 			return;
 		}
@@ -93,8 +95,9 @@ Game.prototype = {
 		var hit = field.checkHit(bombCoords);
 		fieldView.addBomb({x: bombCoords.x, y: bombCoords.y, hit: hit});
 		if (hit) {
-			if (field.checkFullHit(bombCoords)) {
-				fieldView.setShipSunk(bombCoords);
+			var ship = field.checkFullHit(bombCoords);
+			if (ship) {
+				fieldView.setShipSunk(ship);
 			}
 		} else {
 			fieldView.setStatus('Sinu kord!');

@@ -176,48 +176,6 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 	}
 
 	@Override
-	public boolean isOpponentMoveReady(int gameId, boolean isOpponent) {
-		Database.ensure();
-		Connection conn;
-
-		try {
-			conn = Database.getConnection();
-			Statement sta = conn.createStatement();
-
-			ResultSet rs = sta.executeQuery("SELECT Active FROM Games WHERE ID=" + Integer.toString(gameId));
-			rs.next();
-			boolean active = rs.getBoolean(1);
-
-			boolean ready;
-			if (!active) {
-				rs = sta.executeQuery("SELECT PlayerField FROM Games WHERE ID=" + Integer.toString(gameId));
-				rs.next();
-				boolean playerReady = rs.getString(1) != null;
-				rs = sta.executeQuery("SELECT OpponentField FROM Games WHERE ID=" + Integer.toString(gameId));
-				rs.next();
-				boolean opponentReady = rs.getString(1) != null;
-
-				ready = isOpponent ? playerReady : opponentReady;
-
-				if (playerReady && opponentReady) {
-					sta.executeUpdate("UPDATE Games SET Active=true WHERE ID=" + Integer.toString(gameId));
-				}
-			} else {
-				ready = false;
-			}
-
-			sta.close();
-			conn.close();
-
-			return ready;
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-		return false;
-	}
-
-	@Override
 	public boolean playerMove(int gameId, boolean isOpponent, int x, int y) {
 		Database.ensure();
 		Connection conn;
