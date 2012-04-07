@@ -27,15 +27,18 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 			conn = Database.getConnection();
 			Statement sta = conn.createStatement();
 			sta.executeUpdate("INSERT INTO Players (name) VALUES ('" + playerName + "')");
+
 			ResultSet rs = sta.executeQuery("SELECT ID FROM Players WHERE Name='" + playerName + "'");
 			rs.next();
 			int playerId = rs.getInt(1);
 			sta.executeUpdate("INSERT INTO Rankings (Player, Victories, Defeats) VALUES ('" + playerId + "', 0, 0)");
-			sta.executeUpdate("INSERT INTO Games (Name, Player, Active) VALUES ('" + playerName + " ootab...', " + Integer.toString(playerId) + ", false)");
+			boolean playerStartsFirst = new Random().nextBoolean();
+			sta.executeUpdate("INSERT INTO Games (Name, Player, PlayerStarts, Active) VALUES ('" + playerName + " ootab...', " + Integer.toString(playerId) + ", " + Boolean.toString(playerStartsFirst) + ", false)");
 			gamesListVersion++;
 			rs = sta.executeQuery("SELECT id FROM Games WHERE Player='" + Integer.toString(playerId) + "'");
 			rs.next();
 			int gameId = rs.getInt(1);
+
 			sta.close();
 			conn.close();
 			return new Integer(gameId);
@@ -294,15 +297,16 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 		try {
 			Connection conn = Database.getConnection();
 			Statement sta = conn.createStatement();
-			boolean startFirst;
+
+			ResultSet rs = sta.executeQuery("SELECT PlayerStarts FROM Games WHERE ID=" + Integer.toString(gameId));
+			rs.next();
+			boolean startFirst = !rs.getBoolean(1);
+
 			if (playerType.equalsIgnoreCase("opponent")) {
 				sta.executeUpdate("UPDATE Games SET OpponentField='" + fieldEnc +  "' WHERE ID=" + Integer.toString(gameId));
-				ResultSet rs = sta.executeQuery("SELECT PlayerStarts FROM Games WHERE ID=" + Integer.toString(gameId));
-				rs.next();
-				startFirst = !rs.getBoolean(1);
+				startFirst = !startFirst;
 			} else {
-				startFirst = new Random().nextBoolean();
-				sta.executeUpdate("UPDATE Games SET PlayerField='" + fieldEnc +  "', PlayerStarts=" + Boolean.toString(startFirst) +  " WHERE ID=" + Integer.toString(gameId));
+				sta.executeUpdate("UPDATE Games SET PlayerField='" + fieldEnc +  "' WHERE ID=" + Integer.toString(gameId));
 				if (playerType.equalsIgnoreCase("againstai")) {
 					Map<Integer, Ship> ships = Ship.generateRandomShips();
 					Map<Integer, Bomb> bombs = new HashMap<Integer, Bomb>();
@@ -310,6 +314,7 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 					sta.executeUpdate("UPDATE Games SET Opponent=-1, OpponentField='" + fieldEnc +  "' WHERE ID=" + Integer.toString(gameId));
 				}
 			}
+
 			sta.close();
 			conn.close();
 			return startFirst;
