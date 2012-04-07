@@ -19,6 +19,7 @@ Lobby.prototype = {
 
 	onRender: function() {
 		this.menu.onRender();
+		this.username.onRender();
 		this.gamesList.onRender();
 		if (this.joinBtn) {
 			this.joinBtn.onRender();
@@ -45,21 +46,23 @@ Lobby.prototype = {
 
 		var el = $('<div id="lobby" class="screen"></div>');
 
+		this.gameBtn = new Button(Client.placement ? "Tagasi m&auml;ngu" : "Alusta m&auml;ngu",
+  	    	{disabled: true,
+			scope: this, fn: function() {
+  	    	if (Client.game) {
+  	    		Client.startGame();
+  	    	} else {
+	  	    	//this.username.setError('Nimi juba v&otilde;etud!');
+  	    		delete this.joinGame;
+  	    		Client.startPlacement();
+  	    	}
+  	    	if (this.joinBtn) {
+  	    		this.joinBtn.setEnabled(false);
+  	    	}
+  	    }});
 		this.menu = new Menu([
 	  	    new Button("Esileht", {image: 'img/home.png'}),
-	  	    new Button(Client.placement ? "Tagasi m&auml;ngu" : "Alusta m&auml;ngu",
-	  	    	{scope: this, fn: function() {
-	  	    	if (Client.game) {
-	  	    		Client.startGame();
-	  	    	} else {
-		  	    	//this.username.setError('Nimi juba v&otilde;etud!');
-	  	    		delete this.joinGame;
-	  	    		Client.startPlacement();
-	  	    	}
-	  	    	if (this.joinBtn) {
-	  	    		this.joinBtn.setEnabled(false);
-	  	    	}
-	  	    }}),
+	  	    this.gameBtn,
 	  	    new Button("Logi sisse"),
 	  	    new Button("Edetabel", {fn: function() {
 	  	    	Client.startRankings();
@@ -68,10 +71,16 @@ Lobby.prototype = {
 	  	]);
 	  	el.append(this.menu.render());
 
-	  	var username = new TextField({label: 'Nimi:', disabled: true, fn: function(e) {
+	  	var username = new TextField({label: 'Nimi:', disabled: true, keyup: function(e) {
+	  		var nameOk = false;
 	  		if (e.keyCode == 13) {
 	  			this.username.setError('Nimi juba v&otilde;etud!');
 	  		}
+	  		if (this.username.getText() != '') {
+	  			nameOk = true;
+	  		}
+	  		this.gameBtn.setEnabled(nameOk);
+	  		
 	  	}, scope: this});
 	  	this.username = username;
 	  	el.append(username.render());
@@ -110,6 +119,7 @@ Lobby.prototype = {
 	initialize: function(playerName) {
 		this.username.setText(playerName);
 		this.username.setEnabled(true);
+		this.gameBtn.setEnabled(true);
 		this.loadingGif.remove();
 		delete this.loadingGif;
 		this.initialized = true;
