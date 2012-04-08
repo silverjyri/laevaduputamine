@@ -91,6 +91,17 @@ Field.prototype = {
 		return (Client.sizeOf(this.ships) == 10);
 	},
 
+	checkBombHits : function() {
+		var count = 0;
+		for ( var i in this.bombs) {
+			if (this.bombs[i].hit) {
+				count++;
+			}
+		}
+		// 20 bombs in total
+		return count == 20;
+	},
+
 	getShipAtCoords : function(coords) {
 		if (!coords) {
 			return false;
@@ -216,13 +227,18 @@ Field.prototype = {
 
 	// If we know that there is a sunken 4-ship, then we also know that a ship with 3 bombs has been sunk.
 	// Check for this condition.
-	shipCheckLargerFullHit: function(length) {
-		var shipsLeft = {1: 4, 2: 3, 3: 2, 4: 1};
+	shipCheckLargerFullHit : function(length) {
+		var shipsLeft = {
+			1 : 4,
+			2 : 3,
+			3 : 2,
+			4 : 1
+		};
 		for ( var i in this.ships) {
 			shipsLeft[this.ships[i].length]--;
 		}
 
-		for (var l = length + 1; l <= 4; l++) {
+		for ( var l = length + 1; l <= 4; l++) {
 			if (shipsLeft[l] != 0) {
 				return false;
 			}

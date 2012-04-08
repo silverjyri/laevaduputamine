@@ -71,6 +71,10 @@ Game.prototype = {
 				this.opponentField.field.addShip(ship);
 				this.opponentField.setShipSunk(ship);
 			}
+			if (this.opponentField.field.checkBombHits()) {
+				alert('Sina võitsid!');
+				Client.stopGame();
+			}
 			return;
 		} else {
 			this.opponentField.testSurroundingFullHit(coords);
@@ -100,6 +104,11 @@ Game.prototype = {
 			var ship = field.checkFullHit(bombCoords);
 			if (ship) {
 				fieldView.setShipSunk(ship);
+			}
+			if (this.playerField.field.checkBombHits()) {
+				alert('Sa kaotasid!');
+				Client.stopGame();
+				return;
 			}
 		} else {
 			fieldView.setStatus('Sinu kord!');
