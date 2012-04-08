@@ -21,16 +21,16 @@ Placement.prototype = {
 				this.updateInterval);
 	},
 
-	getPlayersCallback : function(players) {
+	getPlayersCallback : function(player, opponent) {
 		if (this.isOpponent) {
-			if (players[0]) {
-				this.webOpponentItem.setText(players[0]);
-				this.webOpponentItem.value = players[0];
+			if (player) {
+				this.webOpponentItem.setText(player);
+				this.webOpponentItem.value = player;
 			}
 		} else {
-			if (players[1]) {
-				this.webOpponentItem.setText(players[1]);
-				this.webOpponentItem.value = players[1];
+			if (opponent) {
+				this.webOpponentItem.setText(opponent);
+				this.webOpponentItem.value = opponent;
 				this.opponentHasJoined = true;
 			}
 		}

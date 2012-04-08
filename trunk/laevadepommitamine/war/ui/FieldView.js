@@ -212,6 +212,41 @@ FieldView.prototype = {
 		}
 	},
 
+	testSurroundingFullHit: function(coords) {
+		var x = coords.x;
+		var y = coords.y;
+		var ship, test;
+
+		test = this.field.bombs['' + (x-1) + y];
+		if (test && test.hit) {
+			ship = this.field.guessFullHit(test);
+			if (ship) {
+				this.setShipSunk(ship);
+			}
+		}
+		test = this.field.bombs['' + (x+1) + y];
+		if (test && test.hit) {
+			ship = this.field.guessFullHit(test);
+			if (ship) {
+				this.setShipSunk(ship);
+			}
+		}
+		test = this.field.bombs['' + x + (y-1)];
+		if (test && test.hit) {
+			ship = this.field.guessFullHit(test);
+			if (ship) {
+				this.setShipSunk(ship);
+			}
+		}
+		test = this.field.bombs['' + x + (y+1)];
+		if (test && test.hit) {
+			ship = this.field.guessFullHit(test);
+			if (ship) {
+				this.setShipSunk(ship);
+			}
+		}
+	},
+
 	removeShip: function(ship) {
 		var x = ship.x;
 		var y = ship.y;

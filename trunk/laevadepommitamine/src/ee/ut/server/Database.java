@@ -42,7 +42,10 @@ public class Database {
 							+ "Name VARCHAR(50),"
 							+ "PlayerStarts BOOLEAN,"
 							+ "Active BOOLEAN DEFAULT false,"
-							+ "LastMove INTEGER DEFAULT -1,"
+							+ "MoveHistory VARCHAR(200),"
+							+ "MoveHistoryVersion INTEGER DEFAULT -1,"
+							+ "PlayerMoveHistoryVersion INTEGER DEFAULT -1,"
+							+ "OpponentMoveHistoryVersion INTEGER DEFAULT -1,"
 							+ "FOREIGN KEY (Player) REFERENCES Players(ID))");
 					sta.executeUpdate("CREATE TABLE Rankings ("
 							+ "Player INTEGER,"
