@@ -8,15 +8,14 @@
     
     <!-- LAB.js loads scripts that depend on each other in the right order -->
     <script type="text/javascript" src="lib/LAB.js"></script>
+	<script type="text/javascript" src="laevadepommitamine/laevadepommitamine.nocache.js"></script>
 	<script>
 	  $LAB
 	    .script("lib/jquery-1.7.1.js")
+	    //.script("laevadepommitamine/laevadepommitamine.nocache.js")
 	    .wait()
 	    .script("Client.js")
-	    //.wait()
-	    //.script("laevadepommitamine/laevadepommitamine.nocache.js");
 	</script>
-	<script type="text/javascript" src="laevadepommitamine/laevadepommitamine.nocache.js"></script>
   </head>
 
   <body>

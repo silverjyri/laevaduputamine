@@ -27,6 +27,11 @@ public class Bomb {
 		this.y = y;
 	}
 
+	@Override
+	public String toString() {
+		return Integer.toString(x) + Integer.toString(y);
+	}
+
 	// Checks if there is a ship at the given coordinates
 	public static boolean checkHit(Map<Integer, Ship> ships, Bomb bomb) {
 		for (Entry<Integer, Ship> shipEntry : ships.entrySet()) {

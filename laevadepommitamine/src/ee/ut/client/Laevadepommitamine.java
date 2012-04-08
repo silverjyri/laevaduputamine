@@ -61,9 +61,9 @@ public class Laevadepommitamine implements EntryPoint {
 		return $wnd.Client.lobby.gamesListVersion;
 	}-*/;
 
-	public native static void getGamePlayersCallback(String[] players) /*-{
+	public native static void getGamePlayersCallback(String player, String opponent) /*-{
 		if ($wnd.Client.placement) {
-			$wnd.Client.placement.getPlayersCallback(players);
+			$wnd.Client.placement.getPlayersCallback(player, opponent);
 		}
 	}-*/;
 	
@@ -151,12 +151,11 @@ public class Laevadepommitamine implements EntryPoint {
 	{
 		gameService.getGamePlayers(gameId, new AsyncCallback<String[]>() {
 			public void onFailure(Throwable caught) {
-				Window.alert("createGame RPC failed.");
-				caught.printStackTrace();
+				Window.alert("getGamePlayers RPC failed.");
 			}
 
 			public void onSuccess(String[] players) {
-				getGamePlayersCallback(players);
+				getGamePlayersCallback(players[0], players[1]);
 			}
 		});
 	}

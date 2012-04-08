@@ -184,21 +184,31 @@ Field.prototype = {
 		var hasShip = false;
 		var length;
 		if (vertical === true) {
-			if ((y1 == 0 || this.bombs['' + x1 + (y1 - 1)]) && (y2 == 9 || this.bombs['' + x2 + (y2 + 1)])) {
+			if ((y1 == 0 || this.bombs['' + x1 + (y1 - 1)]) &&
+				(y2 == 9 || this.bombs['' + x2 + (y2 + 1)])) {
 				hasShip = true;
 				length = y2 - y1 + 1;
 			}
 		} else if (vertical === false) {
-			if ((x1 == 0 || this.bombs['' + (x1 + 1) + y1]) && (x2 == 9 || this.bombs['' + (x2 + 1) + y2])) {
+			if ((x1 == 0 || this.bombs['' + (x1 - 1) + y1]) &&
+				(x2 == 9 || this.bombs['' + (x2 + 1) + y2])) {
 				hasShip = true;
 				length = x2 - x1 + 1;
+			}
+		} else {
+			// No direction, check if it's a single
+			if ((y1 == 0 || this.bombs['' + x1 + (y1 - 1)]) &&
+				(y2 == 9 || this.bombs['' + x2 + (y2 + 1)]) &&
+				(x1 == 0 || this.bombs['' + (x1 - 1) + y1]) &&
+				(x2 == 9 || this.bombs['' + (x2 + 1) + y2])) {
+				hasShip = true;
+				length = 1;
 			}
 		}
 		if (hasShip) {
 			var ship = {x: x1, y: y1, length: length, vertical: vertical};
 			return ship;
 		}
-		console.log(x1,y1,x2,y2, hasShip);
 		return null;
 	},
 

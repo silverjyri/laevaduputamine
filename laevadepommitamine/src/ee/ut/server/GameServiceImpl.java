@@ -73,6 +73,36 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 	}
 
 	@Override
+	public Integer getGamesListVersion() {
+		return gamesListVersion;
+	}
+
+	@Override
+	public String[] getGamePlayers(int gameId) {
+		String[] players = new String[2];
+		Database.ensure();
+		try {
+			Connection conn = Database.getConnection();
+			Statement sta = conn.createStatement();
+
+			ResultSet playerName = sta.executeQuery("SELECT Players.Name FROM Games INNER JOIN Players ON Players.ID = Games.Player WHERE ID=" + Integer.toString(gameId));
+			if (playerName.next()) {
+				players[0] = playerName.getString(1);
+			}
+			ResultSet opponentName = sta.executeQuery("SELECT Players.Name FROM Games INNER JOIN Players ON Players.ID = Games.Opponent WHERE ID=" + Integer.toString(gameId));
+			if (opponentName.next()) {
+				players[1] = opponentName.getString(1);
+			}
+
+			sta.close();
+			conn.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return players;
+	}
+
+	@Override
 	public void joinGame(int gameId, String playerName) {
 		Database.ensure();
 		Connection conn;
@@ -187,6 +217,8 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 			conn = Database.getConnection();
 			Statement sta = conn.createStatement();
 			ResultSet rs;
+
+			// Get opponent's playing field
 			if (isOpponent) {
 				rs = sta.executeQuery("SELECT PlayerField FROM Games WHERE ID=" + Integer.toString(gameId));
 			} else {
@@ -197,12 +229,13 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 			Map<Integer, Ship> ships = Ship.decodeShips(field);
 			Map<Integer, Bomb> bombs = Bomb.decodeBombs(field);
 
+			// Make player bomb
 			Bomb bomb = new Bomb(x, y);
 			boolean hit = Bomb.checkHit(ships, bomb);
-
 			int id = x * 10 + y;
 			bombs.put(id, bomb);
 
+			// Update playing field with the new bomb
 			String fieldEnc = Ship.encodeField(ships, bombs);
 			if (isOpponent) {
 				sta.executeUpdate("UPDATE Games SET PlayerField='" + fieldEnc +  "' WHERE ID=" + Integer.toString(gameId));
@@ -210,7 +243,8 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 				sta.executeUpdate("UPDATE Games SET OpponentField='" + fieldEnc +  "' WHERE ID=" + Integer.toString(gameId));
 			}
 
-			sta.executeUpdate("UPDATE Games SET LastMove=" + Integer.toString(id) + " WHERE ID=" + Integer.toString(gameId));
+			updateMoveHistory(gameId, x, y, sta);
+			updateMoveHistoryVersion(gameId, isOpponent, sta);
 
 			sta.close();
 			conn.close();
@@ -223,6 +257,7 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 		return false;
 	}
 
+	// Returns info about opponent's move
 	@Override
 	public int[] remoteMove(int gameId, boolean isOpponent) {
 		Database.ensure();
@@ -233,16 +268,7 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 			Statement sta = conn.createStatement();
 			ResultSet rs;
 
-			if (isOpponent) {
-				rs = sta.executeQuery("SELECT OpponentField FROM Games WHERE ID=" + Integer.toString(gameId));
-			} else {
-				rs = sta.executeQuery("SELECT PlayerField FROM Games WHERE ID=" + Integer.toString(gameId));
-			}
-			rs.next();
-			String field = rs.getString(1);
-			Map<Integer, Ship> ships = Ship.decodeShips(field);
-			Map<Integer, Bomb> bombs = Bomb.decodeBombs(field);
-
+			// Check if opponent is AI
 			boolean ai;
 			if (isOpponent) {
 				ai = false;
@@ -254,29 +280,49 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 
 			int x = 0, y = 0;
 			if (ai) {
+				// Get playing field
+				rs = sta.executeQuery("SELECT PlayerField FROM Games WHERE ID=" + Integer.toString(gameId));
+				rs.next();
+				String field = rs.getString(1);
+				Map<Integer, Ship> ships = Ship.decodeShips(field);
+				Map<Integer, Bomb> bombs = Bomb.decodeBombs(field);
+
+				// Make a move with AI
 				Bomb bomb = Bomb.getAiBomb(bombs);
 				x = bomb.getX();
 				y = bomb.getY();
 				int id = x * 10 + y;
 				bombs.put(id, bomb);
 				String fieldEnc = Ship.encodeField(ships, bombs);
-				if (isOpponent) {
-					sta.executeUpdate("UPDATE Games SET OpponentField='" + fieldEnc +  "' WHERE ID=" + Integer.toString(gameId));
-				} else {
-					sta.executeUpdate("UPDATE Games SET PlayerField='" + fieldEnc +  "' WHERE ID=" + Integer.toString(gameId));
-				}
+				sta.executeUpdate("UPDATE Games SET PlayerField='" + fieldEnc +  "' WHERE ID=" + Integer.toString(gameId));
+
+				updateMoveHistory(gameId, x, y, sta);
+				updateMoveHistoryVersion(gameId, true, sta);
+				updateMoveHistoryVersion(gameId, false, sta);
 			} else {
-				rs = sta.executeQuery("SELECT LastMove FROM Games WHERE ID=" + Integer.toString(gameId));
+				if (isOpponent) {
+					rs = sta.executeQuery("SELECT MoveHistoryVersion, OpponentMoveHistoryVersion FROM Games WHERE ID=" + Integer.toString(gameId));
+				} else {
+					rs = sta.executeQuery("SELECT MoveHistoryVersion, PlayerMoveHistoryVersion FROM Games WHERE ID=" + Integer.toString(gameId));
+				}
 				rs.next();
-				int id = rs.getInt(1);
-				if (id == -1) {
+				int version = rs.getInt(1);
+				int playerVersion = rs.getInt(2);
+				
+				if (playerVersion == version) {
 					// Opponent move not ready
 					x = -1;
 					y = -1;
 				} else {
-					x = id / 10;
-					y = id % 10;
-					sta.executeUpdate("UPDATE Games SET LastMove=-1 WHERE ID=" + Integer.toString(gameId));
+					// Not up to date, send back move information from history
+					rs = sta.executeQuery("SELECT MoveHistory FROM Games WHERE ID=" + Integer.toString(gameId));
+					rs.next();
+					String history = rs.getString(1);
+					int position = (playerVersion + 1) * 2; 
+					String move = history.substring(position, position + 2);
+					x = move.codePointAt(0) - 48;
+					y = move.codePointAt(1) - 48;
+					updateMoveHistoryVersion(gameId, isOpponent, sta);
 				}
 			}
 
@@ -324,33 +370,30 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 		return false;
 	}
 
-	@Override
-	public Integer getGamesListVersion() {
-		return gamesListVersion;
+	private void updateMoveHistory(int gameId, int x, int y, Statement sta) throws SQLException {
+		String stringId = Integer.toString(x) + Integer.toString(y);
+		ResultSet rs = sta.executeQuery("SELECT MoveHistoryVersion, MoveHistory FROM Games WHERE ID=" + Integer.toString(gameId));
+		rs.next();
+		int version = rs.getInt(1) + 1;
+		String history = rs.getString(2);
+		history = (history != null) ? history : "";
+		history += stringId;
+		sta.executeUpdate("UPDATE Games SET MoveHistoryVersion=" + Integer.toString(version) + ", MoveHistory='" + history +  "' WHERE ID=" + Integer.toString(gameId));
 	}
-
-	@Override
-	public String[] getGamePlayers(int gameId) {
-		String[] players = new String[2];
-		Database.ensure();
-		try {
-			Connection conn = Database.getConnection();
-			Statement sta = conn.createStatement();
-
-			ResultSet playerName = sta.executeQuery("SELECT Players.Name FROM Games INNER JOIN Players ON Players.ID = Games.Player WHERE ID=" + Integer.toString(gameId));
-			if (playerName.next()) {
-				players[0] = playerName.getString(1);
-			}
-			ResultSet opponentName = sta.executeQuery("SELECT Players.Name FROM Games INNER JOIN Players ON Players.ID = Games.Opponent WHERE ID=" + Integer.toString(gameId));
-			if (opponentName.next()) {
-				players[1] = opponentName.getString(1);
-			}
-
-			sta.close();
-			conn.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
+	
+	private void updateMoveHistoryVersion(int gameId, boolean isOpponent, Statement sta) throws SQLException {
+		ResultSet rs;
+		if (isOpponent) {
+			rs = sta.executeQuery("SELECT OpponentMoveHistoryVersion FROM Games WHERE ID=" + Integer.toString(gameId));
+		} else {
+			rs = sta.executeQuery("SELECT PlayerMoveHistoryVersion FROM Games WHERE ID=" + Integer.toString(gameId));
 		}
-		return players;
+		rs.next();
+		String version = Integer.toString(rs.getInt(1) + 1);
+		if (isOpponent) {
+			sta.executeUpdate("UPDATE Games SET OpponentMoveHistoryVersion=" + version + " WHERE ID=" + Integer.toString(gameId));			
+		} else {
+			sta.executeUpdate("UPDATE Games SET PlayerMoveHistoryVersion=" + version + " WHERE ID=" + Integer.toString(gameId));
+		}
 	}
 }

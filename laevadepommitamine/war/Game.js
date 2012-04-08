@@ -72,6 +72,8 @@ Game.prototype = {
 				this.opponentField.setShipSunk(ship);
 			}
 			return;
+		} else {
+			this.opponentField.testSurroundingFullHit(coords);
 		}
 
 		this.currentPlayer = Client.opponent;
@@ -86,7 +88,7 @@ Game.prototype = {
 
 	remoteMoveResult: function(bombCoords) {
 		if (bombCoords.x == -1 && bombCoords.y == -1) {
-			setTimeout($.proxy(this.makeMove, this), 500);
+			setTimeout($.proxy(this.makeMove, this), 300);
 			return;
 		}
 
