@@ -180,20 +180,24 @@ Field.prototype = {
 			vertical = false;
 		}
 
-		// If we have a direction, just check the endpoints
+		// If we have a direction, just check the endpoints, unless it's already a quad ship
 		var hasShip = false;
 		var length;
 		if (vertical === true) {
-			if ((y1 == 0 || this.bombs['' + x1 + (y1 - 1)]) &&
+			length = y2 - y1 + 1;
+			if (length == 4) {
+				hasShip = true;
+			} else if ((y1 == 0 || this.bombs['' + x1 + (y1 - 1)]) &&
 				(y2 == 9 || this.bombs['' + x2 + (y2 + 1)])) {
 				hasShip = true;
-				length = y2 - y1 + 1;
 			}
 		} else if (vertical === false) {
-			if ((x1 == 0 || this.bombs['' + (x1 - 1) + y1]) &&
+			length = x2 - x1 + 1;
+			if (length == 4) {
+				hasShip = true;
+			} else if ((x1 == 0 || this.bombs['' + (x1 - 1) + y1]) &&
 				(x2 == 9 || this.bombs['' + (x2 + 1) + y2])) {
 				hasShip = true;
-				length = x2 - x1 + 1;
 			}
 		} else {
 			// No direction, check if it's a single
