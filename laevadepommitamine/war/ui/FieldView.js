@@ -215,33 +215,18 @@ FieldView.prototype = {
 	testSurroundingFullHit: function(coords) {
 		var x = coords.x;
 		var y = coords.y;
-		var ship, test;
+		this.testSurroundingFullHitAt(x-1, y);
+		this.testSurroundingFullHitAt(x+1, y);
+		this.testSurroundingFullHitAt(x, y-1);
+		this.testSurroundingFullHitAt(x, y+1);
+	},
 
-		test = this.field.bombs['' + (x-1) + y];
+	testSurroundingFullHitAt: function(x, y) {
+		var test = this.field.bombs['' + x + y];
 		if (test && test.hit) {
-			ship = this.field.guessFullHit(test);
+			var ship = this.field.guessFullHit(test);
 			if (ship) {
-				this.setShipSunk(ship);
-			}
-		}
-		test = this.field.bombs['' + (x+1) + y];
-		if (test && test.hit) {
-			ship = this.field.guessFullHit(test);
-			if (ship) {
-				this.setShipSunk(ship);
-			}
-		}
-		test = this.field.bombs['' + x + (y-1)];
-		if (test && test.hit) {
-			ship = this.field.guessFullHit(test);
-			if (ship) {
-				this.setShipSunk(ship);
-			}
-		}
-		test = this.field.bombs['' + x + (y+1)];
-		if (test && test.hit) {
-			ship = this.field.guessFullHit(test);
-			if (ship) {
+				this.field.addShip(ship);
 				this.setShipSunk(ship);
 			}
 		}
