@@ -31,9 +31,8 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 			ResultSet rs = sta.executeQuery("SELECT ID FROM Players WHERE Name='" + playerName + "'");
 			rs.next();
 			int playerId = rs.getInt(1);
-			sta.executeUpdate("INSERT INTO Rankings (Player, Victories, Defeats) VALUES ('" + playerId + "', 0, 0)");
 			boolean playerStartsFirst = new Random().nextBoolean();
-			sta.executeUpdate("INSERT INTO Games (Name, Player, PlayerStarts, Active) VALUES ('" + playerName + " ootab...', " + Integer.toString(playerId) + ", " + Boolean.toString(playerStartsFirst) + ", false)");
+			sta.executeUpdate("INSERT INTO Games (Name, Player, PlayerStarts, Finished) VALUES ('" + playerName + " ootab...', " + Integer.toString(playerId) + ", " + Boolean.toString(playerStartsFirst) + ", false)");
 			gamesListVersion++;
 			rs = sta.executeQuery("SELECT id FROM Games WHERE Player='" + Integer.toString(playerId) + "'");
 			rs.next();
@@ -57,7 +56,7 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 		try {
 			conn = Database.getConnection();
 			Statement sta = conn.createStatement();
-			ResultSet rs = sta.executeQuery("SELECT ID, Name FROM Games");
+			ResultSet rs = sta.executeQuery("SELECT ID, Name FROM Games WHERE Finished=false");
 			while (rs.next()) {
 				int id = rs.getInt(1);
 				String name = rs.getString(2);
@@ -102,17 +101,24 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 		return players;
 	}
 
+	// Returns true if joining was possible (there was one player in the game).
 	@Override
-	public void joinGame(int gameId, String playerName) {
+	public boolean joinGame(int gameId, String playerName) {
 		Database.ensure();
 		Connection conn;
 		try {
 			conn = Database.getConnection();
 			Statement sta = conn.createStatement();
 
+			ResultSet rs = sta.executeQuery("SELECT Opponent FROM Games WHERE ID=" + Integer.toString(gameId));
+			rs.next();
+			if (rs.getInt(1) != -2) {
+				return false;
+			}
+
 			sta.executeUpdate("INSERT INTO Players (name) VALUES ('" + playerName + "')");
 
-			ResultSet rs = sta.executeQuery("SELECT ID FROM Players WHERE Name='" + playerName + "'");
+			rs = sta.executeQuery("SELECT ID FROM Players WHERE Name='" + playerName + "'");
 			rs.next();
 			int playerId = rs.getInt(1);
 			rs = sta.executeQuery("SELECT Players.name FROM Games INNER JOIN Players ON Players.ID = Games.Player WHERE ID=" + Integer.toString(gameId));
@@ -124,8 +130,10 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 
 			sta.close();
 			conn.close();
+			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return false;
 		}
 	}
 
@@ -175,30 +183,18 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 			conn = Database.getConnection();
 			Statement sta = conn.createStatement();
 
-			ResultSet rs = sta.executeQuery("SELECT Active FROM Games WHERE ID=" + Integer.toString(gameId));
+			boolean ready;
+			ResultSet rs;
+			if (isOpponent) {
+				rs = sta.executeQuery("SELECT PlayerField FROM Games WHERE ID=" + Integer.toString(gameId));
+			} else {
+				rs = sta.executeQuery("SELECT OpponentField FROM Games WHERE ID=" + Integer.toString(gameId));
+			}
 			if (!rs.next()) {
 				// Client from previous session?
 				return false;
 			}
-			boolean active = rs.getBoolean(1);
-
-			boolean ready;
-			if (active) {
-				ready = true;
-			} else {
-				rs = sta.executeQuery("SELECT PlayerField FROM Games WHERE ID=" + Integer.toString(gameId));
-				rs.next();
-				boolean playerReady = rs.getString(1) != null;
-				rs = sta.executeQuery("SELECT OpponentField FROM Games WHERE ID=" + Integer.toString(gameId));
-				rs.next();
-				boolean opponentReady = rs.getString(1) != null;
-
-				ready = isOpponent ? playerReady : opponentReady;
-
-				if (playerReady && opponentReady) {
-					sta.executeUpdate("UPDATE Games SET Active=true WHERE ID=" + Integer.toString(gameId));
-				}
-			}
+			ready = rs.getString(1) != null;
 
 			sta.close();
 			conn.close();

@@ -87,8 +87,8 @@ public class Laevadepommitamine implements EntryPoint {
 		$wnd.Client.game.gameStarted(firstMove);
 	}-*/;
 
-	public native static void gameJoined() /*-{
-		$wnd.Client.placement.gameJoined();
+	public native static void gameJoined(boolean successful) /*-{
+		$wnd.Client.placement.gameJoined(successful);
 	}-*/;
 
 	public native static void consoleError(String msg) /*-{
@@ -219,13 +219,13 @@ public class Laevadepommitamine implements EntryPoint {
 
 	public static void joinGame(int gameId, String playerName)
 	{
-		gameService.joinGame(gameId, playerName, new AsyncCallback<Void>() {
+		gameService.joinGame(gameId, playerName, new AsyncCallback<Boolean>() {
 			public void onFailure(Throwable caught) {
 				Window.alert("joinGame RPC failed. " + caught.getMessage());
 			}
 
-			public void onSuccess(Void result) {
-				gameJoined();
+			public void onSuccess(Boolean successful) {
+				gameJoined(successful);
 			}
 		});
 	}

@@ -42,7 +42,12 @@ Placement.prototype = {
 		this.initialized = true;
 	},
 
-	gameJoined : function() {
+	gameJoined : function(successful) {
+		if (!successful) {
+			alert('Ei saanud liituda!');
+			Client.stopGame();
+			return;
+		}
 		Server.getGamePlayers(this.gameId);
 		this.endGameBtn.setEnabled(true);
 		this.initialized = true;
