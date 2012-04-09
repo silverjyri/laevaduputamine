@@ -24,13 +24,16 @@ public class RankingsServiceImpl extends RemoteServiceServlet implements Ranking
 		try {
 			conn = Database.getConnection();
 			Statement sta = conn.createStatement();
-			ResultSet resultSet = sta.executeQuery("SELECT Players.name, Victories, Player FROM Rankings INNER JOIN Players ON Rankings.Player = Players.ID");
+			ResultSet resultSet = sta.executeQuery("SELECT Name, Victories, Defeats, ID FROM Players");
 			while (resultSet.next()) {
 				String name = resultSet.getString(1);
-				Integer score = resultSet.getInt(2);
-				Integer playerId = resultSet.getInt(3);
-				list.add(name + ' ' + score.toString());
-				sta.executeUpdate("UPDATE Rankings SET Victories=" + Integer.toString(score + 1) + " WHERE Player='" + playerId + "'");
+				Integer victories = resultSet.getInt(2);
+				Integer defeats = resultSet.getInt(3);
+				Integer playerId = resultSet.getInt(4);
+				float total = victories + defeats;
+				int ratio = (int)((victories / total) * 100.0f);
+				list.add(name + " (" + victories.toString() + "/" + defeats.toString() + " " + Integer.toString(ratio) + "%)");
+				sta.executeUpdate("UPDATE Players SET Victories=" + Integer.toString(victories + 1) + " WHERE ID='" + playerId + "'");
 				rankingsVersion++;
 			}
 			sta.close();
@@ -41,10 +44,6 @@ public class RankingsServiceImpl extends RemoteServiceServlet implements Ranking
 		}
 
 		return list;
-	}
-
-	public void setRanking() {
-		
 	}
 
 	@Override

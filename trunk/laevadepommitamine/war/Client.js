@@ -37,14 +37,13 @@ Client.startLobby = function() {
 	this.setScreen(this.lobby);
 };
 
-Client.startPlacement = function() {
+Client.startPlacement = function(gameId) {
 	if (!this.placement) {
 		var username;
 		var gameId;
 		if (this.lobby) {
 			this.lobby.username.setEnabled(false);
 			username = this.lobby.username.getText();
-			gameId = this.lobby.joinGame;
 		}
 		this.player = new LocalPlayer(username, gameId != undefined);
 		this.placement = new Placement(gameId);
@@ -66,6 +65,11 @@ Client.startGame = function() {
 Client.startRankings = function() {
 	this.rankings = this.rankings || new Rankings();
 	this.setScreen(this.rankings);
+};
+
+Client.startHistory = function() {
+	this.history = this.history || new History();
+	this.setScreen(this.history);
 };
 
 Client.stopGame = function() {
@@ -100,4 +104,5 @@ $LAB
 	//Client.startPlacement();
 })
 .script("Game.js")
-.script("Rankings.js");
+.script("Rankings.js")
+.script("History.js");

@@ -66,7 +66,9 @@ Lobby.prototype = {
 	  	    new Button("Edetabel", {fn: function() {
 	  	    	Client.startRankings();
 	  	    }}),
-	  	    new Button("Ajalugu")
+	  	    new Button("Ajalugu", {fn: function() {
+	  	    	Client.startHistory();
+	  	    }}),
 	  	]);
 	  	el.append(this.menu.render());
 
@@ -88,8 +90,7 @@ Lobby.prototype = {
 			if (!this.joinBtn) {
 				this.joinBtn = new Button("Liitu m&auml;nguga", {scope: this, fn: function() {
 					this.joinBtn.setEnabled(false);
-					this.joinGame = this.gamesList.selected.value;
-					Client.startPlacement();
+					Client.startPlacement(this.gamesList.selected.value);
 				}});
 				var joinBtnEl = this.joinBtn.render()
 				this.joinBtn.onRender();
