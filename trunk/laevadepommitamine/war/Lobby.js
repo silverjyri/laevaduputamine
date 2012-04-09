@@ -53,7 +53,6 @@ Lobby.prototype = {
   	    		Client.startGame();
   	    	} else {
 	  	    	//this.username.setError('Nimi juba v&otilde;etud!');
-  	    		delete this.joinGame;
   	    		Client.startPlacement();
   	    	}
   	    	if (this.joinBtn) {
@@ -74,7 +73,7 @@ Lobby.prototype = {
 	  	var username = new TextField({label: 'Nimi:', disabled: true, keyup: function(e) {
 	  		var nameOk = false;
 	  		if (e.keyCode == 13) {
-	  			this.username.setError('Nimi juba v&otilde;etud!');
+	  			//this.username.setError('Nimi juba v&otilde;etud!');
 	  		}
 	  		if (this.username.getText() != '') {
 	  			nameOk = true;
@@ -89,6 +88,7 @@ Lobby.prototype = {
 			if (!this.joinBtn) {
 				this.joinBtn = new Button("Liitu m&auml;nguga", {scope: this, fn: function() {
 					this.joinBtn.setEnabled(false);
+					this.joinGame = this.gamesList.selected.value;
 					Client.startPlacement();
 				}});
 				var joinBtnEl = this.joinBtn.render()
@@ -96,7 +96,6 @@ Lobby.prototype = {
 				joinBtnEl.css('float', 'left');
 				this.el.append(joinBtnEl);
 			}
-			this.joinGame = selected.value;
 		}});
 		this.gamesList = gamesList;
 		el.append(gamesList.render());

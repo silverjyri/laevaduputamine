@@ -176,7 +176,10 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 			Statement sta = conn.createStatement();
 
 			ResultSet rs = sta.executeQuery("SELECT Active FROM Games WHERE ID=" + Integer.toString(gameId));
-			rs.next();
+			if (!rs.next()) {
+				// Client from previous session?
+				return false;
+			}
 			boolean active = rs.getBoolean(1);
 
 			boolean ready;
@@ -269,14 +272,12 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 			ResultSet rs;
 
 			// Check if opponent is AI
-			boolean ai;
-			if (isOpponent) {
-				ai = false;
-			} else {
-				rs = sta.executeQuery("SELECT Opponent FROM Games WHERE ID=" + Integer.toString(gameId));
-				rs.next();
-				ai = rs.getInt(1) == -1;
+			rs = sta.executeQuery("SELECT Opponent FROM Games WHERE ID=" + Integer.toString(gameId));
+			if (!rs.next()) {
+				// Client from previous session?
+				return new int[] {-1, -1};
 			}
+			boolean ai = rs.getInt(1) == -1;
 
 			int x = 0, y = 0;
 			if (ai) {

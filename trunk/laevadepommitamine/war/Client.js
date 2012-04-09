@@ -46,7 +46,7 @@ Client.startPlacement = function() {
 			username = this.lobby.username.getText();
 			gameId = this.lobby.joinGame;
 		}
-		this.player = new LocalPlayer(username);
+		this.player = new LocalPlayer(username, gameId != undefined);
 		this.placement = new Placement(gameId);
 	}
 	this.setScreen(this.placement);
@@ -55,8 +55,8 @@ Client.startPlacement = function() {
 Client.startGame = function() {
 	if (!this.game) {
 		var ai = this.placement.opponentList.selected === this.placement.aiOpponentItem;
-		this.opponent = new WebPlayer(ai ? "AI" : this.placement.webOpponentItem.value);
-		var playerType = this.placement.isOpponent ? 'opponent' : (ai ? 'againstai' : 'player');
+		this.opponent = new WebPlayer(ai ? "AI" : this.placement.webOpponentItem.value, !this.player.isOpponent);
+		var playerType = this.player.isOpponent ? 'opponent' : (ai ? 'againstai' : 'player');
 		this.game = new Game(this.placement.gameId, playerType);
 		delete this.placement;
 	}
