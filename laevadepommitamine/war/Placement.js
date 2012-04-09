@@ -4,12 +4,10 @@ function Placement(gameId) {
 	this.initialized = false;
 
 	if (gameId != undefined) {
-		this.isOpponent = true;
 		this.opponentHasJoined = false;
 		this.gameId = gameId;
 		Server.joinGame(gameId, Client.player.name);
 	} else {
-		this.isOpponent = false;
 		Server.createGame(Client.player.name);
 	}
 }
@@ -22,7 +20,7 @@ Placement.prototype = {
 	},
 
 	getPlayersCallback : function(player, opponent) {
-		if (this.isOpponent) {
+		if (Client.player.isOpponent) {
 			if (player) {
 				this.webOpponentItem.setText(player);
 				this.webOpponentItem.value = player;
@@ -39,10 +37,7 @@ Placement.prototype = {
 
 	gameCreated : function(gameId) {
 		this.gameId = gameId;
-
-		if (!this.isOpponent) {
-			this.onUpdate();
-		}
+		this.onUpdate();
 		this.endGameBtn.setEnabled(true);
 		this.initialized = true;
 	},
@@ -72,7 +67,7 @@ Placement.prototype = {
 			this.opponentList.onRender();
 		}
 
-		if (this.initialized && !this.isOpponent) {
+		if (this.initialized && !Client.player.isOpponent) {
 			this.onUpdate();
 		}
 	},
@@ -110,7 +105,7 @@ Placement.prototype = {
 		if (this.initialized && Client.player.field.checkShipsPlaced()) {
 			if (this.opponentList.selected === this.aiOpponentItem) {
 				enableReady = true;
-			} else if (this.isOpponent || this.opponentHasJoined) {
+			} else if (Client.player.isOpponent || this.opponentHasJoined) {
 				enableReady = true;
 			}
 		}
@@ -329,7 +324,7 @@ Placement.prototype = {
 			text : 'Ootan vastast...',
 			image : 'img/webplayer.png'
 		});
-		if (!this.isOpponent) {
+		if (!Client.player.isOpponent) {
 			this.aiOpponentItem = new ListItem({
 				text : 'Arvuti',
 				image : 'img/aiplayer.png',
@@ -337,7 +332,7 @@ Placement.prototype = {
 			});
 		}
 		this.opponentList = new ListBox({
-			items : (this.isOpponent ? [ this.webOpponentItem ] : [
+			items : (Client.player.isOpponent ? [ this.webOpponentItem ] : [
 					this.webOpponentItem, this.aiOpponentItem ]),
 			style : {
 				position : 'absolute',

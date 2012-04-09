@@ -42,7 +42,7 @@ public class Database {
 							+ "Name VARCHAR(50),"
 							+ "PlayerStarts BOOLEAN,"
 							+ "Active BOOLEAN DEFAULT false,"
-							+ "MoveHistory VARCHAR(200),"
+							+ "MoveHistory VARCHAR(402),"
 							+ "MoveHistoryVersion INTEGER DEFAULT -1,"
 							+ "PlayerMoveHistoryVersion INTEGER DEFAULT -1,"
 							+ "OpponentMoveHistoryVersion INTEGER DEFAULT -1,"

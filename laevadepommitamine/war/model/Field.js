@@ -21,6 +21,17 @@ Field.prototype = {
 		return !!this.bombs['' + coords.x + coords.y];
 	},
 
+	// Checks for the victory condition of 20 bomb hits
+	checkAllHits : function() {
+		var count = 0;
+		for ( var i in this.bombs) {
+			if (this.bombs[i].hit) {
+				count++;
+			}
+		}
+		return count == 20;
+	},
+
 	// Checks if there is a ship at the given coordinates
 	checkHit : function(coords) {
 		for ( var i in this.ships) {
@@ -89,17 +100,6 @@ Field.prototype = {
 
 	checkShipsPlaced : function() {
 		return (Client.sizeOf(this.ships) == 10);
-	},
-
-	checkBombHits : function() {
-		var count = 0;
-		for ( var i in this.bombs) {
-			if (this.bombs[i].hit) {
-				count++;
-			}
-		}
-		// 20 bombs in total
-		return count == 20;
 	},
 
 	getShipAtCoords : function(coords) {
@@ -246,7 +246,7 @@ Field.prototype = {
 		return true;
 	},
 
-	// Returns a 100-character string that represents the playing field
+	// Returns a 100-character string that represents the playing field (for sending to the server)
 	// 0 - empty
 	// 1 - horizontal single
 	// 2 - horizontal double

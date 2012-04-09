@@ -285,9 +285,11 @@ FieldView.prototype = {
 	},
 
 	setStatus: function(text) {
-		if (this.el) {
-			this.el.children('.status_text').html(text);
+		if (this.status != text) {
+			if (this.el) {
+				this.el.children('.status_text').html(text);
+			}
+			this.status = text;
 		}
-		this.status = text;
 	}
 };
