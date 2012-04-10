@@ -48,7 +48,7 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 	}
 
 	@Override
-	public List<Game> getGamesList() {
+	public List<Game> getActiveGamesList() {
 		Database.ensure();
 		List<Game> list = new ArrayList<Game>();
 		Connection conn;
@@ -71,6 +71,31 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 		return list;
 	}
 
+	@Override
+	public List<Game> getFinishedGamesList() {
+		Database.ensure();
+		List<Game> list = new ArrayList<Game>();
+		Connection conn;
+
+		try {
+			conn = Database.getConnection();
+			Statement sta = conn.createStatement();
+			ResultSet rs = sta.executeQuery("SELECT ID, Name FROM Games WHERE Finished=true");
+			while (rs.next()) {
+				int id = rs.getInt(1);
+				String name = rs.getString(2);
+				list.add(new Game(id, name));
+			}
+			sta.close();
+			conn.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return list;
+	}
+
+	
 	@Override
 	public Integer getGamesListVersion() {
 		return gamesListVersion;
@@ -365,6 +390,39 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 			e.printStackTrace();
 		}
 		return false;
+	}
+
+
+	@Override
+	public void quitGame(int gameId, boolean isOpponent) {
+		Database.ensure();
+		Connection conn;
+
+		try {
+			conn = Database.getConnection();
+			Statement sta = conn.createStatement();
+
+			if (isOpponent) {
+				ResultSet rs = sta.executeQuery("SELECT OpponentField FROM Games WHERE ID=" + Integer.toString(gameId));
+				rs.next();
+				if (rs.getString(1) == null) {
+					// If the opponent quits placement, clear opponent
+					sta.executeUpdate("UPDATE Games SET Opponent=-2 WHERE ID=" + Integer.toString(gameId));
+				} else {
+					// Game was active, player wins
+					sta.executeUpdate("UPDATE Games SET Finished=true WHERE ID=" + Integer.toString(gameId));
+				}
+			} else {
+				// Delete the game if the original player quits
+				sta.executeUpdate("DELETE FROM Games WHERE ID=" + Integer.toString(gameId));
+			}
+			gamesListVersion++;
+
+			sta.close();
+			conn.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void updateMoveHistory(int gameId, int x, int y, Statement sta) throws SQLException {

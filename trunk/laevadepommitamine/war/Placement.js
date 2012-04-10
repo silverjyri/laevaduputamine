@@ -128,7 +128,7 @@ Placement.prototype = {
 			disabled : true,
 			scope : this,
 			fn : function() {
-				Client.stopGame();
+				Client.player.quitGame(this.gameId);
 			}
 		});
 		this.readyBtn = new Button("Valmis", {

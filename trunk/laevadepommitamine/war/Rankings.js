@@ -43,5 +43,5 @@ Rankings.prototype = {
 
 		this.el = el;
 		return el;
-	},
+	}
 };

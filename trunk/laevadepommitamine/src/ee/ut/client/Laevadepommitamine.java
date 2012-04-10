@@ -21,9 +21,24 @@ public class Laevadepommitamine implements EntryPoint {
 	public native static void addGameAndSelect(int id, String name) /*-{
 		$wnd.Client.lobby.addGame(id, name, true);
 	}-*/;
+
+	public native static void addHistoryGame(int id, String name) /*-{
+		$wnd.Client.history.addGame(id, name);
+	}-*/;
+
+	public native static void addHistoryGameAndSelect(int id, String name) /*-{
+		$wnd.Client.history.addGame(id, name, true);
+	}-*/;
 	
 	public native static int clearGames() /*-{
 		var list = $wnd.Client.lobby.gamesList;
+		var selectedId = list.selected ? list.selected.value : -1;
+		list.clear();
+		return selectedId;
+	}-*/;
+
+	public native static int clearHistory() /*-{
+		var list = $wnd.Client.history.gamesList;
 		var selectedId = list.selected ? list.selected.value : -1;
 		list.clear();
 		return selectedId;
@@ -113,7 +128,7 @@ public class Laevadepommitamine implements EntryPoint {
 		});
 	}
 
-	public static void getGamesList()
+	public static void getActiveGamesList()
 	{
 		gameService.getGamesListVersion(new AsyncCallback<Integer>() {
 			public void onFailure(Throwable caught) {
@@ -126,7 +141,7 @@ public class Laevadepommitamine implements EntryPoint {
 				}
 				setGamesListVersion(version);
 
-				gameService.getGamesList(new AsyncCallback<List<Game>>() {
+				gameService.getActiveGamesList(new AsyncCallback<List<Game>>() {
 					public void onFailure(Throwable caught) {
 						consoleError("getGamesList RPC failed.");
 					}
@@ -139,6 +154,40 @@ public class Laevadepommitamine implements EntryPoint {
 								addGameAndSelect(id, game.getName());
 							} else {
 								addGame(id, game.getName());
+							}
+						}
+					}
+				});
+			}
+		});
+	}
+
+	public static void getFinishedGamesList()
+	{
+		gameService.getGamesListVersion(new AsyncCallback<Integer>() {
+			public void onFailure(Throwable caught) {
+				consoleError("getGamesListVersion RPC failed.");
+			}
+
+			public void onSuccess(Integer version) {
+				if (version == getGamesListVersion()) {
+					return;
+				}
+				setGamesListVersion(version);
+
+				gameService.getFinishedGamesList(new AsyncCallback<List<Game>>() {
+					public void onFailure(Throwable caught) {
+						consoleError("getFinishedGamesList RPC failed.");
+					}
+		
+					public void onSuccess(List<Game> result) {
+						int selected = clearHistory();
+						for (Game game : result) {
+							int id = game.getId();
+							if (id == selected) {
+								addHistoryGameAndSelect(id, game.getName());
+							} else {
+								addHistoryGame(id, game.getName());
 							}
 						}
 					}
@@ -272,12 +321,25 @@ public class Laevadepommitamine implements EntryPoint {
 		});
 	}
 
+	public static void quitGame(int gameId, boolean isOpponent)
+	{
+		gameService.quitGame(gameId, isOpponent, new AsyncCallback<Void>() {
+			public void onFailure(Throwable caught) {
+				Window.alert("quitGame RPC failed.");
+			}
+
+			public void onSuccess(Void result) {
+			}
+		});
+	}
+
 	public native void exportMethods() /*-{
 		if (!$wnd.Server) {
 			$wnd.Server = {};
 		}
 		$wnd.Server.createGame = $entry(@ee.ut.client.Laevadepommitamine::createGame(Ljava/lang/String;));
-		$wnd.Server.getGamesList = $entry(@ee.ut.client.Laevadepommitamine::getGamesList());
+		$wnd.Server.getActiveGamesList = $entry(@ee.ut.client.Laevadepommitamine::getActiveGamesList());
+		$wnd.Server.getFinishedGamesList = $entry(@ee.ut.client.Laevadepommitamine::getFinishedGamesList());
 		$wnd.Server.getGamePlayers = $entry(@ee.ut.client.Laevadepommitamine::getGamePlayers(I));
 		$wnd.Server.getUniquePlayerName = $entry(@ee.ut.client.Laevadepommitamine::getUniquePlayerName());
 		$wnd.Server.isOpponentReady = $entry(@ee.ut.client.Laevadepommitamine::isOpponentReady(IZ));
@@ -285,6 +347,7 @@ public class Laevadepommitamine implements EntryPoint {
 		$wnd.Server.playerMove = $entry(@ee.ut.client.Laevadepommitamine::playerMove(IZII));
 		$wnd.Server.remoteMove = $entry(@ee.ut.client.Laevadepommitamine::remoteMove(IZ));
 		$wnd.Server.startGame = $entry(@ee.ut.client.Laevadepommitamine::startGame(ILjava/lang/String;Ljava/lang/String;));
+		$wnd.Server.quitGame = $entry(@ee.ut.client.Laevadepommitamine::quitGame(IZ));
 
 		$wnd.Server.getRankingsList = $entry(@ee.ut.client.Laevadepommitamine::getRankingsList());
 	}-*/;

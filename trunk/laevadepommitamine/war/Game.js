@@ -23,7 +23,7 @@ Game.prototype = {
 		    	Client.startLobby();
 		    }}),
 		    new Button("L&otilde;peta m&auml;ng", {scope: this, fn: function() {
-		    	Client.stopGame();
+		    	Client.player.quitGame(this.gameId);
 		    }}),
 		]);
 		el.append(this.menu.render());
