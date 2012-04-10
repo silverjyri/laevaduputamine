@@ -92,6 +92,9 @@ public class Ship {
 						cp -= "0".codePointAt(0);
 					} else {
 						cp -= "a".codePointAt(0);
+						if (cp == 0) {
+							continue;
+						}
 					}
 					boolean vertical = cp >= 5;
 					if (vertical) {

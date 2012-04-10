@@ -48,6 +48,7 @@ public class Database {
 							+ "Name VARCHAR(50),"
 							+ "PlayerStarts BOOLEAN,"
 							+ "Finished BOOLEAN DEFAULT false,"
+							+ "Winner BOOLEAN DEFAULT 0," // 1 - player won, 2 - opponent won
 							+ "MoveHistory VARCHAR(402),"
 							+ "MoveHistoryVersion INTEGER DEFAULT -1,"
 							+ "PlayerMoveHistoryVersion INTEGER DEFAULT -1,"

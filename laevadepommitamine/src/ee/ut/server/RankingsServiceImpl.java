@@ -28,12 +28,10 @@ public class RankingsServiceImpl extends RemoteServiceServlet implements Ranking
 				String name = resultSet.getString(1);
 				Integer victories = resultSet.getInt(2);
 				Integer defeats = resultSet.getInt(3);
-				Integer playerId = resultSet.getInt(4);
+
 				float total = victories + defeats;
 				int ratio = (int)((victories / total) * 100.0f);
 				list.add(name + " (" + victories.toString() + "/" + defeats.toString() + " " + Integer.toString(ratio) + "%)");
-				sta.executeUpdate("UPDATE Players SET Victories=" + Integer.toString(victories + 1) + " WHERE ID='" + playerId + "'");
-				GameServiceImpl.incrementPlayersListVersion(sta);
 			}
 			sta.close();
 			conn.close();

@@ -24,8 +24,9 @@ LocalPlayer.prototype = {
 				opponentFieldView.setShipSunk(ship);
 			}
 			if (opponentField.checkAllHits()) {
-				alert('Sina v�itsid!');
+				alert('Sina v&otilde;itsid!');
 				Client.stopGame();
+				return;
 			}
 		} else {
 			opponentFieldView.testSurroundingFullHit(bomb);
