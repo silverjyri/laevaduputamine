@@ -23,8 +23,12 @@ ListBox.prototype = {
 		if (this.selected && (this.selected !== item)) {
 			this.selected.el.removeClass('listitem_selected');
 		}
-		this.selected = item;
-		item.el.addClass('listitem_selected');
+		if (item) {
+			item.el.addClass('listitem_selected');
+			this.selected = item;
+		} else {
+			delete this.selected;
+		}
 		if (this.onSelectionChanged) {
 			this.onSelectionChanged(item);
 		}
@@ -103,6 +107,7 @@ ListBox.prototype = {
 
 	clear: function() {
 		this.items = [];
+		this.select(null);
 		if (this.el) {
 			this.el.html('');
 		}

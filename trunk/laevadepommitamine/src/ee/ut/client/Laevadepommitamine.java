@@ -46,7 +46,7 @@ public class Laevadepommitamine implements EntryPoint {
 	public native static void addHistoryGameAndSelect(int id, String name) /*-{
 		$wnd.Client.history.addGame(id, name, true);
 	}-*/;
-	
+
 	public native static int clearHistory() /*-{
 		var list = $wnd.Client.history.gamesList;
 		var selectedId = list.selected ? list.selected.value : -1;
@@ -238,8 +238,7 @@ public class Laevadepommitamine implements EntryPoint {
 	{
 		rankingsService.getRankingsVersion(new AsyncCallback<Integer>() {
 			public void onFailure(Throwable caught) {
-				Window.alert("RPC failed.");
-				caught.printStackTrace();
+				Window.alert("getRankingsVersion RPC failed.");
 			}
 
 			public void onSuccess(Integer version) {
@@ -250,8 +249,7 @@ public class Laevadepommitamine implements EntryPoint {
 
 				rankingsService.getRankingsList(new AsyncCallback<List<String>>() {
 					public void onFailure(Throwable caught) {
-						Window.alert("RPC failed.");
-						caught.printStackTrace();
+						Window.alert("getRankingsList RPC failed.");
 					}
 
 					public void onSuccess(List<String> result) {

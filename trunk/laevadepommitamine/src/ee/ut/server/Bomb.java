@@ -11,8 +11,15 @@ public class Bomb {
 		this.y = y;
 	}
 
+	public Bomb(int x, int y, boolean hit) {
+		this.x = x;
+		this.y = y;
+		this.hit = hit;
+	}
+
 	private int x;
 	private int y;
+	private boolean hit;
 
 	public int getX() {
 		return x;
@@ -26,10 +33,27 @@ public class Bomb {
 	public void setY(int y) {
 		this.y = y;
 	}
+	public boolean isHit() {
+		return hit;
+	}
+	public void setHit(boolean hit) {
+		this.hit = hit;
+	}
 
 	@Override
 	public String toString() {
 		return Integer.toString(x) + Integer.toString(y);
+	}
+
+	// Checks for the victory condition of 20 bomb hits
+	public static boolean checkAllHits(Map<Integer, Bomb> bombs) {
+		int count = 0;
+		for (Entry<Integer, Bomb> bomb : bombs.entrySet()) {
+			if (bomb.getValue().isHit()) {
+				count++;
+			}
+		}
+		return count == 20;
 	}
 
 	// Checks if there is a ship at the given coordinates
@@ -55,7 +79,8 @@ public class Bomb {
 				char c = fieldEnc.charAt(y*10 + x);
 				int cp = String.valueOf(c).codePointAt(0);
 				if (cp < 48 || cp > 58) {
-					bombs.put(x*10 + y, new Bomb(x,y));
+					boolean hit = (c != 'a');
+					bombs.put(x*10 + y, new Bomb(x,y,hit));
 				}
 			}
 		}
