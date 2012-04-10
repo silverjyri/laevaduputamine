@@ -14,6 +14,7 @@ public class Laevadepommitamine implements EntryPoint {
 	private static final RankingsServiceAsync rankingsService = (RankingsServiceAsync) GWT
 			.create(RankingsService.class);
 
+	// Game list
 	public native static void addGame(int id, String name) /*-{
 		$wnd.Client.lobby.addGame(id, name);
 	}-*/;
@@ -22,6 +23,22 @@ public class Laevadepommitamine implements EntryPoint {
 		$wnd.Client.lobby.addGame(id, name, true);
 	}-*/;
 
+	public native static int clearGames() /*-{
+		var list = $wnd.Client.lobby.gamesList;
+		var selectedId = list.selected ? list.selected.value : -1;
+		list.clear();
+		return selectedId;
+	}-*/;
+
+	public native static int getGamesListVersion() /*-{
+		return $wnd.Client.lobby.gamesListVersion;
+	}-*/;
+
+	public native static void setGamesListVersion(int version) /*-{
+		$wnd.Client.lobby.gamesListVersion = version;
+	}-*/;
+
+	// History list
 	public native static void addHistoryGame(int id, String name) /*-{
 		$wnd.Client.history.addGame(id, name);
 	}-*/;
@@ -30,13 +47,6 @@ public class Laevadepommitamine implements EntryPoint {
 		$wnd.Client.history.addGame(id, name, true);
 	}-*/;
 	
-	public native static int clearGames() /*-{
-		var list = $wnd.Client.lobby.gamesList;
-		var selectedId = list.selected ? list.selected.value : -1;
-		list.clear();
-		return selectedId;
-	}-*/;
-
 	public native static int clearHistory() /*-{
 		var list = $wnd.Client.history.gamesList;
 		var selectedId = list.selected ? list.selected.value : -1;
@@ -44,6 +54,32 @@ public class Laevadepommitamine implements EntryPoint {
 		return selectedId;
 	}-*/;
 
+	public native static int getHistoryVersion() /*-{
+		return $wnd.Client.history.version;
+	}-*/;
+
+	public native static void setHistoryVersion(int version) /*-{
+		$wnd.Client.history.version = version;
+	}-*/;
+
+	// Rankings
+	public native static int getRankingsVersion() /*-{
+		return $wnd.Client.rankings.version;
+	}-*/;
+
+	public native static void setRankingsVersion(int version) /*-{
+		$wnd.Client.rankings.version = version;
+	}-*/;
+
+	public native static void addRanking(String ranking) /*-{
+		$wnd.Client.rankings.rankingsList.add(ranking);
+	}-*/;
+
+	public native static void clearRankings() /*-{
+		$wnd.Client.rankings.rankingsList.clear();
+	}-*/;
+
+	// Game
 	public native static void isOpponentReadyCallback(boolean result) /*-{
 		$wnd.Client.game.isOpponentReadyCallback(result);
 	}-*/;
@@ -64,34 +100,10 @@ public class Laevadepommitamine implements EntryPoint {
 		$wnd.Client.opponent.moveResult({x: bomb[0], y: bomb[1]});
 	}-*/;
 
-	public native static void addRanking(String ranking) /*-{
-		$wnd.Client.rankings.rankingsList.add(ranking);
-	}-*/;
-
-	public native static void clearRankings() /*-{
-		$wnd.Client.rankings.rankingsList.clear();
-	}-*/;
-
-	public native static int getGamesListVersion() /*-{
-		return $wnd.Client.lobby.gamesListVersion;
-	}-*/;
-
 	public native static void getGamePlayersCallback(String player, String opponent) /*-{
 		if ($wnd.Client.placement) {
 			$wnd.Client.placement.getPlayersCallback(player, opponent);
 		}
-	}-*/;
-	
-	public native static int getRankingsVersion() /*-{
-		return $wnd.Client.rankings.version;
-	}-*/;
-
-	public native static void setGamesListVersion(int version) /*-{
-		$wnd.Client.lobby.gamesListVersion = version;
-	}-*/;
-
-	public native static void setRankingsVersion(int version) /*-{
-		$wnd.Client.rankings.version = version;
 	}-*/;
 
 	public native static void gameCreated(int gameId) /*-{
@@ -170,10 +182,10 @@ public class Laevadepommitamine implements EntryPoint {
 			}
 
 			public void onSuccess(Integer version) {
-				if (version == getGamesListVersion()) {
+				if (version == getHistoryVersion()) {
 					return;
 				}
-				setGamesListVersion(version);
+				setHistoryVersion(version);
 
 				gameService.getFinishedGamesList(new AsyncCallback<List<Game>>() {
 					public void onFailure(Throwable caught) {

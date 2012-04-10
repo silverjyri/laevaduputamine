@@ -29,7 +29,7 @@ Rankings.prototype = {
 			return this.el;
 		}
 
-		var el = $('<div id="placement" class="screen"></div>');
+		var el = $('<div id="rankings" class="screen"></div>');
 
 		this.menu = new Menu([
 	  	    new Button("Esileht", {image: 'img/home.png', scope: this, fn: function() {

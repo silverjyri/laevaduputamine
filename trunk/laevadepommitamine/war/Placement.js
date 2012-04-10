@@ -26,10 +26,10 @@ Placement.prototype = {
 				this.webOpponentItem.value = player;
 			}
 		} else {
-			if (opponent) {
-				this.webOpponentItem.setText(opponent);
+			if (opponent != this.webOpponentItem.value) {
+				this.webOpponentItem.setText(opponent ? opponent : "Ootan vastast...");
 				this.webOpponentItem.value = opponent;
-				this.opponentHasJoined = true;
+				this.opponentHasJoined = !!opponent;
 			}
 		}
 		this.checkReady();
@@ -44,7 +44,7 @@ Placement.prototype = {
 
 	gameJoined : function(successful) {
 		if (!successful) {
-			alert('Ei saanud liituda!');
+			alert("Ei saanud liituda!");
 			Client.stopGame();
 			return;
 		}
@@ -326,12 +326,12 @@ Placement.prototype = {
 			shipContainer.append(value);
 		});
 		this.webOpponentItem = new ListItem({
-			text : 'Ootan vastast...',
+			text : "Ootan vastast...",
 			image : 'img/webplayer.png'
 		});
 		if (!Client.player.isOpponent) {
 			this.aiOpponentItem = new ListItem({
-				text : 'Arvuti',
+				text : "Arvuti",
 				image : 'img/aiplayer.png',
 				value : -1
 			});
@@ -360,7 +360,7 @@ Placement.prototype = {
 
 		this.fieldView = new FieldView(Client.player.field, {
 			id : 0,
-			status: 'Aseta laevad v&auml;ljale',
+			status: "Aseta laevad v&auml;ljale",
 			playerName: Client.player.name,
 			scope : this,
 			onMouseDown : function(e) {

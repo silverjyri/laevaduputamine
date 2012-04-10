@@ -29,7 +29,7 @@ History.prototype = {
 			return this.el;
 		}
 
-		var el = $('<div id="placement" class="screen"></div>');
+		var el = $('<div id="history" class="screen"></div>');
 
 		this.menu = new Menu([
 	  	    new Button("Esileht", {image: 'img/home.png', scope: this, fn: function() {
@@ -38,8 +38,8 @@ History.prototype = {
 		]);
 		el.append(this.menu.render());
 
-		this.rankingsList = new ListBox();
-		el.append(this.rankingsList.render());
+		this.gamesList = new ListBox();
+		el.append(this.gamesList.render());
 
 		this.el = el;
 		return el;
