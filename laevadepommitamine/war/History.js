@@ -6,7 +6,7 @@ function History() {
 
 History.prototype = {
 	onUpdate: function() {
-		Server.getRankingsList();
+		Server.getFinishedGamesList();
 		this.updateTimer = setTimeout(this.onUpdate.bind(this), this.updateInterval);
 	},
 
@@ -20,7 +20,7 @@ History.prototype = {
 	onRender: function() {
 		this.menu.onRender();
 		if (!this.updateTimer) {
-			//this.onUpdate();
+			this.onUpdate();
 		}
 	},
 
@@ -44,4 +44,12 @@ History.prototype = {
 		this.el = el;
 		return el;
 	},
+
+	addGame: function(id, name, select) {
+		var item = new ListItem({value: id, text: name, image: 'img/game.png'});
+		this.gamesList.add(item);
+		if (select) {
+			this.gamesList.select(item);
+		}
+	}
 };

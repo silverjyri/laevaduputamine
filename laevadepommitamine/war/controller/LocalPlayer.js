@@ -24,7 +24,7 @@ LocalPlayer.prototype = {
 				opponentFieldView.setShipSunk(ship);
 			}
 			if (opponentField.checkAllHits()) {
-				alert('Sina võitsid!');
+				alert('Sina vï¿½itsid!');
 				Client.stopGame();
 			}
 		} else {
@@ -44,5 +44,10 @@ LocalPlayer.prototype = {
 
 		this.moveCoords = coords;
 		Server.playerMove(Client.game.gameId, this.isOpponent, coords.x, coords.y);
+	},
+
+	quitGame : function(gameId) {
+		Server.quitGame(gameId, this.isOpponent);
+		Client.stopGame();
 	}
 };

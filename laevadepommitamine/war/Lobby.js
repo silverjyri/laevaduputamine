@@ -6,7 +6,7 @@ function Lobby() {
 
 Lobby.prototype = {
 	onUpdate: function() {
-		Server.getGamesList();
+		Server.getActiveGamesList();
 		this.updateTimer = setTimeout(this.onUpdate.bind(this), this.updateInterval);
 	},
 
@@ -62,7 +62,7 @@ Lobby.prototype = {
 		this.menu = new Menu([
 	  	    new Button("Esileht", {image: 'img/home.png'}),
 	  	    this.gameBtn,
-	  	    new Button("Logi sisse"),
+	  	    new Button("Logi sisse", {disabled: true}),
 	  	    new Button("Edetabel", {fn: function() {
 	  	    	Client.startRankings();
 	  	    }}),
