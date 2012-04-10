@@ -17,7 +17,6 @@ import ee.ut.client.GameService;
 
 public class GameServiceImpl extends RemoteServiceServlet implements GameService {
 	private static final long serialVersionUID = 1L;
-	private static int gamesListVersion = 1;
 
 	@Override
 	public Integer createGame(String playerName) {
@@ -26,14 +25,19 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 		try {
 			conn = Database.getConnection();
 			Statement sta = conn.createStatement();
-			sta.executeUpdate("INSERT INTO Players (name) VALUES ('" + playerName + "')");
 
 			ResultSet rs = sta.executeQuery("SELECT ID FROM Players WHERE Name='" + playerName + "'");
-			rs.next();
+			if (!rs.next()) {
+				sta.executeUpdate("INSERT INTO Players (name) VALUES ('" + playerName + "')");
+				rs = sta.executeQuery("SELECT ID FROM Players WHERE Name='" + playerName + "'");
+				rs.next();
+				incrementPlayersListVersion(sta);
+			}
 			int playerId = rs.getInt(1);
+
 			boolean playerStartsFirst = new Random().nextBoolean();
 			sta.executeUpdate("INSERT INTO Games (Name, Player, PlayerStarts, Finished) VALUES ('" + playerName + " ootab...', " + Integer.toString(playerId) + ", " + Boolean.toString(playerStartsFirst) + ", false)");
-			gamesListVersion++;
+			incrementGamesListVersion(sta);
 			rs = sta.executeQuery("SELECT id FROM Games WHERE Player='" + Integer.toString(playerId) + "'");
 			rs.next();
 			int gameId = rs.getInt(1);
@@ -95,10 +99,42 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 		return list;
 	}
 
-	
+	public static Integer getPlayersListVersion(Statement sta) throws SQLException {
+		ResultSet rs = sta.executeQuery("SELECT PlayersListVersion FROM Global");
+		rs.next();
+		return rs.getInt(1);
+	}
+
+	public static void incrementPlayersListVersion(Statement sta) throws SQLException {
+		Integer version = getPlayersListVersion(sta) + 1;
+		sta.executeUpdate("UPDATE Global SET PlayersListVersion=" + version.toString());
+	}
+
+	public static Integer getGamesListVersion(Statement sta) throws SQLException {
+		ResultSet rs = sta.executeQuery("SELECT GamesListVersion FROM Global");
+		rs.next();
+		return rs.getInt(1);
+	}
+
+	public static void incrementGamesListVersion(Statement sta) throws SQLException {
+		Integer version = getGamesListVersion(sta) + 1;
+		sta.executeUpdate("UPDATE Global SET GamesListVersion=" + version.toString());
+	}
+
 	@Override
 	public Integer getGamesListVersion() {
-		return gamesListVersion;
+		Database.ensure();
+		try {
+			Connection conn = Database.getConnection();
+			Statement sta = conn.createStatement();
+			int version = getGamesListVersion(sta);
+			sta.close();
+			conn.close();
+			return version;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return 0;
 	}
 
 	@Override
@@ -109,13 +145,23 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 			Connection conn = Database.getConnection();
 			Statement sta = conn.createStatement();
 
-			ResultSet playerName = sta.executeQuery("SELECT Players.Name FROM Games INNER JOIN Players ON Players.ID = Games.Player WHERE ID=" + Integer.toString(gameId));
-			if (playerName.next()) {
-				players[0] = playerName.getString(1);
+			ResultSet rs = sta.executeQuery("SELECT Players.Name FROM Games INNER JOIN Players ON Players.ID = Games.Player WHERE ID=" + Integer.toString(gameId));
+			if (rs.next()) {
+				players[0] = rs.getString(1);
 			}
-			ResultSet opponentName = sta.executeQuery("SELECT Players.Name FROM Games INNER JOIN Players ON Players.ID = Games.Opponent WHERE ID=" + Integer.toString(gameId));
-			if (opponentName.next()) {
-				players[1] = opponentName.getString(1);
+
+			rs = sta.executeQuery("SELECT Opponent FROM Games WHERE ID=" + Integer.toString(gameId));
+			rs.next();
+			int opponentId = rs.getInt(1);
+
+			if (opponentId == -1) {
+				players[1] = "AI";
+			} else if (opponentId == -2) {
+				players[1] = null;
+			} else {
+				rs = sta.executeQuery("SELECT Name FROM Players WHERE ID=" + Integer.toString(opponentId));
+				rs.next();
+				players[1] = rs.getString(1);
 			}
 
 			sta.close();
@@ -141,17 +187,21 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 				return false;
 			}
 
-			sta.executeUpdate("INSERT INTO Players (name) VALUES ('" + playerName + "')");
-
 			rs = sta.executeQuery("SELECT ID FROM Players WHERE Name='" + playerName + "'");
-			rs.next();
+			if (!rs.next()) {
+				sta.executeUpdate("INSERT INTO Players (name) VALUES ('" + playerName + "')");
+				rs = sta.executeQuery("SELECT ID FROM Players WHERE Name='" + playerName + "'");
+				rs.next();
+				incrementPlayersListVersion(sta);
+			}
 			int playerId = rs.getInt(1);
+
 			rs = sta.executeQuery("SELECT Players.name FROM Games INNER JOIN Players ON Players.ID = Games.Player WHERE ID=" + Integer.toString(gameId));
 			rs.next();
 			String opponentName = rs.getString(1);
 
 			sta.executeUpdate("UPDATE Games SET Opponent=" + Integer.toString(playerId) + ", Name='" + opponentName + " vs. " + playerName + "' WHERE ID=" + Integer.toString(gameId));
-			gamesListVersion++;
+			incrementGamesListVersion(sta);
 
 			sta.close();
 			conn.close();
@@ -379,7 +429,11 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 					Map<Integer, Ship> ships = Ship.generateRandomShips();
 					Map<Integer, Bomb> bombs = new HashMap<Integer, Bomb>();
 					fieldEnc = Ship.encodeField(ships, bombs);
-					sta.executeUpdate("UPDATE Games SET Opponent=-1, OpponentField='" + fieldEnc +  "' WHERE ID=" + Integer.toString(gameId));
+					rs = sta.executeQuery("SELECT Players.Name FROM Games INNER JOIN Players ON Players.ID = Games.Player WHERE ID=" + Integer.toString(gameId));
+					rs.next();
+					String playerName = rs.getString(1);
+					sta.executeUpdate("UPDATE Games SET Opponent=-1, Name='" + playerName + " vs. AI', OpponentField='" + fieldEnc +  "' WHERE ID=" + Integer.toString(gameId));
+					incrementGamesListVersion(sta);
 				}
 			}
 
@@ -407,7 +461,10 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 				rs.next();
 				if (rs.getString(1) == null) {
 					// If the opponent quits placement, clear opponent
-					sta.executeUpdate("UPDATE Games SET Opponent=-2 WHERE ID=" + Integer.toString(gameId));
+					rs = sta.executeQuery("SELECT Players.Name FROM Games INNER JOIN Players ON Players.ID = Games.Player WHERE ID=" + Integer.toString(gameId));
+					rs.next();
+					String playerName = rs.getString(1);
+					sta.executeUpdate("UPDATE Games SET Opponent=-2, Name='" + playerName + " ootab...' WHERE ID=" + Integer.toString(gameId));
 				} else {
 					// Game was active, player wins
 					sta.executeUpdate("UPDATE Games SET Finished=true WHERE ID=" + Integer.toString(gameId));
@@ -416,7 +473,7 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 				// Delete the game if the original player quits
 				sta.executeUpdate("DELETE FROM Games WHERE ID=" + Integer.toString(gameId));
 			}
-			gamesListVersion++;
+			incrementGamesListVersion(sta);
 
 			sta.close();
 			conn.close();

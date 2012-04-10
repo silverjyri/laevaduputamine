@@ -13,13 +13,12 @@ import ee.ut.client.RankingsService;
 
 public class RankingsServiceImpl extends RemoteServiceServlet implements RankingsService {
 	private static final long serialVersionUID = 1L;
-	private static int rankingsVersion = 1;
 	
 	@Override
 	public List<String> getRankingsList() {
 		Database.ensure();
-		List<String> list = new ArrayList<String>();
 		Connection conn;
+		List<String> list = new ArrayList<String>();
 
 		try {
 			conn = Database.getConnection();
@@ -34,7 +33,7 @@ public class RankingsServiceImpl extends RemoteServiceServlet implements Ranking
 				int ratio = (int)((victories / total) * 100.0f);
 				list.add(name + " (" + victories.toString() + "/" + defeats.toString() + " " + Integer.toString(ratio) + "%)");
 				sta.executeUpdate("UPDATE Players SET Victories=" + Integer.toString(victories + 1) + " WHERE ID='" + playerId + "'");
-				rankingsVersion++;
+				GameServiceImpl.incrementPlayersListVersion(sta);
 			}
 			sta.close();
 			conn.close();
@@ -48,6 +47,19 @@ public class RankingsServiceImpl extends RemoteServiceServlet implements Ranking
 
 	@Override
 	public Integer getRankingsVersion() {
-		return rankingsVersion;
+		Database.ensure();
+		Connection conn;
+
+		try {
+			conn = Database.getConnection();
+			Statement sta = conn.createStatement();
+			int version = GameServiceImpl.getPlayersListVersion(sta);
+			sta.close();
+			conn.close();
+			return version;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return 0;
 	}
 }
