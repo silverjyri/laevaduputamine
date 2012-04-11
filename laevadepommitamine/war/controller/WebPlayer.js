@@ -12,7 +12,7 @@ WebPlayer.prototype = {
 
 	moveResult: function(coords) {
 		if (coords.x == -1 && coords.y == -1) {
-			setTimeout($.proxy(this.makeMove, this), 300);
+			setTimeout($.proxy(this.makeMove, this), 10);
 			return;
 		}
 

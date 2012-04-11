@@ -1,7 +1,7 @@
 function Game(gameId, playerType) {
 	this.gameId = gameId;
 	Server.startGame(gameId, playerType, Client.player.field.encode());
-	this.moveDelay = 300;
+	this.moveDelay = 250;
 }
 
 Game.prototype = {
@@ -54,7 +54,11 @@ Game.prototype = {
 	},
 
 	makeMove: function(player) {
-		setTimeout($.proxy(player ? this.makePlayerMove : this.makeOpponentMove, this), this.moveDelay);
+		if (player) {
+			setTimeout($.proxy(this.makePlayerMove, this), this.moveDelay);
+		} else {
+			this.makeOpponentMove.bind(this)();
+		}
 	},
 
 	makePlayerMove: function() {
