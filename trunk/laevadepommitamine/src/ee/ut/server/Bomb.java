@@ -72,7 +72,7 @@ public class Bomb {
 
 	// Decodes a string that represents a playing field (see ui/Field.js)
 	public static Map<Integer, Bomb> decodeBombs(String fieldEnc) {
-		Map<Integer, Bomb> bombs = new HashMap<Integer, Bomb>();
+		Map<Integer, Bomb> bombs = new HashMap<Integer, Bomb>(100, 1.0f);
 		int x, y;
 		for(y = 0; y < 10; y++) {
 			for(x = 0; x < 10; x++) {
@@ -95,7 +95,7 @@ public class Bomb {
 		boolean valid = false;
 		int x = 0, y = 0;
 		Random random = new Random();
-		int id = 0;
+		int id;
 		while (!valid) {
 			x = random.nextInt(10);
 			y = random.nextInt(10);
@@ -103,5 +103,10 @@ public class Bomb {
 			valid = !bombs.containsKey(id);
 		}
 		return new Bomb(x, y);
+	}
+
+	@Override
+	public int hashCode() {
+		return x * 10 + y;
 	}
 }
