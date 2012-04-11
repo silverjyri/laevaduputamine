@@ -66,7 +66,11 @@ public class Ship {
 						digit += 3;
 					}
 				} else {
-					digit = 0;
+					if (bomb != null && bomb.isHit()) {
+						digit = 8;
+					} else {
+						digit = 0;
+					}
 				}
 				if (bomb != null) {
 					digit += String.valueOf('a').codePointAt(0);
@@ -91,10 +95,10 @@ public class Ship {
 					if (cp >= 48 && cp <= 58) {
 						cp -= "0".codePointAt(0);
 					} else {
-						cp -= "a".codePointAt(0);
-						if (cp == 0) {
+						if (cp == 'a' || c == 'i') {
 							continue;
 						}
+						cp -= "a".codePointAt(0);
 					}
 					boolean vertical = cp >= 5;
 					if (vertical) {

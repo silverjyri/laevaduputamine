@@ -257,6 +257,7 @@ Field.prototype = {
 	// 7 - vertical quad
 	// a - bomb only
 	// b-h instead of 1-7 to mark bomb+ship
+	// i - undefined ship+bomb hit
 	encode : function() {
 		var x, y, id;
 		var field = '';
@@ -272,7 +273,11 @@ Field.prototype = {
 						digit += 3;
 					}
 				} else {
-					digit = 0;
+					if (bomb) {
+						digit = 8;
+					} else {
+						digit = 0;
+					}
 				}
 				if (bomb) {
 					digit += 'a'.charCodeAt(0);
