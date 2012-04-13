@@ -29,7 +29,7 @@ Button.prototype = {
 
 		var el;
 		if (this.image) {
-			el = $('<img class="button_img" src="' + this.image + '" alt="' + this.text + '" />');
+			el = $('<img class="button_img" src="' + this.image + '" title="' + this.text + '" alt="' + this.text + '" />');
 		} else {
 			el = $('<button type="button" class="button">' + this.text + '</button>');
 		}

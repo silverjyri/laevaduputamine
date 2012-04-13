@@ -62,16 +62,6 @@ Client.startGame = function() {
 	this.setScreen(this.game);
 };
 
-Client.startRankings = function() {
-	this.rankings = this.rankings || new Rankings();
-	this.setScreen(this.rankings);
-};
-
-Client.startHistory = function() {
-	this.history = this.history || new History();
-	this.setScreen(this.history);
-};
-
 Client.stopGame = function() {
 	if (this.lobby) {
 		this.lobby.username.setEnabled(true);
@@ -84,7 +74,22 @@ Client.stopGame = function() {
 	delete this.player;
 	delete this.opponent;
 	Client.startLobby();
-}
+};
+
+Client.startRankings = function() {
+	this.rankings = this.rankings || new Rankings();
+	this.setScreen(this.rankings);
+};
+
+Client.startHistory = function() {
+	this.history = this.history || new History();
+	this.setScreen(this.history);
+};
+
+Client.startReplay = function() {
+	this.replay = this.replay || new Replay();
+	this.setScreen(this.replay);
+};
 
 $LAB
 .script("ui/components/Button.js")
@@ -105,4 +110,5 @@ $LAB
 })
 .script("Game.js")
 .script("Rankings.js")
-.script("History.js");
+.script("History.js")
+.script("Replay.js");

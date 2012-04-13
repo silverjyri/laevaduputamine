@@ -19,6 +19,7 @@ History.prototype = {
 
 	onRender: function() {
 		this.menu.onRender();
+		this.replayBtn.onRender();
 		if (!this.updateTimer) {
 			this.onUpdate();
 		}
@@ -37,6 +38,11 @@ History.prototype = {
 		    }}),
 		]);
 		el.append(this.menu.render());
+
+		this.replayBtn = new Button("M&auml;ngi ette", {scope: this, fn: function() {
+			Client.startReplay();
+		}});
+		el.append(this.replayBtn.render());
 
 		this.gamesList = new ListBox();
 		el.append(this.gamesList.render());
