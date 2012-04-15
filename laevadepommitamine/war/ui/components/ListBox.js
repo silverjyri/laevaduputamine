@@ -5,6 +5,7 @@ function ListBox(options) {
 		this.scope = options.scope;
 		this.items = options.items;
 		this.style = options.style;
+		this.selected = options.selected;
 	}
 	this.items = this.items || [];
 
@@ -16,22 +17,30 @@ function ListBox(options) {
 	if (this.onSelectionChanged && this.scope) {
 		this.onSelectionChanged = this.onSelectionChanged.bind(this.scope);
 	}
+	this.select(this.selected);
 }
 
 ListBox.prototype = {
 	select: function(item) {
-		if (this.selected && (this.selected !== item)) {
-			this.selected.el.removeClass('listitem_selected');
-		}
+		var prevSelected = this.selected;
+
 		if (item) {
 			item.el.addClass('listitem_selected');
 			this.selected = item;
 		} else {
 			delete this.selected;
 		}
-		if (this.onSelectionChanged) {
-			this.onSelectionChanged(item);
+
+		if (prevSelected !== item) {
+			if (prevSelected) {
+				prevSelected.el.removeClass('listitem_selected');
+			}
+			if (this.onSelectionChanged) {
+				this.onSelectionChanged(item);
+			}
 		}
+
+		return prevSelected;
 	},
 
 	onClick: function(e) {
@@ -85,6 +94,8 @@ ListBox.prototype = {
 				item.el.click(this.onClick.bind(item));
 			}
 		}
+
+		return item;
 	},
 
 	remove: function(item) {
@@ -107,9 +118,10 @@ ListBox.prototype = {
 
 	clear: function() {
 		this.items = [];
-		this.select(null);
+		var prevSelected = this.select();
 		if (this.el) {
 			this.el.html('');
 		}
+		return prevSelected;
 	}
 };
