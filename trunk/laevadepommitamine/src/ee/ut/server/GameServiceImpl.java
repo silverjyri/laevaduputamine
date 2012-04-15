@@ -182,7 +182,9 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 			Statement sta = conn.createStatement();
 
 			ResultSet rs = sta.executeQuery("SELECT Opponent FROM Games WHERE ID=" + Integer.toString(gameId));
-			rs.next();
+			if (!rs.next()) {
+				return false;
+			}
 			if (rs.getInt(1) != -2) {
 				return false;
 			}
