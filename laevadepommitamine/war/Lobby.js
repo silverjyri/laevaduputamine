@@ -21,9 +21,7 @@ Lobby.prototype = {
 		this.menu.onRender();
 		this.username.onRender();
 		this.gamesList.onRender();
-		if (this.joinBtn) {
-			this.joinBtn.onRender();
-		}
+		this.joinBtn.onRender();
 
 		if (!this.updateTimer) {
 			this.onUpdate();
@@ -85,21 +83,20 @@ Lobby.prototype = {
 	  	}, scope: this});
 	  	this.username = username;
 	  	el.append(username.render());
-	  	
+
 		var gamesList = new ListBox({scope: this, onSelectionChanged: function(selected) {
-			if (!this.joinBtn) {
-				this.joinBtn = new Button("Liitu m&auml;nguga", {scope: this, fn: function() {
-					this.joinBtn.setEnabled(false);
-					Client.startPlacement(this.gamesList.selected.value);
-				}});
-				var joinBtnEl = this.joinBtn.render()
-				this.joinBtn.onRender();
-				joinBtnEl.css('float', 'left');
-				this.el.append(joinBtnEl);
-			}
+			this.joinBtn.setEnabled(!!selected && (Client.placement && Client.game));
 		}});
 		this.gamesList = gamesList;
 		el.append(gamesList.render());
+
+		this.joinBtn = new Button("Liitu m&auml;nguga", {disabled: true, scope: this, fn: function() {
+			this.joinBtn.setEnabled(false);
+			Client.startPlacement(this.gamesList.selected.value);
+		}});
+		var joinBtnEl = this.joinBtn.render()
+		joinBtnEl.css('float', 'left');
+		el.append(joinBtnEl);
 
 		this.loadingGif = $('<img src="img/loading.gif" />');
 		el.append(this.loadingGif);
