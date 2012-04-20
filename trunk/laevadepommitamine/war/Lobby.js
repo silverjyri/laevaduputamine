@@ -85,7 +85,7 @@ Lobby.prototype = {
 	  	el.append(username.render());
 
 		var gamesList = new ListBox({scope: this, onSelectionChanged: function(selected) {
-			this.joinBtn.setEnabled(!!selected && (Client.placement && Client.game));
+			this.joinBtn.setEnabled(!!selected && !(Client.placement || Client.game));
 		}});
 		this.gamesList = gamesList;
 		el.append(gamesList.render());

@@ -92,8 +92,8 @@ public class Laevadepommitamine implements EntryPoint {
 		$wnd.Client.lobby.initialize(name);
 	}-*/;
 
-	public native static void playerMoveResult(boolean hit) /*-{
-		$wnd.Client.player.moveResult(hit);
+	public native static void playerMoveResult(boolean hit, boolean sunk) /*-{
+		$wnd.Client.player.moveResult(hit, sunk);
 	}-*/;
 
 	public native static void remoteMoveResult(int[] bomb) /*-{
@@ -291,13 +291,15 @@ public class Laevadepommitamine implements EntryPoint {
 
 	public static void playerMove(int gameId, boolean isOpponent, int x, int y)
 	{
-		gameService.playerMove(gameId, isOpponent, x, y, new AsyncCallback<Boolean>() {
+		gameService.playerMove(gameId, isOpponent, x, y, new AsyncCallback<boolean[]>() {
 			public void onFailure(Throwable caught) {
 				Window.alert("playerMove RPC failed. " + caught.getMessage());
 			}
 
-			public void onSuccess(Boolean result) {
-				playerMoveResult(result);
+			public void onSuccess(boolean[] result) {
+				// result[0] = hit
+				// result[1] = sunk
+				playerMoveResult(result[0], result[1]);
 			}
 		});
 	}

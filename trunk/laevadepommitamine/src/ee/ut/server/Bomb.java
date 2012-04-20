@@ -57,17 +57,34 @@ public class Bomb {
 	}
 
 	// Checks if there is a ship at the given coordinates
-	public static boolean checkHit(Map<Integer, Ship> ships, Bomb bomb) {
+	public static Ship checkHit(Map<Integer, Ship> ships, Bomb bomb) {
 		for (Entry<Integer, Ship> shipEntry : ships.entrySet()) {
 			Ship ship = shipEntry.getValue();
 			int sw = ship.isVertical() ? 1 : ship.getLength();
 			int sh = ship.isVertical() ? ship.getLength() : 1;
 			if ((bomb.x >= ship.getX()) && (bomb.x < ship.getX() + sw) &&
 				(bomb.y >= ship.getY()) && (bomb.y < ship.getY() + sh)) {
-				return true;
+				return ship;
 			}
 		}
-		return false;
+		return null;
+	}
+
+	// Checks if the given ship is sunk (fully bombed)
+	public static boolean checkSunk(Map<Integer, Bomb> bombs, Ship ship) {
+		int x = ship.getX();
+		int y = ship.getY();
+		int vp = ship.isVertical() ? 1 : 0;
+		int hp = ship.isVertical() ? 0 : 1;
+
+		int i;
+		for (i = 0; i < ship.getLength(); i++) {
+			int id = (x + i * hp) * 10 + (y + i * vp);
+			if (!bombs.containsKey(id)) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	// Decodes a string that represents a playing field (see ui/Field.js)
