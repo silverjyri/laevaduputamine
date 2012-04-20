@@ -10,26 +10,23 @@ LocalPlayer.prototype = {
 		// Nothing to do here, wait for fieldCallback from the opponent field
 	},
 
-	moveResult : function(hit) {
+	moveResult : function(hit, sunk) {
 		var opponent = Client.opponent;
 		var opponentField = opponent.field;
 		var opponentFieldView = opponent.fieldView;
 		var bomb = {x: this.moveCoords.x, y: this.moveCoords.y, hit: hit};
 
 		opponentFieldView.addBomb(bomb);
-		if (hit) {
-			var ship = opponentField.guessFullHit(bomb);
-			if (ship) {
-				opponentField.addShip(ship);
-				opponentFieldView.setShipSunk(ship);
-			}
+		if (sunk) {
+			var ship = opponentField.getShipByBombs(bomb);
+			opponentField.addShip(ship);
+			opponentFieldView.setShipSunk(ship);
+
 			if (opponentField.checkAllHits()) {
 				alert('Sina v&otilde;itsid!');
 				Client.stopGame();
 				return;
 			}
-		} else {
-			opponentFieldView.testSurroundingFullHit(bomb);
 		}
 		Client.game.playerMoveResult(hit);
 		delete this.moveCoords;

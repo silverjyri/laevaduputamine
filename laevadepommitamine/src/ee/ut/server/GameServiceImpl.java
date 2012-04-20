@@ -285,7 +285,7 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 	}
 
 	@Override
-	public boolean playerMove(int gameId, boolean isOpponent, int x, int y) {
+	public boolean[] playerMove(int gameId, boolean isOpponent, int x, int y) {
 		Database.ensure();
 		Connection conn;
 
@@ -307,10 +307,12 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 
 			// Make player bomb
 			Bomb bomb = new Bomb(x, y);
-			boolean hit = Bomb.checkHit(ships, bomb);
+			Ship hitShip = Bomb.checkHit(ships, bomb);
+			boolean hit = hitShip != null;
 			bomb.setHit(hit);
 			int id = x * 10 + y;
 			bombs.put(id, bomb);
+			boolean sunk = hit ? Bomb.checkSunk(bombs, hitShip) : false;
 
 			// Update playing field with the new bomb
 			String fieldEnc = Ship.encodeField(ships, bombs);
@@ -324,7 +326,7 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 			updateMoveHistoryVersion(gameId, isOpponent, sta);
 
 			// Check for victory
-			if (hit && Bomb.checkAllHits(bombs)) {
+			if (sunk && Bomb.checkAllHits(bombs)) {
 				rs = sta.executeQuery("SELECT Player, Opponent FROM Games WHERE ID=" + Integer.toString(gameId));
 				rs.next();
 				int playerId = rs.getInt(1);
@@ -368,12 +370,12 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 			sta.close();
 			conn.close();
 
-			return hit;
+			return new boolean[]{hit, sunk};
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 
-		return false;
+		return new boolean[]{false, false};
 	}
 
 	// Returns info about opponent's move
@@ -409,7 +411,9 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 				x = bomb.getX();
 				y = bomb.getY();
 				int id = x * 10 + y;
-				boolean hit = Bomb.checkHit(ships, bomb);
+				Ship hitShip = Bomb.checkHit(ships, bomb);
+				boolean hit = hitShip != null;
+				boolean sunk = hit ? Bomb.checkSunk(bombs, hitShip) : false;
 				bomb.setHit(hit);
 				bombs.put(id, bomb);
 				String fieldEnc = Ship.encodeField(ships, bombs);
@@ -420,7 +424,7 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 				updateMoveHistoryVersion(gameId, false, sta);
 
 				// Check for victory
-				if (hit && Bomb.checkAllHits(bombs)) {
+				if (sunk && Bomb.checkAllHits(bombs)) {
 					sta.executeUpdate("UPDATE Games SET Winner=2, Finished=true WHERE ID=" + Integer.toString(gameId));
 
 					rs = sta.executeQuery("SELECT Player FROM Games WHERE ID=" + Integer.toString(gameId));

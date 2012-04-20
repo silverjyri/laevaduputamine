@@ -212,26 +212,6 @@ FieldView.prototype = {
 		}
 	},
 
-	testSurroundingFullHit: function(coords) {
-		var x = coords.x;
-		var y = coords.y;
-		this.testSurroundingFullHitAt(x-1, y);
-		this.testSurroundingFullHitAt(x+1, y);
-		this.testSurroundingFullHitAt(x, y-1);
-		this.testSurroundingFullHitAt(x, y+1);
-	},
-
-	testSurroundingFullHitAt: function(x, y) {
-		var test = this.field.bombs['' + x + y];
-		if (test && test.hit) {
-			var ship = this.field.guessFullHit(test);
-			if (ship) {
-				this.field.addShip(ship);
-				this.setShipSunk(ship);
-			}
-		}
-	},
-
 	removeShip: function(ship) {
 		var x = ship.x;
 		var y = ship.y;

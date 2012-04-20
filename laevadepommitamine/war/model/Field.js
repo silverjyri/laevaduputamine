@@ -46,8 +46,7 @@ Field.prototype = {
 		return false;
 	},
 
-	// Checks if there is a ship at the given coordinates which is completely
-	// bombed
+	// Checks if there is a ship at the given coordinates which is sunk (fully bombed)
 	checkFullHit : function(coords) {
 		if (!this.checkHit(coords)) {
 			return null;
@@ -118,11 +117,9 @@ Field.prototype = {
 		}
 	},
 
-	// Guess if there is a ship at the given coordinates which is completely bombed.
-	// The ships on this field are not all known, so need to look at surrounding boxes.
-	// Assuming coords was a hit.
-	guessFullHit : function(coords) {
-		// Try to find the start of the ship (upper-left part)
+	// Get ship at location when only bombs are known. coords is the location of the last bomb before sinking the ship.
+	getShipByBombs : function(coords) {
+		// Find the start of the ship (upper-left part)
 		var x1 = coords.x;
 		var y1 = coords.y;
 		var id;
@@ -153,7 +150,7 @@ Field.prototype = {
 			y1--;
 		}
 
-		// Try to find the end of the ship (bottom-right part)
+		// Find the end of the ship (bottom-right part)
 		var x2 = coords.x;
 		var y2 = coords.y;
 		var id;
@@ -197,53 +194,14 @@ Field.prototype = {
 		var length;
 		if (vertical === true) {
 			length = y2 - y1 + 1;
-			if ((y1 == 0 || this.bombs['' + x1 + (y1 - 1)]) &&
-				(y2 == 9 || this.bombs['' + x2 + (y2 + 1)])) {
-				hasShip = true;
-			}
 		} else if (vertical === false) {
 			length = x2 - x1 + 1;
-			if ((x1 == 0 || this.bombs['' + (x1 - 1) + y1]) &&
-				(x2 == 9 || this.bombs['' + (x2 + 1) + y2])) {
-				hasShip = true;
-			}
 		} else {
+			vertical = false;
 			length = 1;
-			// No direction, check if it's a single
-			if ((y1 == 0 || this.bombs['' + x1 + (y1 - 1)]) &&
-				(y2 == 9 || this.bombs['' + x2 + (y2 + 1)]) &&
-				(x1 == 0 || this.bombs['' + (x1 - 1) + y1]) &&
-				(x2 == 9 || this.bombs['' + (x2 + 1) + y2])) {
-				hasShip = true;
-			}
 		}
 
-		if (hasShip || this.shipCheckLargerFullHit(length)) {
-			var ship = {x: x1, y: y1, length: length, vertical: vertical};
-			return ship;
-		}
-		return null;
-	},
-
-	// If we know that there is a sunken 4-ship, then we also know that a ship with 3 bombs has been sunk.
-	// Check for this condition.
-	shipCheckLargerFullHit : function(length) {
-		var shipsLeft = {
-			1 : 4,
-			2 : 3,
-			3 : 2,
-			4 : 1
-		};
-		for ( var i in this.ships) {
-			shipsLeft[this.ships[i].length]--;
-		}
-
-		for ( var l = length + 1; l <= 4; l++) {
-			if (shipsLeft[l] != 0) {
-				return false;
-			}
-		}
-		return true;
+		return {x: x1, y: y1, length: length, vertical: vertical};
 	},
 
 	// Returns a 100-character string that represents the playing field (for sending to the server)
