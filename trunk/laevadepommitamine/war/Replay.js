@@ -4,6 +4,12 @@ function Replay() {
 Replay.prototype = {
 	onRender: function() {
 		this.menu.onRender();
+		if (Modernizr.localstorage) {
+			this.hasLocalStorage = true;
+		} else {
+			alert('Local Storage not supported!');
+			this.hasLocalStorage = false;
+		}
 	},
 
 	render: function() {
