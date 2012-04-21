@@ -240,6 +240,7 @@ public class Laevadepommitamine implements EntryPoint {
 				// data[2] = player field
 				// data[3] = opponent field
 				// data[4] = move history
+				// data[5] = player starts
 				getGameReplayDataCallback(data[0], data[1], data[2], data[3], data[4], Boolean.parseBoolean(data[5]));
 			}
 		});

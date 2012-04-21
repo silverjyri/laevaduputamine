@@ -204,6 +204,33 @@ Field.prototype = {
 		return {x: x1, y: y1, length: length, vertical: vertical};
 	},
 
+	// Decodes a string that represents a playing field
+	decode : function(fieldEnc) {
+		var x, y, id;
+		for(y = 0; y < 10; y++) {
+			for(x = 0; x < 10; x++) {
+				id = y * 10 + x;
+				var c = fieldEnc[id];
+				if (c != '0') {
+					var cp = c.charCodeAt();
+					if (cp >= 48 && cp <= 58) {
+						cp -= '0'.charCodeAt(0);
+					} else {
+						if (c == 'a' || c == 'i') {
+							continue;
+						}
+						cp -= 'a'.charCodeAt(0);
+					}
+					var vertical = cp >= 5;
+					if (vertical) {
+						cp -= 3;
+					}
+					this.ships[id] = {x: x, y: y, length: cp, vertical: vertical};
+				}
+			}
+		}
+	},
+
 	// Returns a 100-character string that represents the playing field (for sending to the server)
 	// 0 - empty
 	// 1 - horizontal single
