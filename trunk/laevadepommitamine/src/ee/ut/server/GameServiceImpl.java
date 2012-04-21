@@ -191,14 +191,14 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 
 			ResultSet rs = sta.executeQuery("SELECT Finished, PlayerField, OpponentField, MoveHistory, PlayerStarts FROM Games WHERE ID=" + Integer.toString(gameId));
 			if (rs.next()) {
-				boolean finished = rs.getBoolean(1);
 				// Can't see fields until finished
+				boolean finished = rs.getBoolean(1);
 				if (finished) {
 					replayData[2] = rs.getString(2);
 					replayData[3] = rs.getString(3);
 				}
 				replayData[4] = rs.getString(4);
-				replayData[5] = Boolean.toString(rs.getBoolean(4));
+				replayData[5] = Boolean.toString(rs.getBoolean(5));
 			}
 
 			sta.close();

@@ -68,9 +68,9 @@ FieldView.prototype = {
 			el.attr("id", this.id);
 		}
 
-		if (this.playerName) {
+		//if (this.playerName) {
 			el.append('<div class="name">M&auml;ngija: ' + this.playerName + '</div>');
-		}
+		//}
 		el.append('<div class="status_text">' + this.status + '</div>');
 
 		this.el = el;
@@ -238,9 +238,11 @@ FieldView.prototype = {
 	},
 
 	setShips: function(ships, oldShips) {
-		$.each(oldShips, function(index, value) {
-			this.removeShip(value);
-		}.bind(this));
+		if (oldShips) {
+			$.each(oldShips, function(index, value) {
+				this.removeShip(value);
+			}.bind(this));
+		}
 
 		$.each(ships, function(index, value) {
 			this.addShip(value);
@@ -270,6 +272,15 @@ FieldView.prototype = {
 				this.el.children('.status_text').html(text);
 			}
 			this.status = text;
+		}
+	},
+
+	setPlayerName: function(name) {
+		if (this.playerName != name) {
+			if (this.el) {
+				this.el.children('.name').html(name);
+			}
+			this.playerName = name;
 		}
 	}
 };

@@ -20,6 +20,12 @@ Replay.prototype = {
 	},
 
 	getGameReplayDataCallback: function(player, opponent, playerField, opponentField, moveHistory, playerStarts) {
+		this.playerField.setPlayerName(player);
+		this.playerField.field.decode(playerField);
+		this.playerField.setShips(this.playerField.field.ships);
+		this.opponentField.setPlayerName(opponent);
+		this.opponentField.field.decode(opponentField);
+		this.opponentField.setShips(this.opponentField.field.ships);
 		console.log(arguments);
 	},
 
@@ -37,7 +43,7 @@ Replay.prototype = {
 		    new Button("Back", {image: 'img/back.png', scope: this, fn: function() {
 		    	
 		    }}),
-		    new Button("Play", {image: 'img/pause.png', scope: this, fn: function() {
+		    new Button("Play", {image: 'img/play.png', scope: this, fn: function() {
 		    	
 		    }}),
 		    new Button("Forward", {image: 'img/forward.png', scope: this, fn: function() {
@@ -46,9 +52,13 @@ Replay.prototype = {
 		]);
 		el.append(this.menu.render());
 
-		//el.append(playerField.render());
-		//el.append(opponentField.render());
-
+		var fieldDiv = $('<div style="clear: both; padding-top: 10px"></div>');
+		this.playerField = new FieldView(new Field(), {id: '1'});
+		this.opponentField = new FieldView(new Field(), {id: '2'});
+		fieldDiv.append(this.playerField.render());
+		fieldDiv.append(this.opponentField.render());
+		el.append(fieldDiv);
+		
 		this.el = el;
 		return el;
 	}
