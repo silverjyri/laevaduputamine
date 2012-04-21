@@ -140,6 +140,21 @@ FieldView.prototype = {
 		box.addClass('explosionAnimation');
 	},
 
+	renderShipPart: function(x, y, animate) {
+		var box = $('#'+this.getBoxId(x, y));
+		box.html('');
+		var shipLayer = $('<div class="ship_layer"></div>');
+		box.append(shipLayer);
+		if (animate) {
+			this.setAnimAdd(box);
+		}
+		var bomb = this.field.bombs['' + x + y];
+		if (bomb) {
+			this.addBomb(bomb);
+		}
+		return shipLayer;
+	},
+
 	renderShip: function(ship, animate) {
 		var x = ship.x;
 		var y = ship.y;
@@ -147,27 +162,15 @@ FieldView.prototype = {
 		var vertical = ship.vertical;
 
 		if (length == 1) {
-			var box = $('#'+this.getBoxId(x, y));
-			box.html('');
-			var shipLayer = $('<div class="ship_layer"></div>');
-			box.append(shipLayer);
+			var shipLayer = this.renderShipPart(x, y);
 			shipLayer.addClass('ship_single');
-			if (animate) {
-				this.setAnimAdd(box);
-			}
 			return;
 		}
 
 		var i;
 		if (vertical) {
 			for (i = 0; i < length; i++) {
-				var box = $('#'+this.getBoxId(x, y + i));
-				box.html('');
-				var shipLayer = $('<div class="ship_layer"></div>');
-				box.append(shipLayer);
-				if (animate) {
-					this.setAnimAdd(box);
-				}
+				var shipLayer = this.renderShipPart(x, y + i);
 				if (i == 0) {
 					shipLayer.addClass('ship_vertical_1');
 				} else if (i == length - 1) {
@@ -178,13 +181,7 @@ FieldView.prototype = {
 			}
 		} else {
 			for (i = 0; i < length; i++) {
-				var box = $('#'+this.getBoxId(x + i, y));
-				box.html('');
-				var shipLayer = $('<div class="ship_layer"></div>');
-				box.append(shipLayer);
-				if (animate) {
-					this.setAnimAdd(box);
-				}
+				var shipLayer = this.renderShipPart(x + i, y);
 				if (i == 0) {
 					shipLayer.addClass('ship_horizontal_1');
 				} else if (i == length - 1) {
@@ -254,10 +251,37 @@ FieldView.prototype = {
 		this.renderBomb(bomb);
 	},
 
+	removeBomb: function(coords) {
+		var ship = this.field.getShipAtCoords(coords);
+		if (ship) {
+			var box = $('#'+this.getBoxId(coords.x, coords.y));
+			box.children('.bomb_layer').remove();
+			var sunk = this.field.checkFullHit(ship);
+			delete this.field.bombs['' + coords.x + coords.y];
+			if (sunk) {
+				this.renderShip(ship);
+			} else {
+			}
+		} else {
+			var box = $('#'+this.getBoxId(coords.x, coords.y));
+			this.clearBox(box);
+			delete this.field.bombs['' + coords.x + coords.y];
+		}
+	},
+
 	renderBomb: function(bomb) {
 		var box = $('#'+this.getBoxId(bomb.x, bomb.y));
-		var bombLayer = $('<div class="bomb_layer"></div>');
-		box.append(bombLayer);
+		var bombLayer = box.children('.bomb_layer');
+		if (bombLayer.length != 0) {
+			if (bomb.hit) {
+				bombLayer.removeClass('empty');
+			} else {
+				bombLayer.removeClass('bomb');
+			}
+		} else {
+			bombLayer = $('<div class="bomb_layer"></div>');
+			box.append(bombLayer);
+		}
 		this.setAnimExplosion(box);
 		if (bomb.hit) {
 			bombLayer.addClass('bomb');

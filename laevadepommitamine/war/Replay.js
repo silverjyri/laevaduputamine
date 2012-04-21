@@ -36,7 +36,10 @@ Replay.prototype = {
 		this.opponentField.setShips(this.opponentField.field.ships);
 		this.moveHistory = data.moveHistory;
 		this.moveHistoryPosition = 0;
-		this.currentPlayer = data.playerStarts;
+		this.moveHistoryEnd = this.moveHistory.length / 2;
+		// unknown at first, calculated based on moves
+		this.turnHistory = new Array(this.moveHistoryEnd);
+		this.turnHistory[0] = data.playerStarts;
 	},
 
 	getGameReplayDataCallback: function(player, opponent, playerField, opponentField, moveHistory, playerStarts) {
@@ -47,8 +50,8 @@ Replay.prototype = {
 	},
 
 	makeMove: function() {
-		var playerField = this.currentPlayer ? this.playerField : this.opponentField;
-		var opponentField = this.currentPlayer ? this.playerField : this.opponentField;
+		var currentPlayer = this.turnHistory[this.moveHistoryPosition];
+		var opponentField = currentPlayer ? this.opponentField : this.playerField;
 		var pos = this.moveHistoryPosition * 2;
 		var move = this.moveHistory.substring(pos, pos+2);
 		var x = parseInt(move / 10);
@@ -57,16 +60,19 @@ Replay.prototype = {
 		var hit = opponentField.field.checkHit(bomb);
 		bomb.hit = hit;
 		opponentField.addBomb(bomb);
-		var sunkShip = opponentField.field.checkFullHit(bomb);
-		if (sunkShip) {
-			opponentField.setShipSunk(sunkShip);
-		}
+
 		this.moveHistoryPosition++;
-		if (!hit) {
-			this.currentPlayer = !this.currentPlayer;
+		if (hit) {
+			var sunkShip = opponentField.field.checkFullHit(bomb);
+			if (sunkShip) {
+				opponentField.setShipSunk(sunkShip);
+			}
+			this.turnHistory[this.moveHistoryPosition] = currentPlayer;
+		} else {
+			this.turnHistory[this.moveHistoryPosition] = !currentPlayer;
 		}
 
-		if (this.moveHistory.length == pos) {
+		if (this.moveHistoryPosition == this.moveHistoryEnd) {
 			this.playBtn.setEnabled(false);
 			this.forwardBtn.setEnabled(false);
 			if (this.playTimer) {
@@ -81,22 +87,27 @@ Replay.prototype = {
 	},
 
 	makeMoveBack: function() {
-		var playerField = this.currentPlayer ? this.playerField : this.opponentField;
-		var opponentField = this.currentPlayer ? this.playerField : this.opponentField;
+		this.moveHistoryPosition--;
+		var currentPlayer = this.turnHistory[this.moveHistoryPosition];
 		var pos = this.moveHistoryPosition * 2;
 		var move = this.moveHistory.substring(pos, pos+2);
 		var x = parseInt(move / 10);
 		var y = parseInt(move % 10);
 
-		this.moveHistoryPosition--;
+		var opponentField = currentPlayer ? this.opponentField : this.playerField;
+		opponentField.removeBomb({x: x, y: y});
+		
 		if (this.moveHistoryPosition == 0) {
 			this.backBtn.setEnabled(false);
+		} else {
+			this.playBtn.setEnabled(true);
+			this.forwardBtn.setEnabled(true);
 		}
 	},
 
 	playMoves: function() {
-		this.makeMove();
 		this.playTimer = setTimeout(this.playMoves.bind(this), this.playInterval);
+		this.makeMove();
 	},
 
 	render: function() {
@@ -121,6 +132,7 @@ Replay.prototype = {
 
 		this.menu = new Menu([
 	  	    new Button("Esileht", {image: 'img/home.png', scope: this, fn: function() {
+	  	    	delete Client.replay;
 		    	Client.startLobby();
 		    }}),
 		    this.backBtn,
