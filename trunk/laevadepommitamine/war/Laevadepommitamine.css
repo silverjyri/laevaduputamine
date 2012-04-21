@@ -56,6 +56,10 @@ h1 {
 	padding-top: 2px;
 }
 
+.button_img_disabled {
+	opacity: 0.5;
+}
+
 .field_label {
 	color: white;
 	margin: 0px 10px 0px 0px;

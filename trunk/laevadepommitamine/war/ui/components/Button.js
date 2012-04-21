@@ -18,6 +18,9 @@ function Button(text, options) {
 Button.prototype = {
 	onRender: function() {
 		if (this.fn) {
+			if (this.image && this.disabled) {
+				return;
+			}
 			this.el.click(this.fn);
 		}
 	},
@@ -30,11 +33,14 @@ Button.prototype = {
 		var el;
 		if (this.image) {
 			el = $('<img class="button_img" src="' + this.image + '" title="' + this.text + '" alt="' + this.text + '" />');
+			if (this.disabled) {
+				el.addClass('button_img_disabled');
+			}
 		} else {
 			el = $('<button type="button" class="button">' + this.text + '</button>');
-		}
-		if (this.disabled) {
-			el.attr('disabled', 'disabled');
+			if (this.disabled) {
+				el.attr('disabled', 'disabled');
+			}
 		}
 
 		if (this.style) {
@@ -52,13 +58,34 @@ Button.prototype = {
 		}
 	},
 
+	setImage: function(image) {
+		if (this.image != image) {
+			if (this.el) {
+				this.el.attr('src', image);
+			}
+			this.image = image;
+		}
+	},
+
 	setEnabled: function(enabled) {
 		if (this.disabled == enabled) {
 			if (this.el) {
 				if (enabled) {
-					this.el.removeAttr('disabled');
+					if (this.image) {
+						this.el.removeClass('button_img_disabled');
+						this.el.click(this.fn);
+					} else {
+						this.el.removeAttr('disabled');
+					}
 				} else {
-					this.el.attr('disabled', 'disabled');
+					if (this.image) {
+						this.el.addClass('button_img_disabled');
+						this.el.off('click', this.fn);
+						
+					} else {
+						this.el.attr('disabled', 'disabled');
+					}
+					
 				}
 			}
 			this.disabled = !enabled;
