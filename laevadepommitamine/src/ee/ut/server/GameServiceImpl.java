@@ -137,6 +137,29 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 		return 0;
 	}
 
+	public String[] getGamePlayers(int gameId, Statement sta) throws SQLException {
+		String[] players = new String[2];
+		ResultSet rs = sta.executeQuery("SELECT Players.Name FROM Games INNER JOIN Players ON Players.ID = Games.Player WHERE ID=" + Integer.toString(gameId));
+		if (rs.next()) {
+			players[0] = rs.getString(1);
+		}
+
+		rs = sta.executeQuery("SELECT Opponent FROM Games WHERE ID=" + Integer.toString(gameId));
+		rs.next();
+		int opponentId = rs.getInt(1);
+
+		if (opponentId == -1) {
+			players[1] = "AI";
+		} else if (opponentId == -2) {
+			players[1] = null;
+		} else {
+			rs = sta.executeQuery("SELECT Name FROM Players WHERE ID=" + Integer.toString(opponentId));
+			rs.next();
+			players[1] = rs.getString(1);
+		}
+		return players;
+	}
+
 	@Override
 	public String[] getGamePlayers(int gameId) {
 		String[] players = new String[2];
@@ -144,24 +167,38 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 		try {
 			Connection conn = Database.getConnection();
 			Statement sta = conn.createStatement();
+			players = getGamePlayers(gameId, sta);
+			sta.close();
+			conn.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return players;
+	}
 
-			ResultSet rs = sta.executeQuery("SELECT Players.Name FROM Games INNER JOIN Players ON Players.ID = Games.Player WHERE ID=" + Integer.toString(gameId));
+	// Returns player field, opponent field and move history.
+	@Override
+	public String[] getGameReplayData(int gameId) {
+		String[] replayData = new String[6];
+		Database.ensure();
+		try {
+			Connection conn = Database.getConnection();
+			Statement sta = conn.createStatement();
+
+			String[] players = getGamePlayers(gameId, sta);
+			replayData[0] = players[0];
+			replayData[1] = players[1];
+
+			ResultSet rs = sta.executeQuery("SELECT Finished, PlayerField, OpponentField, MoveHistory, PlayerStarts FROM Games WHERE ID=" + Integer.toString(gameId));
 			if (rs.next()) {
-				players[0] = rs.getString(1);
-			}
-
-			rs = sta.executeQuery("SELECT Opponent FROM Games WHERE ID=" + Integer.toString(gameId));
-			rs.next();
-			int opponentId = rs.getInt(1);
-
-			if (opponentId == -1) {
-				players[1] = "AI";
-			} else if (opponentId == -2) {
-				players[1] = null;
-			} else {
-				rs = sta.executeQuery("SELECT Name FROM Players WHERE ID=" + Integer.toString(opponentId));
-				rs.next();
-				players[1] = rs.getString(1);
+				boolean finished = rs.getBoolean(1);
+				// Can't see fields until finished
+				if (finished) {
+					replayData[2] = rs.getString(2);
+					replayData[3] = rs.getString(3);
+				}
+				replayData[4] = rs.getString(4);
+				replayData[5] = Boolean.toString(rs.getBoolean(4));
 			}
 
 			sta.close();
@@ -169,7 +206,7 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return players;
+		return replayData;
 	}
 
 	// Returns true if joining was possible (there was one player in the game).
@@ -413,9 +450,9 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 				int id = x * 10 + y;
 				Ship hitShip = Bomb.checkHit(ships, bomb);
 				boolean hit = hitShip != null;
-				boolean sunk = hit ? Bomb.checkSunk(bombs, hitShip) : false;
 				bomb.setHit(hit);
 				bombs.put(id, bomb);
+				boolean sunk = hit ? Bomb.checkSunk(bombs, hitShip) : false;
 				String fieldEnc = Ship.encodeField(ships, bombs);
 				sta.executeUpdate("UPDATE Games SET PlayerField='" + fieldEnc +  "' WHERE ID=" + Integer.toString(gameId));
 

@@ -12,6 +12,7 @@ public interface GameService extends RemoteService {
 	public List<Game> getActiveGamesList();
 	public List<Game> getFinishedGamesList();
 	public String[] getGamePlayers(int gameId);
+	public String[] getGameReplayData(int gameId);
 	public String getUniquePlayerName();
 	public boolean isOpponentReady(int gameId, boolean isOpponent);
 	public boolean[] playerMove(int gameId, boolean isOpponent, int x, int y);

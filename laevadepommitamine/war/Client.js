@@ -86,8 +86,10 @@ Client.startHistory = function() {
 	this.setScreen(this.history);
 };
 
-Client.startReplay = function() {
-	this.replay = this.replay || new Replay();
+Client.startReplay = function(gameId) {
+	if (!this.replay || this.replay.gameId != gameId) {
+		this.replay = new Replay(gameId);
+	}
 	this.setScreen(this.replay);
 };
 

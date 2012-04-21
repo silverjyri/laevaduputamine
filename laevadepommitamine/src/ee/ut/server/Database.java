@@ -15,13 +15,22 @@ public class Database {
 	
 	public static void storeTestData(Connection conn) throws SQLException {
 		Statement sta = conn.createStatement();
-		sta.executeUpdate("INSERT INTO Games (name) VALUES ('Andres vs. P&auml;tris')");
-		sta.executeUpdate("INSERT INTO Games (name) VALUES ('Silver vs. AI')");
+		sta.executeUpdate("INSERT INTO Players (name) VALUES ('P&auml;tris')");
 		sta.executeUpdate("INSERT INTO Players (name) VALUES ('Silver')");
 		sta.executeUpdate("INSERT INTO Players (name) VALUES ('Andres')");
+		ResultSet rs = sta.executeQuery("SELECT id FROM Players WHERE name='Andres'");
+		rs.next();
+		Integer playerId = rs.getInt(1);
+		sta.executeUpdate("INSERT INTO Games (name, player, opponent, finished, " +
+			"playerField, opponentField, moveHistory, playerStarts, winner) " +
+			"VALUES ('Andres vs. AI', " + playerId + ", -1, true, " +
+			"'aa0b0600b00aaaai000aa0a0aia00a0aaaa0aa0020a5a0000700ai030iaiaaaa00aaai00aa05aaai1aa0a0aa000a0100aa0a', " +
+			"'0b0a0aaa0a000haaba0aciaiaaa0af00aiaaaa0iaa0iaa00000a00aa0f0a00b0a0aiaga000aa000iaabaa00a0iaaa0adii0a', " +
+			"'30925133122297310223191410043028159926488509261896627813766666868048757352417186820253226276422544874677556845235443502110709544906792912493950698999197695949517379296919110737082747165778384228436363357952750041363231333460186196', " +
+			"true, 1)");
 		sta.close();
 	}
-	
+
 	public synchronized static void ensure() {
 		if (instance == null) {
 			try {
@@ -55,7 +64,7 @@ public class Database {
 							+ "OpponentMoveHistoryVersion INTEGER DEFAULT -1,"
 							+ "FOREIGN KEY (Player) REFERENCES Players(ID))");
 					sta.close();
-					//storeTestData(conn);
+					storeTestData(conn);
 				}
 				conn.close();
 			} catch (InstantiationException e) {

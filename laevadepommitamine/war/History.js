@@ -39,12 +39,14 @@ History.prototype = {
 		]);
 		el.append(this.menu.render());
 
-		this.replayBtn = new Button("M&auml;ngi ette", {scope: this, fn: function() {
-			Client.startReplay();
+		this.replayBtn = new Button("M&auml;ngi ette", {disabled: true, scope: this, fn: function() {
+			Client.startReplay(this.gamesList.selected.value);
 		}});
 		el.append(this.replayBtn.render());
 
-		this.gamesList = new ListBox();
+		this.gamesList = new ListBox({scope: this, onSelectionChanged: function(selected) {
+			this.replayBtn.setEnabled(!!selected);
+		}});
 		el.append(this.gamesList.render());
 
 		this.el = el;

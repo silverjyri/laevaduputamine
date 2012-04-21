@@ -9,6 +9,7 @@ public interface GameServiceAsync {
 	public void getActiveGamesList(AsyncCallback<List<Game>> callback);
 	public void getFinishedGamesList(AsyncCallback<List<Game>> callback);
 	public void getGamePlayers(int gameId, AsyncCallback<String[]> callback);
+	public void getGameReplayData(int gameId, AsyncCallback<String[]> callback);
 	public void getUniquePlayerName(AsyncCallback<String> callback);
 	public void joinGame(int gameId, String playerName, AsyncCallback<Boolean> callback);
 	public void isOpponentReady(int gameId, boolean isOpponent, AsyncCallback<Boolean> callback);
