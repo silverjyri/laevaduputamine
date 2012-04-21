@@ -1,15 +1,26 @@
-function Replay() {
+function Replay(gameId) {
+	this.gameId = gameId;
+
+	this.hasLocalStorage = Modernizr.localstorage;
+	if (!this.hasLocalStorage) {
+		alert('Local Storage not supported!');
+	} else {
+		this.replayData = localStorage.getItem('history' + gameId);
+	}
+	
+	if (!this.replayData) {
+		// Game not found in local storage, fetch from server.
+		Server.getGameReplayData(gameId);
+	}
 }
 
 Replay.prototype = {
 	onRender: function() {
 		this.menu.onRender();
-		if (Modernizr.localstorage) {
-			this.hasLocalStorage = true;
-		} else {
-			alert('Local Storage not supported!');
-			this.hasLocalStorage = false;
-		}
+	},
+
+	getGameReplayDataCallback: function(player, opponent, playerField, opponentField, moveHistory, playerStarts) {
+		console.log(arguments);
 	},
 
 	render: function() {

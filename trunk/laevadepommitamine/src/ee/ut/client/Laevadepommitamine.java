@@ -106,6 +106,12 @@ public class Laevadepommitamine implements EntryPoint {
 		}
 	}-*/;
 
+	public native static void getGameReplayDataCallback(String player, String opponent, String playerField, String opponentField, String moveHistory, boolean playerStarts) /*-{
+		if ($wnd.Client.replay) {
+			$wnd.Client.replay.getGameReplayDataCallback(player, opponent, playerField, opponentField, moveHistory, playerStarts);
+		}
+	}-*/;
+
 	public native static void gameCreated(int gameId) /*-{
 		$wnd.Client.placement.gameCreated(gameId);
 	}-*/;
@@ -217,6 +223,24 @@ public class Laevadepommitamine implements EntryPoint {
 
 			public void onSuccess(String[] players) {
 				getGamePlayersCallback(players[0], players[1]);
+			}
+		});
+	}
+
+	public static void getGameReplayData(int gameId)
+	{
+		gameService.getGameReplayData(gameId, new AsyncCallback<String[]>() {
+			public void onFailure(Throwable caught) {
+				Window.alert("getGameReplayData RPC failed.");
+			}
+
+			public void onSuccess(String[] data) {
+				// data[0] = player name
+				// data[1] = opponent name
+				// data[2] = player field
+				// data[3] = opponent field
+				// data[4] = move history
+				getGameReplayDataCallback(data[0], data[1], data[2], data[3], data[4], Boolean.parseBoolean(data[5]));
 			}
 		});
 	}
@@ -353,6 +377,7 @@ public class Laevadepommitamine implements EntryPoint {
 		$wnd.Server.getActiveGamesList = $entry(@ee.ut.client.Laevadepommitamine::getActiveGamesList());
 		$wnd.Server.getFinishedGamesList = $entry(@ee.ut.client.Laevadepommitamine::getFinishedGamesList());
 		$wnd.Server.getGamePlayers = $entry(@ee.ut.client.Laevadepommitamine::getGamePlayers(I));
+		$wnd.Server.getGameReplayData = $entry(@ee.ut.client.Laevadepommitamine::getGameReplayData(I));
 		$wnd.Server.getUniquePlayerName = $entry(@ee.ut.client.Laevadepommitamine::getUniquePlayerName());
 		$wnd.Server.isOpponentReady = $entry(@ee.ut.client.Laevadepommitamine::isOpponentReady(IZ));
 		$wnd.Server.joinGame = $entry(@ee.ut.client.Laevadepommitamine::joinGame(ILjava/lang/String;));
