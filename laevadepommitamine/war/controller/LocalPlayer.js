@@ -21,14 +21,8 @@ LocalPlayer.prototype = {
 			var ship = opponentField.getShipByBombs(bomb);
 			opponentField.addShip(ship);
 			opponentFieldView.setShipSunk(ship);
-
-			if (opponentField.checkAllHits()) {
-				alert('Sina v&otilde;itsid!');
-				Client.stopGame();
-				return;
-			}
 		}
-		Client.game.playerMoveResult(hit);
+		Client.game.playerMoveResult(hit, sunk);
 		delete this.moveCoords;
 	},
 
@@ -41,7 +35,7 @@ LocalPlayer.prototype = {
 		}
 
 		this.moveCoords = coords;
-		Server.playerMove(Client.game.gameId, this.isOpponent, coords.x, coords.y);
+		Server.playerMove(Client.gameId, this.isOpponent, coords.x, coords.y);
 	},
 
 	quitGame : function(gameId) {

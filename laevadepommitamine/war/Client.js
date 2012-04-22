@@ -37,16 +37,15 @@ Client.startLobby = function() {
 	this.setScreen(this.lobby);
 };
 
-Client.startPlacement = function(gameId) {
+Client.startPlacement = function() {
 	if (!this.placement) {
 		var username;
-		var gameId;
 		if (this.lobby) {
 			this.lobby.username.setEnabled(false);
 			username = this.lobby.username.getText();
 		}
-		this.player = new LocalPlayer(username, gameId != undefined);
-		this.placement = new Placement(gameId);
+		this.player = new LocalPlayer(username, Client.gameId != undefined);
+		this.placement = new Placement();
 	}
 	this.setScreen(this.placement);
 };
@@ -56,7 +55,7 @@ Client.startGame = function() {
 		var ai = this.placement.opponentList.selected === this.placement.aiOpponentItem;
 		this.opponent = new WebPlayer(ai ? "AI" : this.placement.webOpponentItem.value, !this.player.isOpponent);
 		var playerType = this.player.isOpponent ? 'opponent' : (ai ? 'againstai' : 'player');
-		this.game = new Game(this.placement.gameId, playerType);
+		this.game = new Game(playerType);
 		delete this.placement;
 	}
 	this.setScreen(this.game);
@@ -71,6 +70,7 @@ Client.stopGame = function() {
 	}
 	delete this.placement;
 	delete this.game;
+	delete this.gameId;
 	delete this.player;
 	delete this.opponent;
 	Client.startLobby();
@@ -91,6 +91,21 @@ Client.startReplay = function(gameId) {
 		this.replay = new Replay(gameId);
 	}
 	this.setScreen(this.replay);
+};
+
+Client.getGameReplayData = function(gameId) {
+	if (Modernizr.localstorage) {
+		Server.getGameReplayData(gameId);
+	}
+};
+
+Client.getGameReplayDataCallback = function(player, opponent, playerField, opponentField, moveHistory, playerStarts) {
+	var data = {player: player, opponent: opponent, playerField: playerField, opponentField: opponentField,
+		moveHistory: moveHistory, playerStarts: playerStarts}
+	localStorage.setItem('history' + this.gameId, JSON.stringify(data));
+	if (this.replay) {
+		this.replay.setReplayData(data);
+	}
 };
 
 $LAB

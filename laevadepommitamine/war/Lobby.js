@@ -92,7 +92,8 @@ Lobby.prototype = {
 
 		this.joinBtn = new Button("Liitu m&auml;nguga", {disabled: true, scope: this, fn: function() {
 			this.joinBtn.setEnabled(false);
-			Client.startPlacement(this.gamesList.selected.value);
+			Client.gameId = this.gamesList.selected.value;
+			Client.startPlacement();
 		}});
 		var joinBtnEl = this.joinBtn.render()
 		joinBtnEl.css('float', 'left');

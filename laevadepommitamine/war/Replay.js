@@ -21,7 +21,7 @@ Replay.prototype = {
 				this.setReplayData(JSON.parse(replayData));
 			} else {
 				// Game not found in local storage, fetch from server.
-				Server.getGameReplayData(gameId);
+				Client.getGameReplayData(this.gameId);
 			}
 			this.renderedReplayData = true;
 		}
@@ -40,13 +40,6 @@ Replay.prototype = {
 		// unknown at first, calculated based on moves
 		this.turnHistory = new Array(this.moveHistoryEnd);
 		this.turnHistory[0] = data.playerStarts;
-	},
-
-	getGameReplayDataCallback: function(player, opponent, playerField, opponentField, moveHistory, playerStarts) {
-		var data = {player: player, opponent: opponent, playerField: playerField, opponentField: opponentField,
-			moveHistory: moveHistory, playerStarts: playerStarts}
-		localStorage.setItem('history' + this.gameId, JSON.stringify(data));
-		this.setReplayData(data);
 	},
 
 	makeMove: function() {
@@ -75,11 +68,7 @@ Replay.prototype = {
 		if (this.moveHistoryPosition == this.moveHistoryEnd) {
 			this.playBtn.setEnabled(false);
 			this.forwardBtn.setEnabled(false);
-			if (this.playTimer) {
-				clearTimeout(this.playTimer);
-				delete this.playTimer;
-				this.playBtn.setImage('img/play.png');
-			}
+			this.pause();
 		} else if (this.moveHistoryPosition != 0) {
 			this.backBtn.setEnabled(true);
 			this.playBtn.setEnabled(true);
@@ -110,6 +99,14 @@ Replay.prototype = {
 		this.makeMove();
 	},
 
+	pause: function() {
+		if (this.playTimer) {
+			clearTimeout(this.playTimer);
+			delete this.playTimer;
+			this.playBtn.setImage('img/play.png');
+		}
+	},
+
 	render: function() {
 		if (this.el) {
 			return this.el;
@@ -120,9 +117,7 @@ Replay.prototype = {
 		this.backBtn = new Button("Samm tagasi", {image: 'img/back.png', disabled: true, scope: this, fn: this.makeMoveBack});
 		this.playBtn = new Button("M&auml;ngi", {image: 'img/play.png', scope: this, fn: function() {
 			if (this.playTimer) {
-				clearTimeout(this.playTimer);
-				delete this.playTimer;
-				this.playBtn.setImage('img/play.png');
+				this.pause();
 			} else {
 		    	this.playBtn.setImage('img/pause.png');
 				this.playMoves();
