@@ -417,7 +417,7 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 
 	// Returns info about opponent's move
 	@Override
-	public int[] remoteMove(int gameId, boolean isOpponent) {
+	public synchronized int[] remoteMove(int gameId, boolean isOpponent) {
 		Database.ensure();
 		Connection conn;
 
@@ -530,7 +530,6 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 				sta.executeUpdate("UPDATE Games SET OpponentField='" + fieldEnc +  "' WHERE ID=" + Integer.toString(gameId));
 				startFirst = !playerStarts;
 			} else {
-				sta.executeUpdate("UPDATE Games SET PlayerField='" + fieldEnc +  "' WHERE ID=" + Integer.toString(gameId));
 				if (playerType.equalsIgnoreCase("againstai")) {
 					Map<Integer, Ship> ships = Ship.generateRandomShips();
 					Map<Integer, Bomb> bombs = new HashMap<Integer, Bomb>();
@@ -541,6 +540,7 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 					sta.executeUpdate("UPDATE Games SET Opponent=-1, Name='" + playerName + " vs. AI', OpponentField='" + fieldEnc +  "' WHERE ID=" + Integer.toString(gameId));
 					incrementGamesListVersion(sta);
 				}
+				sta.executeUpdate("UPDATE Games SET PlayerField='" + fieldEnc +  "' WHERE ID=" + Integer.toString(gameId));
 				startFirst = playerStarts;
 			}
 
