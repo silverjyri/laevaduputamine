@@ -107,9 +107,7 @@ public class Laevadepommitamine implements EntryPoint {
 	}-*/;
 
 	public native static void getGameReplayDataCallback(String player, String opponent, String playerField, String opponentField, String moveHistory, boolean playerStarts) /*-{
-		if ($wnd.Client.replay) {
-			$wnd.Client.replay.getGameReplayDataCallback(player, opponent, playerField, opponentField, moveHistory, playerStarts);
-		}
+		$wnd.Client.getGameReplayDataCallback(player, opponent, playerField, opponentField, moveHistory, playerStarts);
 	}-*/;
 
 	public native static void gameCreated(int gameId) /*-{

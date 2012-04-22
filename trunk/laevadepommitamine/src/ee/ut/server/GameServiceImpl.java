@@ -33,12 +33,12 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 				rs.next();
 				incrementPlayersListVersion(sta);
 			}
-			int playerId = rs.getInt(1);
+			Integer playerId = rs.getInt(1);
 
-			boolean playerStartsFirst = new Random().nextBoolean();
-			sta.executeUpdate("INSERT INTO Games (Name, Player, PlayerStarts) VALUES ('" + playerName + " ootab...', " + Integer.toString(playerId) + ", " + Boolean.toString(playerStartsFirst) + ")");
+			Boolean playerStartsFirst = new Random().nextBoolean();
+			sta.executeUpdate("INSERT INTO Games (Name, Player, PlayerStarts) VALUES ('" + playerName + " ootab...', " + playerId + ", " + playerStartsFirst + ")");
 			incrementGamesListVersion(sta);
-			rs = sta.executeQuery("SELECT id FROM Games WHERE Player='" + Integer.toString(playerId) + "'");
+			rs = sta.executeQuery("SELECT id FROM Games WHERE Player='" + playerId + "'");
 			rs.next();
 			int gameId = rs.getInt(1);
 
@@ -322,7 +322,7 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 	}
 
 	@Override
-	public boolean[] playerMove(int gameId, boolean isOpponent, int x, int y) {
+	public synchronized boolean[] playerMove(int gameId, boolean isOpponent, int x, int y) {
 		Database.ensure();
 		Connection conn;
 
@@ -523,11 +523,12 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 
 			ResultSet rs = sta.executeQuery("SELECT PlayerStarts FROM Games WHERE ID=" + Integer.toString(gameId));
 			rs.next();
-			boolean startFirst = !rs.getBoolean(1);
+			boolean playerStarts = rs.getBoolean(1);
+			boolean startFirst;
 
 			if (playerType.equalsIgnoreCase("opponent")) {
 				sta.executeUpdate("UPDATE Games SET OpponentField='" + fieldEnc +  "' WHERE ID=" + Integer.toString(gameId));
-				startFirst = !startFirst;
+				startFirst = !playerStarts;
 			} else {
 				sta.executeUpdate("UPDATE Games SET PlayerField='" + fieldEnc +  "' WHERE ID=" + Integer.toString(gameId));
 				if (playerType.equalsIgnoreCase("againstai")) {
@@ -540,6 +541,7 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 					sta.executeUpdate("UPDATE Games SET Opponent=-1, Name='" + playerName + " vs. AI', OpponentField='" + fieldEnc +  "' WHERE ID=" + Integer.toString(gameId));
 					incrementGamesListVersion(sta);
 				}
+				startFirst = playerStarts;
 			}
 
 			sta.close();

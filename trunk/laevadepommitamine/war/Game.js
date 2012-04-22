@@ -1,6 +1,5 @@
-function Game(gameId, playerType) {
-	this.gameId = gameId;
-	Server.startGame(gameId, playerType, Client.player.field.encode());
+function Game(playerType) {
+	Server.startGame(Client.gameId, playerType, Client.player.field.encode());
 	this.moveDelay = 250;
 }
 
@@ -23,7 +22,7 @@ Game.prototype = {
 		    	Client.startLobby();
 		    }}),
 		    new Button("L&otilde;peta m&auml;ng", {scope: this, fn: function() {
-		    	Client.player.quitGame(this.gameId);
+		    	Client.player.quitGame(Client.gameId);
 		    }}),
 		]);
 		el.append(this.menu.render());
@@ -75,7 +74,13 @@ Game.prototype = {
 		this.currentPlayer.makeMove();
 	},
 
-	playerMoveResult: function(hit) {
+	playerMoveResult: function(hit, sunk) {
+		if (sunk && Client.opponent.field.checkAllHits()) {
+			alert('Sina v&otilde;itsid!');
+			Client.getGameReplayData(Client.gameId);
+			Client.stopGame();
+			return;
+		}
 		this.currentPlayer = null;
 		this.makeMove(hit);
 	},
@@ -85,6 +90,7 @@ Game.prototype = {
 		if (hit) {
 			if (Client.player.field.checkAllHits()) {
 				alert('Sa kaotasid!');
+				Client.getGameReplayData(Client.gameId);
 				Client.stopGame();
 				return;
 			}
@@ -102,7 +108,7 @@ Game.prototype = {
 	},
 
 	isOpponentReady: function() {
-		Server.isOpponentReady(this.gameId, Client.player.isOpponent);
+		Server.isOpponentReady(Client.gameId, Client.player.isOpponent);
 	},
 
 	isOpponentReadyCallback: function(ready) {

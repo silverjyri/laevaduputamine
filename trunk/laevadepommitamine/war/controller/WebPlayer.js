@@ -7,12 +7,12 @@ function WebPlayer(name, isOpponent) {
 
 WebPlayer.prototype = {
 	makeMove: function() {
-		Server.remoteMove(Client.game.gameId, Client.player.isOpponent);
+		Server.remoteMove(Client.gameId, Client.player.isOpponent);
 	},
 
 	moveResult: function(coords) {
 		if (coords.x == -1 && coords.y == -1) {
-			setTimeout($.proxy(this.makeMove, this), 10);
+			setTimeout($.proxy(this.makeMove, this), 50);
 			return;
 		}
 

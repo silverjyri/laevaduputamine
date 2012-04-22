@@ -1,12 +1,11 @@
-function Placement(gameId) {
+function Placement() {
 	this.defaultUpdateInterval = 1500;
 	this.updateInterval = this.defaultUpdateInterval;
 	this.initialized = false;
 
-	if (gameId != undefined) {
+	if (Client.gameId != undefined) {
 		this.opponentHasJoined = false;
-		this.gameId = gameId;
-		Server.joinGame(gameId, Client.player.name);
+		Server.joinGame(Client.gameId, Client.player.name);
 	} else {
 		Server.createGame(Client.player.name);
 	}
@@ -14,7 +13,7 @@ function Placement(gameId) {
 
 Placement.prototype = {
 	onUpdate : function() {
-		Server.getGamePlayers(this.gameId);
+		Server.getGamePlayers(Client.gameId);
 		this.updateTimer = setTimeout(this.onUpdate.bind(this),
 				this.updateInterval);
 	},
@@ -36,7 +35,7 @@ Placement.prototype = {
 	},
 
 	gameCreated : function(gameId) {
-		this.gameId = gameId;
+		Client.gameId = gameId;
 		this.onUpdate();
 		this.endGameBtn.setEnabled(true);
 		this.initialized = true;
@@ -48,7 +47,7 @@ Placement.prototype = {
 			Client.stopGame();
 			return;
 		}
-		Server.getGamePlayers(this.gameId);
+		Server.getGamePlayers(Client.gameId);
 		this.endGameBtn.setEnabled(true);
 		this.initialized = true;
 		this.checkReady();
@@ -128,7 +127,7 @@ Placement.prototype = {
 			disabled : true,
 			scope : this,
 			fn : function() {
-				Client.player.quitGame(this.gameId);
+				Client.player.quitGame(Client.gameId);
 			}
 		});
 		this.readyBtn = new Button("Valmis", {
