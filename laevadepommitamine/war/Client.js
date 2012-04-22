@@ -95,17 +95,22 @@ Client.startReplay = function(gameId) {
 
 Client.getGameReplayData = function(gameId) {
 	if (Modernizr.localstorage) {
+		this.replayGameId = gameId;
 		Server.getGameReplayData(gameId);
 	}
 };
 
 Client.getGameReplayDataCallback = function(player, opponent, playerField, opponentField, moveHistory, playerStarts) {
+	if (!this.replayGameId) {
+		return;
+	}
 	var data = {player: player, opponent: opponent, playerField: playerField, opponentField: opponentField,
 		moveHistory: moveHistory, playerStarts: playerStarts}
-	localStorage.setItem('history' + this.gameId, JSON.stringify(data));
+	localStorage.setItem('history' + this.replayGameId, JSON.stringify(data));
 	if (this.replay) {
 		this.replay.setReplayData(data);
 	}
+	delete this.replayGameId;
 };
 
 $LAB
