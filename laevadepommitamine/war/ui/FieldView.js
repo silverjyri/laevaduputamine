@@ -207,6 +207,9 @@ FieldView.prototype = {
 			bombLayer.addClass('sunk');
 			el.children('.ship_layer').remove();
 		}
+		
+		document.getElementById("sunk").innerHTML="<embed src=\"../sound/sunk.mp3\" hidden=\"true\" autostart=\"true\" loop=\"false\" />";
+
 	},
 
 	removeShip: function(ship) {
@@ -249,6 +252,7 @@ FieldView.prototype = {
 	addBomb: function(bomb) {
 		this.field.bombs['' + bomb.x + bomb.y] = bomb;
 		this.renderBomb(bomb);
+		
 	},
 
 	removeBomb: function(coords) {
@@ -285,8 +289,10 @@ FieldView.prototype = {
 		this.setAnimExplosion(box);
 		if (bomb.hit) {
 			bombLayer.addClass('bomb');
+			document.getElementById("bomb").innerHTML="<embed src=\"../sound/bomb.mp3\" hidden=\"true\" autostart=\"true\" loop=\"false\" />";
 		} else {
 			bombLayer.addClass('empty');
+			document.getElementById("empty").innerHTML="<embed src=\"../sound/empty.mp3\" hidden=\"true\" autostart=\"true\" loop=\"false\" />";
 		}
 	},
 
