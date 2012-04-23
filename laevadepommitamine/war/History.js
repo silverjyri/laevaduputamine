@@ -20,6 +20,7 @@ History.prototype = {
 	onRender: function() {
 		this.menu.onRender();
 		this.replayBtn.onRender();
+		this.gamesList.onRender();
 		if (!this.updateTimer) {
 			this.onUpdate();
 		}

@@ -52,7 +52,7 @@ Replay.prototype = {
 		var bomb = {x: x, y: y};
 		var hit = opponentField.field.checkHit(bomb);
 		bomb.hit = hit;
-		opponentField.addBomb(bomb);
+		opponentField.addBomb(bomb, true);
 
 		this.moveHistoryPosition++;
 		if (hit) {

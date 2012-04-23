@@ -16,7 +16,7 @@ LocalPlayer.prototype = {
 		var opponentFieldView = opponent.fieldView;
 		var bomb = {x: this.moveCoords.x, y: this.moveCoords.y, hit: hit};
 
-		opponentFieldView.addBomb(bomb);
+		opponentFieldView.addBomb(bomb, true);
 		if (sunk) {
 			var ship = opponentField.getShipByBombs(bomb);
 			opponentField.addShip(ship);
