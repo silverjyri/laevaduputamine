@@ -150,7 +150,7 @@ FieldView.prototype = {
 		}
 		var bomb = this.field.bombs['' + x + y];
 		if (bomb) {
-			this.addBomb(bomb);
+			this.addBomb(bomb, animate);
 		}
 		return shipLayer;
 	},
@@ -207,9 +207,8 @@ FieldView.prototype = {
 			bombLayer.addClass('sunk');
 			el.children('.ship_layer').remove();
 		}
-		
-		document.getElementById("sunk").innerHTML="<embed src=\"../sound/sunk.mp3\" hidden=\"true\" autostart=\"true\" loop=\"false\" />";
 
+		Client.playSound('sunk');
 	},
 
 	removeShip: function(ship) {
@@ -249,9 +248,9 @@ FieldView.prototype = {
 		}.bind(this));
 	},
 
-	addBomb: function(bomb) {
+	addBomb: function(bomb, animate) {
 		this.field.bombs['' + bomb.x + bomb.y] = bomb;
-		this.renderBomb(bomb);
+		this.renderBomb(bomb, animate);
 		
 	},
 
@@ -273,7 +272,7 @@ FieldView.prototype = {
 		}
 	},
 
-	renderBomb: function(bomb) {
+	renderBomb: function(bomb, animate) {
 		var box = $('#'+this.getBoxId(bomb.x, bomb.y));
 		var bombLayer = box.children('.bomb_layer');
 		if (bombLayer.length != 0) {
@@ -286,13 +285,19 @@ FieldView.prototype = {
 			bombLayer = $('<div class="bomb_layer"></div>');
 			box.append(bombLayer);
 		}
-		this.setAnimExplosion(box);
+		if (animate) {
+			this.setAnimExplosion(box);
+		}
 		if (bomb.hit) {
 			bombLayer.addClass('bomb');
-			document.getElementById("bomb").innerHTML="<embed src=\"../sound/bomb.mp3\" hidden=\"true\" autostart=\"true\" loop=\"false\" />";
+			if (animate) {
+				Client.playSound('bomb');
+			}
 		} else {
 			bombLayer.addClass('empty');
-			document.getElementById("empty").innerHTML="<embed src=\"../sound/empty.mp3\" hidden=\"true\" autostart=\"true\" loop=\"false\" />";
+			if (animate) {
+				Client.playSound('empty');
+			}
 		}
 	},
 

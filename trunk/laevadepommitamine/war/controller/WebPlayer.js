@@ -22,7 +22,7 @@ WebPlayer.prototype = {
 
 		var hit = playerField.checkHit(coords);
 		var bomb = {x: coords.x, y: coords.y, hit: hit};
-		playerFieldView.addBomb(bomb);
+		playerFieldView.addBomb(bomb, true);
 
 		if (hit) {
 			var ship = playerField.checkFullHit(bomb);

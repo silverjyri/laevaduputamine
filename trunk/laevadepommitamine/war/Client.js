@@ -23,6 +23,23 @@ Client.sizeOf = function(obj) {
 	return size;
 };
 
+Client.playSound = function(sound) {
+	var id = 'sound_' + sound;
+	if (!Client[id]) {
+		if (!Modernizr.audio.mp3 && !Modernizr.audio.ogg) {
+			Client[id] = $('<embed src="sound/' + sound + '.mp3" hidden="true" autostart="true" loop="false" /');
+		} else {
+			Client[id] = $('<audio id="' + id + '">' +
+				'<source src="sound/' + sound + '.ogg" type="audio/ogg" />' +
+				'<source src="sound/' + sound + '.mp3" type="audio/mp3" /></audio>');
+		}
+		$('#sounds').append(Client[id]);
+	}
+	var soundEl = Client[id][0];
+	soundEl.load();
+	soundEl.play();
+};
+
 Client.setScreen = function(screen) {
 	if (this.screen && this.screen.onHide) {
 		this.screen.onHide();
