@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
@@ -140,20 +142,22 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 	public String[] getGamePlayers(int gameId, Statement sta) throws SQLException {
 		String[] players = new String[2];
 		ResultSet rs = sta.executeQuery("SELECT Players.Name FROM Games INNER JOIN Players ON Players.ID = Games.Player WHERE ID=" + Integer.toString(gameId));
-		if (rs.next()) {
-			players[0] = rs.getString(1);
+		if (!rs.next()) {
+			// Game not found, server restarted?
+			return players;
 		}
+		players[0] = rs.getString(1);
 
 		rs = sta.executeQuery("SELECT Opponent FROM Games WHERE ID=" + Integer.toString(gameId));
 		rs.next();
-		int opponentId = rs.getInt(1);
+		Integer opponentId = rs.getInt(1);
 
 		if (opponentId == -1) {
 			players[1] = "AI";
 		} else if (opponentId == -2) {
 			players[1] = null;
 		} else {
-			rs = sta.executeQuery("SELECT Name FROM Players WHERE ID=" + Integer.toString(opponentId));
+			rs = sta.executeQuery("SELECT Name FROM Players WHERE ID=" + opponentId);
 			rs.next();
 			players[1] = rs.getString(1);
 		}
@@ -226,6 +230,14 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 				return false;
 			}
 
+			// If opponent has a field set, then the game has started, can't join.
+			rs = sta.executeQuery("SELECT OpponentField FROM Games WHERE ID=" + Integer.toString(gameId));
+			rs.next();
+			if (rs.getString(1) != null) {
+				return false;
+			}
+
+			// Retrieve player ID
 			rs = sta.executeQuery("SELECT ID FROM Players WHERE Name='" + playerName + "'");
 			if (!rs.next()) {
 				sta.executeUpdate("INSERT INTO Players (name) VALUES ('" + playerName + "')");
@@ -233,13 +245,13 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 				rs.next();
 				incrementPlayersListVersion(sta);
 			}
-			int playerId = rs.getInt(1);
+			Integer playerId = rs.getInt(1);
 
+			// Update game opponent and game name
 			rs = sta.executeQuery("SELECT Players.name FROM Games INNER JOIN Players ON Players.ID = Games.Player WHERE ID=" + Integer.toString(gameId));
 			rs.next();
 			String opponentName = rs.getString(1);
-
-			sta.executeUpdate("UPDATE Games SET Opponent=" + Integer.toString(playerId) + ", Name='" + opponentName + " vs. " + playerName + "' WHERE ID=" + Integer.toString(gameId));
+			sta.executeUpdate("UPDATE Games SET Opponent=" + playerId + ", Name='" + opponentName + " vs. " + playerName + "' WHERE ID=" + Integer.toString(gameId));
 			incrementGamesListVersion(sta);
 
 			sta.close();
@@ -321,11 +333,14 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 		return false;
 	}
 
+	 private final Lock lock = new ReentrantLock();
+	
 	@Override
 	public synchronized boolean[] playerMove(int gameId, boolean isOpponent, int x, int y) {
 		Database.ensure();
 		Connection conn;
 
+		lock.lock();
 		try {
 			conn = Database.getConnection();
 			Statement sta = conn.createStatement();
@@ -407,11 +422,13 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 			sta.close();
 			conn.close();
 
+			lock.unlock();
 			return new boolean[]{hit, sunk};
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 
+		lock.unlock();
 		return new boolean[]{false, false};
 	}
 
@@ -421,6 +438,7 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 		Database.ensure();
 		Connection conn;
 
+		lock.lock();
 		try {
 			conn = Database.getConnection();
 			Statement sta = conn.createStatement();
@@ -430,6 +448,7 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 			rs = sta.executeQuery("SELECT Opponent FROM Games WHERE ID=" + Integer.toString(gameId));
 			if (!rs.next()) {
 				// Client from previous session?
+				lock.unlock();
 				return new int[] {-1, -1};
 			}
 			boolean ai = rs.getInt(1) == -1;
@@ -506,11 +525,13 @@ public class GameServiceImpl extends RemoteServiceServlet implements GameService
 			sta.close();
 			conn.close();
 
+			lock.unlock();
 			return new int[] {x, y};
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 
+		lock.unlock();
 		return new int[] {-1,-1};
 	}
 

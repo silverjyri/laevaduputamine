@@ -93,10 +93,16 @@ public class Laevadepommitamine implements EntryPoint {
 	}-*/;
 
 	public native static void playerMoveResult(boolean hit, boolean sunk) /*-{
+		if (!$wnd.Client.player) {
+			console.log($wnd.Client);
+		}
 		$wnd.Client.player.moveResult(hit, sunk);
 	}-*/;
 
 	public native static void remoteMoveResult(int[] bomb) /*-{
+		if (!$wnd.Client.opponent) {
+			console.log($wnd.Client);
+		}
 		$wnd.Client.opponent.moveResult({x: bomb[0], y: bomb[1]});
 	}-*/;
 

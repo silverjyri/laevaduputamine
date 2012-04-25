@@ -64,7 +64,7 @@ public class Database {
 							+ "OpponentMoveHistoryVersion INTEGER DEFAULT -1,"
 							+ "FOREIGN KEY (Player) REFERENCES Players(ID))");
 					sta.close();
-					//storeTestData(conn);
+					storeTestData(conn);
 				}
 				conn.close();
 			} catch (InstantiationException e) {
