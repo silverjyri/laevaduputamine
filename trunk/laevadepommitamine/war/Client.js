@@ -118,7 +118,7 @@ Client.getGameReplayData = function(gameId) {
 };
 
 Client.getGameReplayDataCallback = function(player, opponent, playerField, opponentField, moveHistory, playerStarts) {
-	if (!this.replayGameId) {
+	if (this.replayGameId == undefined) {
 		return;
 	}
 	var data = {player: player, opponent: opponent, playerField: playerField, opponentField: opponentField,
