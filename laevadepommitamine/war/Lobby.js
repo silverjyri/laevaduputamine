@@ -84,6 +84,10 @@ Lobby.prototype = {
 	  	this.username = username;
 	  	el.append(username.render());
 
+		this.loadingGif = $('<img src="img/loading.gif" />');
+		el.append(this.loadingGif);
+	  	el.append($('<div style="float: right; padding-right: 195px;" class="fb-login-button">Logi sisse</div>'));
+	  	
 		var gamesList = new ListBox({scope: this, onSelectionChanged: function(selected) {
 			this.joinBtn.setEnabled(!!selected && !(Client.placement || Client.game));
 		}});
@@ -99,9 +103,7 @@ Lobby.prototype = {
 		joinBtnEl.css('float', 'left');
 		el.append(joinBtnEl);
 
-		this.loadingGif = $('<img src="img/loading.gif" />');
-		el.append(this.loadingGif);
-		
+	
 		this.el = el;
 		return el;
 	},
