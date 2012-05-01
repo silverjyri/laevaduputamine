@@ -130,6 +130,37 @@ Client.getGameReplayDataCallback = function(player, opponent, playerField, oppon
 	delete this.replayGameId;
 };
 
+Client.fbLogout = function() {
+	FB.logout(function (response) {
+    });
+	Client.fbStatus(false);
+};
+
+Client.fbStatus = function(logged_in) {
+	var lobby = Client.lobby;
+	if (logged_in) {
+		if (lobby) {
+			lobby.fb_loginbtn.hide();
+			lobby.fb_logoutbtn.show();
+		}
+		FB.api('/me', function(response) {
+			Client.fb_username = response.name;
+			if (lobby) {
+				lobby.username.setText(response.name);
+				lobby.username.setEnabled(false);
+			}
+		});
+	} else {
+		delete Client.fb_username;
+		if (lobby) {
+			lobby.fb_loginbtn.show();
+			lobby.fb_logoutbtn.hide();
+			lobby.username.setEnabled(true);
+		}
+	}
+	FB.XFBML.parse(document.getElementById('.fb-button'));
+};
+
 $LAB
 .script("ui/components/Button.js")
 .script("ui/components/ListItem.js")
@@ -138,6 +169,35 @@ $LAB
 .script("ui/components/ListBox.js").wait()
 .script("Lobby.js").wait(function() {
 	Client.startLobby();
+})
+.script('//connect.facebook.net/en_US/all.js').wait(function() {
+	FB.init({
+		appId: '355620854495125',
+		status: true, 
+		cookie: true,
+		xfbml: true,
+		oauth: true
+	});
+	FB.getLoginStatus(function(response) {
+		var lobby = Client.lobby;
+		if (!lobby)
+			return;
+		var fb_loginbtn = $('<div class="fb-login-button">Logi sisse</div>');
+		var fb_logoutbtn = $('<span onclick="Client.fbLogout()"><a class="fb_button fb_button_medium"><span class="fb_button_text">Logi v&auml;lja</span></a></span>');
+		var css = {'float': 'right', 'padding-right': '195px'};
+		fb_loginbtn.css(css);
+		fb_logoutbtn.css(css);
+		fb_loginbtn.insertBefore(lobby.gamesList.el);
+		fb_logoutbtn.insertBefore(lobby.gamesList.el);
+		lobby.fb_loginbtn = fb_loginbtn;
+		lobby.fb_logoutbtn = fb_logoutbtn;
+		Client.fbStatus(response.status === 'connected');
+	});
+	FB.Event.subscribe('auth.login',
+	    function(response) {
+			Client.fbStatus(true);
+	    }
+	);
 })
 .script("model/Field.js")
 .script("ui/ShipFloating.js")
@@ -151,19 +211,3 @@ $LAB
 .script("Rankings.js")
 .script("History.js")
 .script("Replay.js");
-
-window.fbAsyncInit = function() {
-FB.init({
-		appId: '355620854495125',
-		status: true, 
-		cookie: true,
-		xfbml: true,
-		oauth: true
-	});
-};
-(function(d){
-	var js, id = 'facebook-jssdk'; if (d.getElementById(id)) {return;}
-	js = d.createElement('script'); js.id = id; js.async = true;
-	js.src = "//connect.facebook.net/en_US/all.js";
-	d.getElementsByTagName('head')[0].appendChild(js);
-}(document));
