@@ -86,8 +86,7 @@ Lobby.prototype = {
 
 		this.loadingGif = $('<img src="img/loading.gif" />');
 		el.append(this.loadingGif);
-	  	el.append($('<div style="float: right; padding-right: 195px;" class="fb-login-button">Logi sisse</div>'));
-	  	
+
 		var gamesList = new ListBox({scope: this, onSelectionChanged: function(selected) {
 			this.joinBtn.setEnabled(!!selected && !(Client.placement || Client.game));
 		}});
@@ -117,8 +116,13 @@ Lobby.prototype = {
 	},
 
 	initialize: function(playerName) {
-		this.username.setText(playerName);
-		this.username.setEnabled(true);
+		if (Client.fb_username) {
+			this.username.setText(Client.fb_username);
+			this.username.setEnabled(false);
+		} else {
+			this.username.setText(playerName);
+			this.username.setEnabled(true);
+		}
 		this.gameBtn.setEnabled(true);
 		this.loadingGif.remove();
 		delete this.loadingGif;
