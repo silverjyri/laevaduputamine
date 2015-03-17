@@ -1,0 +1,1 @@
+Veebirakenduste loomises tehtav programm laevade pommitamine.
